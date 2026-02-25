@@ -1,5 +1,11 @@
-/* Clear default Vite styles that might conflict with Chakra UI */
+:root {
+  --primary-gold: #e6b566;
+  --white: #ffffff;
+}
+
 body {
   margin: 0;
   padding: 0;
+  background-color: var(--white);
+  color: #333; /* Default text color for general usage */
 }
