@@ -81,9 +81,9 @@ const LoginPage = () => {
     }
   };
 
-  const primaryMaroon = "#AE2050";
-  const white = "#FFFFFF";
-  const lightGray = "#718096";
+  const primaryMaroon = "var(--primary-maroon)";
+  const white = "var(--white)";
+  const lightGray = "var(--light-gray)";
 
   const stepVariants = {
     initial: (direction) => ({

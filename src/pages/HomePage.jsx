@@ -10,8 +10,8 @@ import {
 import authService from "../auth/authService";
 
 const HomePage = () => {
-  const primaryGold = "#E6B566";
-  const white = "#FFFFFF";
+  const primaryGold = "var(--primary-gold)";
+  const white = "var(--white)";
 
   return (
     <Box bg={white} minH="100vh">
