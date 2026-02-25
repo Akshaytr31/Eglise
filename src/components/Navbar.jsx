@@ -8,43 +8,24 @@ import {
   Text,
   Image,
 } from "@chakra-ui/react";
-import EgliseLogo from "../assets/EgliseLogo.png";
+import EgliseLogo from "../assets/logo.png";
 
 const Navbar = () => {
   const primaryMaroon = "#AE2050";
 
   return (
     <Box
-      py={4}
+      py={1}
       px={8}
       borderBottom="1px solid"
       borderColor="gray.100"
       boxShadow="sm"
     >
-      <Flex align="center" direction="column" gap={0}>
+      <Flex align="center" justify="center">
         <HStack spacing={4}>
           <Box>
-            <Image src={EgliseLogo} alt="Eglise Logo" maxH="60px" />
+            <Image src={EgliseLogo} alt="Eglise Logo" maxH="70px" />
           </Box>
-          <VStack align="start" spacing={0}>
-            <Heading
-              as="h1"
-              size="2xl"
-              color={primaryMaroon}
-              letterSpacing="wider"
-              fontFamily="'Brush Script MT', cursive"
-            >
-              Eglise
-            </Heading>
-            <Text
-              fontSize="xs"
-              fontWeight="normal"
-              color={primaryMaroon}
-              mt="-4px"
-            >
-              Complete Solution for Parish Management
-            </Text>
-          </VStack>
         </HStack>
       </Flex>
     </Box>

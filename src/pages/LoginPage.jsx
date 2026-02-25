@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import authService from "../auth/authService";
-import loginIllustration from "../assets/Gemini_Generated_Image_6xm22i6xm22i6xm2.png";
+import loginIllustration from "../assets/133748214_10221134.jpg";
 
 const LoginPage = () => {
   const [step, setStep] = useState(1);
