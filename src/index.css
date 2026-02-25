@@ -1,0 +1,5 @@
+/* Clear default Vite styles that might conflict with Chakra UI */
+body {
+  margin: 0;
+  padding: 0;
+}
