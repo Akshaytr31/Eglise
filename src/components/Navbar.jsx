@@ -3,16 +3,11 @@ import {
   Box,
   Flex,
   HStack,
-  VStack,
-  Heading,
-  Text,
   Image,
 } from "@chakra-ui/react";
 import EgliseLogo from "../assets/logo.png";
 
 const Navbar = () => {
-  const primaryMaroon = "#AE2050";
-
   return (
     <Box
       py={1}

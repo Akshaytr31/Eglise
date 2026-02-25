@@ -9,7 +9,17 @@ import {
   Text,
   Image,
   Flex,
+  Link,
+  Icon,
+  HStack,
 } from "@chakra-ui/react";
+import {
+  LuCircleUser,
+  LuLock,
+  LuShieldCheck,
+  LuScale,
+  LuCircleHelp,
+} from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -40,12 +50,32 @@ const LoginPage = () => {
       await authService.login({ email, password });
       navigate("/");
     } catch (err) {
-      console.error("Login failed:", err);
-      setError(
-        err.response?.data?.detail ||
-          err.message ||
-          "Invalid email or password",
-      );
+      console.error("Login failed full error:", err);
+      const backendError = err.response?.data;
+      let errorMessage = "Invalid email or password";
+
+      if (backendError) {
+        if (typeof backendError === "string") {
+          errorMessage = backendError;
+        } else if (backendError.detail) {
+          errorMessage = backendError.detail;
+        } else if (backendError.error) {
+          errorMessage = backendError.error;
+        } else if (backendError.non_field_errors) {
+          errorMessage = Array.isArray(backendError.non_field_errors)
+            ? backendError.non_field_errors[0]
+            : backendError.non_field_errors;
+        } else if (typeof backendError === "object") {
+          // If it's a field-specific error, show the first one
+          const firstField = Object.keys(backendError)[0];
+          const errorValue = backendError[firstField];
+          errorMessage = `${firstField}: ${Array.isArray(errorValue) ? errorValue[0] : errorValue}`;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -186,15 +216,43 @@ const LoginPage = () => {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                       <VStack spacing={6} align="start" w="full">
+                        {/* Registered Email Display */}
+                        <HStack spacing={3} w="full" py={2}>
+                          <Icon
+                            as={LuCircleUser}
+                            color={primaryMaroon}
+                            boxSize={6}
+                          />
+                          <Text fontWeight="semibold" fontSize="md">
+                            {email}
+                          </Text>
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            color={primaryMaroon}
+                            onClick={() => setStep(1)}
+                            _hover={{
+                              bg: "transparent",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            Change
+                          </Button>
+                        </HStack>
+
+                        <Text fontSize="sm" color="gray.600">
+                          Please enter your registered password
+                        </Text>
+
                         <Field.Root w="full">
-                          <Field.Label fontWeight="medium" mb={2}>
-                            Enter Password
+                          <Field.Label fontWeight="bold" mb={1}>
+                            Password
                           </Field.Label>
                           <Input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder=""
+                            placeholder="Password"
                             required
                             size="lg"
                             borderRadius="md"
@@ -207,6 +265,26 @@ const LoginPage = () => {
                           />
                         </Field.Root>
 
+                        <Flex w="full" justify="space-between" align="center">
+                          <HStack spacing={2}>
+                            <input
+                              type="checkbox"
+                              style={{ accentColor: primaryMaroon }}
+                            />
+                            <Text fontSize="sm" fontWeight="medium">
+                              Remember me
+                            </Text>
+                          </HStack>
+                          <Link
+                            fontSize="sm"
+                            fontWeight="semibold"
+                            color={primaryMaroon}
+                            _hover={{ textDecoration: "underline" }}
+                          >
+                            Forgot Password
+                          </Link>
+                        </Flex>
+
                         <Button
                           type="submit"
                           w="full"
@@ -218,18 +296,45 @@ const LoginPage = () => {
                           isLoading={isLoading}
                           fontSize="lg"
                         >
-                          Login
+                          Log in
                         </Button>
 
-                        <Button
-                          variant="ghost"
-                          color={primaryMaroon}
-                          onClick={() => setStep(1)}
-                          w="full"
-                          _hover={{ bg: "transparent", opacity: 0.8 }}
-                        >
-                          Back
-                        </Button>
+                        {/* Secondary Links */}
+                        <HStack justify="center" w="full" spacing={6} pt={4}>
+                          <HStack
+                            spacing={1}
+                            color="gray.600"
+                            cursor="pointer"
+                            _hover={{ color: primaryMaroon }}
+                          >
+                            <Text fontSize="xs" fontWeight="medium">
+                              Privacy
+                            </Text>
+                            <Icon as={LuShieldCheck} boxSize={3} />
+                          </HStack>
+                          <HStack
+                            spacing={1}
+                            color="gray.600"
+                            cursor="pointer"
+                            _hover={{ color: primaryMaroon }}
+                          >
+                            <Text fontSize="xs" fontWeight="medium">
+                              Terms
+                            </Text>
+                            <Icon as={LuScale} boxSize={3} />
+                          </HStack>
+                          <HStack
+                            spacing={1}
+                            color="gray.600"
+                            cursor="pointer"
+                            _hover={{ color: primaryMaroon }}
+                          >
+                            <Text fontSize="xs" fontWeight="medium">
+                              FAQ
+                            </Text>
+                            <Icon as={LuCircleHelp} boxSize={3} />
+                          </HStack>
+                        </HStack>
                       </VStack>
                     </motion.div>
                   )}
@@ -239,6 +344,16 @@ const LoginPage = () => {
           </VStack>
         </Box>
       </Flex>
+
+      {/* Footer Restored */}
+      <Box py={4} px={8} borderTop="1px solid" borderColor="gray.100">
+        <Flex justify="space-between" color={lightGray} fontSize="xs">
+          <Text>V 1.0.1</Text>
+          <Text>
+            Copyright © 2024 Appzia Tec Solutions. All rights reserved.
+          </Text>
+        </Flex>
+      </Box>
     </Box>
   );
 };
