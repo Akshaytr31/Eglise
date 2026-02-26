@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import FamilyPage from "./pages/FamilyPage";
 import authService from "./auth/authService";
 
 const ProtectedRoute = ({ children }) => {
@@ -25,6 +26,14 @@ function App() {
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/family"
+          element={
+            <ProtectedRoute>
+              <FamilyPage />
             </ProtectedRoute>
           }
         />

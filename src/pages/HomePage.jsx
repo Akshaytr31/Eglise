@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { Link as RouterLink } from "react-router-dom";
 
 const HomePage = () => {
   const [activeMenu, setActiveMenu] = useState("Masters");
@@ -122,6 +123,8 @@ const HomePage = () => {
         {items.map((item) => (
           <Link
             key={item}
+            as={item === "Family" ? RouterLink : "a"}
+            to={item === "Family" ? "/family" : "#"}
             fontSize="md"
             color="gray.800"
             _hover={{ color: primaryMaroon, textDecoration: "underline" }}
