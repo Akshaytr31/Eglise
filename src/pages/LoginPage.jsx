@@ -23,6 +23,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import authService from "../auth/authService";
 import loginIllustration from "../assets/133748214_10221134.jpg";
 
@@ -345,15 +346,7 @@ const LoginPage = () => {
         </Box>
       </Flex>
 
-      {/* Footer Restored */}
-      <Box py={4} px={8} borderTop="1px solid" borderColor="gray.100">
-        <Flex justify="space-between" color={lightGray} fontSize="xs">
-          <Text>V 1.0.1</Text>
-          <Text>
-            Copyright © 2024 Appzia Tec Solutions. All rights reserved.
-          </Text>
-        </Flex>
-      </Box>
+      <Footer />
     </Box>
   );
 };
