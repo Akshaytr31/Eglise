@@ -154,7 +154,7 @@ const HomePage = () => {
 
   return (
     <Box bg="white" minH="100vh" display="flex" flexDirection="column">
-      <Navbar onMenuClick={setActiveMenu} />
+      <Navbar activeItem={activeMenu} onMenuClick={setActiveMenu} />
 
       <Container maxW="container.xl" flex="1" py={10}>
         <SimpleGrid
