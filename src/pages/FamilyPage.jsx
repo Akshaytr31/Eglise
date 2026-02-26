@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Container,
@@ -12,11 +12,13 @@ import {
   Flex,
   Input,
   Icon,
+  Skeleton,
 } from "@chakra-ui/react";
-import { LuPlus, LuPencil, LuEye, LuTrash2 } from "react-icons/lu";
+import { LuPlus, LuPencil, LuTrash2 } from "react-icons/lu";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FamilyFormModal from "../components/FamilyFormModal";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import {
   listFamilies,
   createFamily,
@@ -29,8 +31,12 @@ const FamilyPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [familyToDelete, setFamilyToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
   const primaryMaroon = "var(--primary-maroon)";
-  const primaryBlue = "#1a237e";
 
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
@@ -44,6 +50,7 @@ const FamilyPage = () => {
     try {
       const response = await listFamilies();
       setFamilies(response.data || []);
+      setCurrentPage(1); // Reset to first page on fetch
     } catch (error) {
       console.error("Error fetching families:", error);
     } finally {
@@ -68,14 +75,22 @@ const FamilyPage = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this family?")) {
-      try {
-        await deleteFamily(id);
-        fetchFamilies();
-      } catch (error) {
-        console.error("Error deleting family:", error);
-      }
+  const handleDelete = (id) => {
+    setFamilyToDelete(id);
+    setIsDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteFamily(familyToDelete);
+      fetchFamilies();
+    } catch (error) {
+      console.error("Error deleting family:", error);
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteOpen(false);
+      setFamilyToDelete(null);
     }
   };
 
@@ -89,6 +104,43 @@ const FamilyPage = () => {
     onOpen();
   };
 
+  // Pagination Logic
+  const totalPages = Math.ceil(families.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const paginatedFamilies = families.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Returns an array of page numbers / "..." strings for ellipsis pagination
+  const getPageNumbers = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages = [];
+    const delta = 1; // siblings on each side of currentPage
+    const left = currentPage - delta;
+    const right = currentPage + delta;
+
+    // Always include page 1
+    pages.push(1);
+
+    if (left > 2) pages.push("...");
+
+    for (let i = Math.max(2, left); i <= Math.min(totalPages - 1, right); i++) {
+      pages.push(i);
+    }
+
+    if (right < totalPages - 1) pages.push("...");
+
+    // Always include last page
+    pages.push(totalPages);
+
+    return pages;
+  };
+
   return (
     <Box bg="white" minH="100vh" display="flex" flexDirection="column">
       <Navbar />
@@ -97,169 +149,265 @@ const FamilyPage = () => {
         <Box
           border="1px"
           borderColor="gray.200"
-          borderRadius="md"
+          borderRadius="xl"
           overflow="hidden"
+          boxShadow="sm"
+          bg="white"
         >
           {/* Header */}
           <Flex
             justify="space-between"
             align="center"
-            px={6}
-            py={4}
-            borderBottom="1px"
-            borderColor="gray.200"
+            px={8}
+            py={6}
+            borderBottom="2px"
+            borderColor={primaryMaroon}
+            bg="white"
           >
-            <Heading size="md" fontWeight="medium">
-              Families
+            <Heading
+              size="lg"
+              color={primaryMaroon}
+              fontWeight="700"
+              letterSpacing="tight"
+            >
+              Family Directory
             </Heading>
             <Button
-              bg={primaryBlue}
+              bg={primaryMaroon}
               color="white"
-              px={6}
-              borderRadius="10px"
+              px={8}
+              h="48px"
+              borderRadius="lg"
               fontWeight="bold"
-              _hover={{ bg: "#151b4d" }}
+              _hover={{
+                bg: "#6b0f1a",
+                transform: "translateY(-1px)",
+                boxShadow: "md",
+              }}
+              _active={{ transform: "translateY(0)" }}
               onClick={handleAddNew}
               display="flex"
               alignItems="center"
               gap={2}
+              transition="all 0.2s"
             >
-              <Icon as={LuPlus} fontSize="18px" />
-              Add New
+              <Icon as={LuPlus} fontSize="20px" />
+              Add New Family
             </Button>
           </Flex>
 
           {/* Table Container */}
-          <Box p={6}>
-            <Flex justify="flex-end" mb={4} align="center" gap={2}>
-              <Text fontWeight="600" fontSize="md">
+          <Box p={8}>
+            <Flex justify="flex-end" mb={6} align="center" gap={3}>
+              <Text fontWeight="600" fontSize="md" color="gray.600">
                 Search:
               </Text>
               <Input
-                maxW="250px"
+                placeholder="Search families..."
+                maxW="300px"
                 size="md"
-                borderRadius="10px"
-                borderColor="gray.300"
+                borderRadius="lg"
+                borderColor="gray.200"
+                _focus={{
+                  borderColor: primaryMaroon,
+                  boxShadow: `0 0 0 1px ${primaryMaroon}`,
+                }}
               />
             </Flex>
 
             <Box
               border="1px"
-              borderColor="gray.300"
-              borderRadius="md"
+              borderColor="gray.100"
+              borderRadius="xl"
               overflowX="auto"
+              boxShadow="inner"
             >
               <Table.Root variant="line">
-                <Table.Header bg="gray.100">
-                  <Table.Row>
+                <Table.Header bg="gray.50">
+                  <Table.Row borderBottom="2px" borderColor="gray.100">
                     <Table.ColumnHeader
                       textAlign="center"
                       borderRight="1px"
-                      borderColor="gray.300"
-                      py={4}
-                      fontWeight="bold"
-                      fontSize="lg"
+                      borderColor="gray.100"
+                      py={5}
+                      fontWeight="700"
+                      fontSize="md"
+                      color="gray.700"
+                      textTransform="uppercase"
+                      letterSpacing="wider"
                     >
-                      Sl No
+                      SI No
                     </Table.ColumnHeader>
                     <Table.ColumnHeader
+                      textAlign="center"
                       borderRight="1px"
-                      borderColor="gray.300"
-                      py={4}
-                      fontWeight="bold"
-                      fontSize="lg"
+                      borderColor="gray.100"
+                      py={5}
+                      fontWeight="700"
+                      fontSize="md"
+                      color="gray.700"
+                      textTransform="uppercase"
+                      letterSpacing="wider"
                     >
                       Family Name
                     </Table.ColumnHeader>
                     <Table.ColumnHeader
-                      textAlign="center"
-                      py={4}
-                      fontWeight="bold"
-                      fontSize="lg"
+                      textAlign="right"
+                      py={5}
+                      pr={20}
+                      fontWeight="700"
+                      fontSize="md"
+                      color="gray.700"
+                      textTransform="uppercase"
+                      letterSpacing="wider"
                     >
                       Actions
                     </Table.ColumnHeader>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                  {families.map((family, index) => (
-                    <Table.Row
-                      key={family.id}
-                      _odd={{ bg: "gray.50" }}
-                      _even={{ bg: "white" }}
-                    >
-                      <Table.Cell
-                        textAlign="center"
-                        borderRight="1px"
-                        borderColor="gray.300"
-                        py={4}
-                        fontSize="md"
-                      >
-                        {index + 1}
-                      </Table.Cell>
-                      <Table.Cell
-                        borderRight="1px"
-                        borderColor="gray.300"
-                        py={4}
-                        fontSize="md"
-                        fontWeight="500"
-                      >
-                        {family.family_name}
-                      </Table.Cell>
-                      <Table.Cell py={4}>
-                        <HStack spacing={3} justify="center">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            borderColor="blue.400"
-                            color="blue.600"
-                            borderRadius="6px"
-                            onClick={() => handleEdit(family)}
-                            _hover={{ bg: "blue.50" }}
-                            display="flex"
-                            alignItems="center"
-                            gap={1}
+                  {isLoading
+                    ? Array.from({ length: itemsPerPage }).map((_, i) => (
+                        <Table.Row key={`skeleton-${i}`}>
+                          <Table.Cell
+                            textAlign="center"
+                            borderRight="1px"
+                            borderColor="gray.100"
+                            py={5}
                           >
-                            <Icon as={LuPencil} fontSize="14px" />
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            borderColor="green.400"
-                            color="green.600"
-                            borderRadius="6px"
-                            _hover={{ bg: "green.50" }}
-                            display="flex"
-                            alignItems="center"
-                            gap={1}
+                            <Skeleton height="18px" mx="auto" width="30px" />
+                          </Table.Cell>
+                          <Table.Cell
+                            textAlign="center"
+                            borderRight="1px"
+                            borderColor="gray.100"
+                            py={5}
                           >
-                            <Icon as={LuEye} fontSize="14px" />
-                            View
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            borderColor="red.400"
-                            color="red.600"
-                            borderRadius="6px"
-                            onClick={() => handleDelete(family.id)}
-                            _hover={{ bg: "red.50" }}
-                            display="flex"
-                            alignItems="center"
-                            gap={1}
+                            <Skeleton height="18px" mx="auto" width="160px" />
+                          </Table.Cell>
+                          <Table.Cell py={5} pr={4}>
+                            <HStack spacing={4} justify="flex-end">
+                              <Skeleton
+                                height="28px"
+                                width="60px"
+                                borderRadius="lg"
+                              />
+                              <Skeleton
+                                height="28px"
+                                width="60px"
+                                borderRadius="lg"
+                              />
+                              <Skeleton
+                                height="28px"
+                                width="70px"
+                                borderRadius="lg"
+                              />
+                            </HStack>
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    : paginatedFamilies.map((family, index) => {
+                        const isRowLoading = false;
+                        return (
+                          <Table.Row
+                            key={family.id}
+                            _hover={{ bg: "gray.50" }}
+                            transition="background 0.2s"
+                            opacity={isRowLoading ? 0.7 : 1}
                           >
-                            <Icon as={LuTrash2} fontSize="14px" />
-                            Delete
-                          </Button>
-                        </HStack>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                  {families.length === 0 && (
+                            <Table.Cell
+                              textAlign="center"
+                              borderRight="1px"
+                              borderColor="gray.100"
+                              py={5}
+                              fontSize="md"
+                              color="gray.600"
+                            >
+                              {indexOfFirstItem + index + 1}
+                            </Table.Cell>
+                            <Table.Cell
+                              textAlign="center"
+                              borderRight="1px"
+                              borderColor="gray.100"
+                              py={5}
+                              fontSize="md"
+                              fontWeight="600"
+                              color="gray.800"
+                            >
+                              {family.family_name}
+                            </Table.Cell>
+                            <Table.Cell py={1} pr={4}>
+                              <HStack spacing={4} justify="flex-end">
+                                <Button
+                                  size="xs"
+                                  variant="outline"
+                                  borderColor="#003399"
+                                  color="#003399"
+                                  borderRadius="lg"
+                                  borderWidth="2px"
+                                  fontWeight="800"
+                                  px={3}
+                                  py={1}
+                                  onClick={() => handleEdit(family)}
+                                  _hover={{
+                                    bg: "#003399",
+                                    color: "white",
+                                    transform: "translateY(-2px)",
+                                    boxShadow:
+                                      "0 4px 12px rgba(68, 44, 162, 0.3)",
+                                  }}
+                                  _active={{ transform: "translateY(0)" }}
+                                  transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+                                  gap={2}
+                                >
+                                  <Icon as={LuPencil} fontSize="14px" />
+                                  EDIT
+                                </Button>
+                                <Button
+                                  size="xs"
+                                  variant="outline"
+                                  borderColor="#d32f2f"
+                                  color="#d32f2f"
+                                  borderRadius="lg"
+                                  borderWidth="2px"
+                                  fontWeight="800"
+                                  px={3}
+                                  py={1}
+                                  onClick={() => handleDelete(family.id)}
+                                  _hover={{
+                                    bg: "#d32f2f",
+                                    color: "white",
+                                    transform: "translateY(-2px)",
+                                    boxShadow:
+                                      "0 4px 12px rgba(211, 47, 47, 0.3)",
+                                  }}
+                                  _active={{ transform: "translateY(0)" }}
+                                  transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+                                  gap={2}
+                                >
+                                  <Icon as={LuTrash2} fontSize="14px" />
+                                  DELETE
+                                </Button>
+                              </HStack>
+                            </Table.Cell>
+                          </Table.Row>
+                        );
+                      })}
+                  {!isLoading && families.length === 0 && (
                     <Table.Row>
-                      <Table.Cell colSpan={3} textAlign="center" py={10}>
-                        No families found.
+                      <Table.Cell colSpan={3} textAlign="center" py={12}>
+                        <VStack spacing={2}>
+                          <Text color="gray.400" fontSize="lg">
+                            No families found.
+                          </Text>
+                          <Button
+                            variant="link"
+                            color={primaryMaroon}
+                            onClick={handleAddNew}
+                          >
+                            Add your first family
+                          </Button>
+                        </VStack>
                       </Table.Cell>
                     </Table.Row>
                   )}
@@ -268,36 +416,68 @@ const FamilyPage = () => {
             </Box>
 
             {/* Pagination Info */}
-            <Flex justify="space-between" align="center" mt={6}>
-              <Text fontSize="sm" color="gray.600">
-                Showing {families.length > 0 ? 1 : 0} to {families.length} of{" "}
+            <Flex justify="space-between" align="center" mt={8}>
+              <Text fontSize="sm" color="gray.500" fontWeight="500">
+                Showing {families.length > 0 ? indexOfFirstItem + 1 : 0} to{" "}
+                {Math.min(indexOfLastItem, families.length)} of{" "}
                 {families.length} entries
               </Text>
-              <HStack spacing={0}>
+              <HStack spacing={2}>
                 <Button
                   variant="outline"
                   size="sm"
-                  borderRadius="md"
-                  borderRightRadius="0"
-                  isDisabled
+                  borderRadius="full"
+                  px={4}
+                  borderColor="gray.200"
+                  color="gray.600"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  isDisabled={currentPage === 1}
+                  _hover={{ bg: "gray.50" }}
                 >
                   Previous
                 </Button>
-                <Button
-                  bg="#003399"
-                  color="white"
-                  size="sm"
-                  borderRadius="0"
-                  _hover={{ bg: "#002266" }}
-                >
-                  1
-                </Button>
+
+                {getPageNumbers().map((page, idx) =>
+                  page === "..." ? (
+                    <Text
+                      key={`ellipsis-${idx}`}
+                      px={1}
+                      fontSize="sm"
+                      color="gray.400"
+                      userSelect="none"
+                      alignSelf="center"
+                    >
+                      …
+                    </Text>
+                  ) : (
+                    <Button
+                      key={page}
+                      bg={currentPage === page ? primaryMaroon : "transparent"}
+                      color={currentPage === page ? "white" : "gray.600"}
+                      variant={currentPage === page ? "solid" : "ghost"}
+                      size="sm"
+                      borderRadius="full"
+                      w="36px"
+                      onClick={() => handlePageChange(page)}
+                      _hover={{
+                        bg: currentPage === page ? "#6b0f1a" : "gray.100",
+                      }}
+                    >
+                      {page}
+                    </Button>
+                  ),
+                )}
+
                 <Button
                   variant="outline"
                   size="sm"
-                  borderRadius="md"
-                  borderLeftRadius="0"
-                  isDisabled
+                  borderRadius="full"
+                  px={4}
+                  borderColor="gray.200"
+                  color="gray.600"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  isDisabled={currentPage === totalPages || totalPages === 0}
+                  _hover={{ bg: "gray.50" }}
                 >
                   Next
                 </Button>
@@ -313,6 +493,13 @@ const FamilyPage = () => {
         onSave={handleCreateOrUpdate}
         familyData={selectedFamily}
         isLoading={isLoading}
+      />
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
       />
 
       <Footer />

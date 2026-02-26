@@ -111,16 +111,16 @@ const LoginPage = () => {
         flex="1"
         direction={{ base: "column", md: "row" }}
         align="center"
-        justify="center"
+        justify="space-evenly"
         px={8}
         py={12}
       >
         {/* Left Side: Illustration */}
         <Box
-          flex="1"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
+          // flex="1"
+          // display="flex"
+          // justifyContent="center"
+          // alignItems="center"
         >
           <Image
             src={loginIllustration}

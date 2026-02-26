@@ -17,7 +17,7 @@ import {
   Flex,
   Icon,
 } from "@chakra-ui/react";
-import { LuSave } from "react-icons/lu";
+import { LuSave, LuX } from "react-icons/lu";
 
 const FamilyFormModal = ({
   isOpen,
@@ -32,8 +32,7 @@ const FamilyFormModal = ({
     history: "",
   });
 
-  const primaryBlue = "#1a237e"; // Mockup dark blue
-  const secondaryBlue = "#0d47a1";
+  const primaryMaroon = "var(--primary-maroon)";
 
   useEffect(() => {
     if (familyData) {
@@ -65,14 +64,14 @@ const FamilyFormModal = ({
     <DialogRoot
       open={isOpen}
       onOpenChange={(e) => !e.open && onClose()}
-      placement="top"
+      placement="center"
       size="lg"
     >
       <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
       <DialogPositioner pt="80px" alignItems="flex-start">
         <DialogContent borderRadius="20px" overflow="hidden" boxShadow="2xl">
           <DialogHeader
-            bg={primaryBlue}
+            bg={primaryMaroon}
             color="white"
             fontSize="lg"
             py={4}
@@ -81,6 +80,7 @@ const FamilyFormModal = ({
             justifyContent="space-between"
             alignItems="center"
             position="relative"
+            borderBottom="1px solid rgba(255,255,255,0.1)"
           >
             <Text fontWeight="600" letterSpacing="0.5px">
               {familyData ? "EDIT FAMILY" : "ADD NEW FAMILY"}
@@ -88,17 +88,23 @@ const FamilyFormModal = ({
             <DialogCloseTrigger
               position="absolute"
               right={4}
-              top={2}
+              top="50%"
+              transform="translateY(-50%)"
               color="white"
               bg="whiteAlpha.200"
               borderRadius="full"
               _hover={{ bg: "whiteAlpha.400" }}
-              p={1}
-            />
+              p={1.5}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Icon as={LuX} fontSize="18px" />
+            </DialogCloseTrigger>
           </DialogHeader>
 
           <form onSubmit={handleSubmit}>
-            <DialogBody py={10} px={10}>
+            <DialogBody py={10} px={10} bg="white">
               <VStack spacing={6} align="start">
                 <Box w="full">
                   <Flex align="center">
@@ -115,13 +121,13 @@ const FamilyFormModal = ({
                       value={formData.family_name}
                       onChange={handleChange}
                       required
-                      borderRadius="15px"
-                      borderColor="gray.300"
-                      h="50px"
+                      borderRadius="xl"
+                      borderColor="gray.200"
+                      h="54px"
                       fontSize="lg"
                       _focus={{
-                        borderColor: primaryBlue,
-                        boxShadow: `0 0 0 1px ${primaryBlue}`,
+                        borderColor: primaryMaroon,
+                        boxShadow: `0 0 0 1px ${primaryMaroon}`,
                       }}
                     />
                   </Flex>
@@ -141,13 +147,13 @@ const FamilyFormModal = ({
                       name="origin"
                       value={formData.origin}
                       onChange={handleChange}
-                      borderRadius="15px"
-                      borderColor="gray.300"
-                      h="50px"
+                      borderRadius="xl"
+                      borderColor="gray.200"
+                      h="54px"
                       fontSize="lg"
                       _focus={{
-                        borderColor: primaryBlue,
-                        boxShadow: `0 0 0 1px ${primaryBlue}`,
+                        borderColor: primaryMaroon,
+                        boxShadow: `0 0 0 1px ${primaryMaroon}`,
                       }}
                     />
                   </Flex>
@@ -169,12 +175,12 @@ const FamilyFormModal = ({
                       value={formData.history}
                       onChange={handleChange}
                       rows={4}
-                      borderRadius="15px"
-                      borderColor="gray.300"
+                      borderRadius="xl"
+                      borderColor="gray.200"
                       fontSize="lg"
                       _focus={{
-                        borderColor: primaryBlue,
-                        boxShadow: `0 0 0 1px ${primaryBlue}`,
+                        borderColor: primaryMaroon,
+                        boxShadow: `0 0 0 1px ${primaryMaroon}`,
                       }}
                     />
                   </Flex>
@@ -186,26 +192,33 @@ const FamilyFormModal = ({
               px={10}
               pb={8}
               pt={0}
+              bg="white"
               display="flex"
               justifyContent="flex-end"
             >
               <Button
                 type="submit"
-                bg={primaryBlue}
+                bg={primaryMaroon}
                 color="white"
-                borderRadius="10px"
-                h="45px"
-                px={6}
+                borderRadius="full"
+                h="50px"
+                px={10}
                 fontSize="lg"
                 fontWeight="bold"
-                _hover={{ bg: secondaryBlue }}
+                _hover={{
+                  bg: "#6b0f1a",
+                  boxShadow: "lg",
+                  transform: "translateY(-1px)",
+                }}
+                _active={{ transform: "translateY(0)" }}
                 isLoading={isLoading}
                 display="flex"
                 alignItems="center"
                 gap={2}
+                transition="all 0.2s"
               >
-                <Icon as={LuSave} fontSize="20px" />
-                SAVE
+                <Icon as={LuSave} fontSize="22px" />
+                SAVE CHANGES
               </Button>
             </DialogFooter>
           </form>
