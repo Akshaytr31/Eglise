@@ -36,7 +36,7 @@ const Navbar = ({ activeItem, onMenuClick }) => {
     >
       <Text
         fontWeight="medium"
-        color={isActive ? primaryMaroon : "gray.500"}
+        color={isActive ? "gray.600" : primaryMaroon}
         fontSize="1.1rem"
       >
         {label}
@@ -45,13 +45,13 @@ const Navbar = ({ activeItem, onMenuClick }) => {
         align="center"
         justify="center"
         border="1px solid"
-        borderColor={isActive ? primaryMaroon : "gray.400"}
+        borderColor={isActive ? "gray.600" : primaryMaroon}
         borderRadius="4px"
         p="2px"
       >
         <Icon
           as={LuChevronDown}
-          color={isActive ? primaryMaroon : "gray.400"}
+          color={isActive ? "gray.600" : primaryMaroon}
           boxSize={3}
         />
       </Flex>
@@ -78,7 +78,7 @@ const Navbar = ({ activeItem, onMenuClick }) => {
         {isLoggedIn && (
           <>
             {/* Center: Nav Items */}
-            <HStack spacing={10} display={{ base: "none", md: "flex" }}>
+            <HStack spacing={10} display={{ base: "none", md: "flex" }} gap={10}>
               <NavItem label="Masters" isActive={activeItem === "Masters"} />
               <NavItem
                 label="Activities"
