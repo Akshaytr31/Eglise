@@ -30,6 +30,7 @@ const FamilyPage = () => {
   const [selectedFamily, setSelectedFamily] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const primaryMaroon = "var(--primary-maroon)";
+  const primaryBlue = "#1a237e";
 
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
@@ -112,51 +113,70 @@ const FamilyPage = () => {
               Families
             </Heading>
             <Button
-              bg="#003399"
+              bg={primaryBlue}
               color="white"
               px={6}
-              _hover={{ bg: "#002266" }}
+              borderRadius="10px"
+              fontWeight="bold"
+              _hover={{ bg: "#151b4d" }}
               onClick={handleAddNew}
+              display="flex"
+              alignItems="center"
+              gap={2}
             >
-              <Icon as={LuPlus} mr={2} />
+              <Icon as={LuPlus} fontSize="18px" />
               Add New
             </Button>
           </Flex>
 
           {/* Table Container */}
           <Box p={6}>
-            <Flex justify="flex-end" mb={4} align="center">
-              <Text mr={2} fontSize="sm">
+            <Flex justify="flex-end" mb={4} align="center" gap={2}>
+              <Text fontWeight="600" fontSize="md">
                 Search:
               </Text>
-              <Input maxW="200px" size="sm" borderRadius="md" />
+              <Input
+                maxW="250px"
+                size="md"
+                borderRadius="10px"
+                borderColor="gray.300"
+              />
             </Flex>
 
             <Box
               border="1px"
-              borderColor="gray.200"
+              borderColor="gray.300"
               borderRadius="md"
               overflowX="auto"
             >
               <Table.Root variant="line">
-                <Table.Header bg="gray.50">
+                <Table.Header bg="gray.100">
                   <Table.Row>
                     <Table.ColumnHeader
                       textAlign="center"
                       borderRight="1px"
-                      borderColor="gray.200"
-                      py={3}
+                      borderColor="gray.300"
+                      py={4}
+                      fontWeight="bold"
+                      fontSize="lg"
                     >
                       Sl No
                     </Table.ColumnHeader>
                     <Table.ColumnHeader
                       borderRight="1px"
-                      borderColor="gray.200"
-                      py={3}
+                      borderColor="gray.300"
+                      py={4}
+                      fontWeight="bold"
+                      fontSize="lg"
                     >
                       Family Name
                     </Table.ColumnHeader>
-                    <Table.ColumnHeader textAlign="center" py={3}>
+                    <Table.ColumnHeader
+                      textAlign="center"
+                      py={4}
+                      fontWeight="bold"
+                      fontSize="lg"
+                    >
                       Actions
                     </Table.ColumnHeader>
                   </Table.Row>
@@ -171,44 +191,65 @@ const FamilyPage = () => {
                       <Table.Cell
                         textAlign="center"
                         borderRight="1px"
-                        borderColor="gray.200"
-                        py={3}
+                        borderColor="gray.300"
+                        py={4}
+                        fontSize="md"
                       >
                         {index + 1}
                       </Table.Cell>
                       <Table.Cell
                         borderRight="1px"
-                        borderColor="gray.200"
-                        py={3}
+                        borderColor="gray.300"
+                        py={4}
+                        fontSize="md"
+                        fontWeight="500"
                       >
                         {family.family_name}
                       </Table.Cell>
-                      <Table.Cell py={3}>
-                        <HStack spacing={2} justify="center">
+                      <Table.Cell py={4}>
+                        <HStack spacing={3} justify="center">
                           <Button
                             size="sm"
                             variant="outline"
-                            colorScheme="blue"
+                            borderColor="blue.400"
+                            color="blue.600"
+                            borderRadius="6px"
                             onClick={() => handleEdit(family)}
+                            _hover={{ bg: "blue.50" }}
+                            display="flex"
+                            alignItems="center"
+                            gap={1}
                           >
-                            <Icon as={LuPencil} mr={2} />
+                            <Icon as={LuPencil} fontSize="14px" />
                             Edit
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            colorScheme="green"
+                            borderColor="green.400"
+                            color="green.600"
+                            borderRadius="6px"
+                            _hover={{ bg: "green.50" }}
+                            display="flex"
+                            alignItems="center"
+                            gap={1}
                           >
-                            <Icon as={LuEye} mr={2} />
+                            <Icon as={LuEye} fontSize="14px" />
                             View
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
-                            colorScheme="red"
+                            borderColor="red.400"
+                            color="red.600"
+                            borderRadius="6px"
                             onClick={() => handleDelete(family.id)}
+                            _hover={{ bg: "red.50" }}
+                            display="flex"
+                            alignItems="center"
+                            gap={1}
                           >
-                            <Icon as={LuTrash2} mr={2} />
+                            <Icon as={LuTrash2} fontSize="14px" />
                             Delete
                           </Button>
                         </HStack>

@@ -7,6 +7,7 @@ import {
   DialogFooter,
   DialogBody,
   DialogCloseTrigger,
+  DialogPositioner,
   Button,
   VStack,
   Text,
@@ -31,7 +32,8 @@ const FamilyFormModal = ({
     history: "",
   });
 
-  const primaryMaroon = "var(--primary-maroon)";
+  const primaryBlue = "#1a237e"; // Mockup dark blue
+  const secondaryBlue = "#0d47a1";
 
   useEffect(() => {
     if (familyData) {
@@ -63,121 +65,152 @@ const FamilyFormModal = ({
     <DialogRoot
       open={isOpen}
       onOpenChange={(e) => !e.open && onClose()}
-      placement="center"
+      placement="top"
       size="lg"
     >
-      <DialogBackdrop bg="blackAlpha.300" backdropFilter="blur(2px)" />
-      <DialogContent borderRadius="15px" overflow="hidden" boxShadow="2xl">
-        <DialogHeader
-          bg="#1a365d"
-          color="white"
-          fontSize="lg"
-          py={3}
-          px={6}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Text fontWeight="bold" letterSpacing="wide">
-            {familyData ? "EDIT FAMILY" : "ADD NEW FAMILY"}
-          </Text>
-          <DialogCloseTrigger
-            position="relative"
-            right={0}
-            top={0}
+      <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
+      <DialogPositioner pt="80px" alignItems="flex-start">
+        <DialogContent borderRadius="20px" overflow="hidden" boxShadow="2xl">
+          <DialogHeader
+            bg={primaryBlue}
             color="white"
-          />
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit}>
-          <DialogBody py={8} px={10}>
-            <VStack spacing={6} align="start">
-              <Box w="full">
-                <Flex align="center" mb={2}>
-                  <Text fontWeight="medium" minW="120px">
-                    Family Name:
-                  </Text>
-                  <Input
-                    name="family_name"
-                    value={formData.family_name}
-                    onChange={handleChange}
-                    placeholder=""
-                    required
-                    borderRadius="10px"
-                    borderColor="gray.300"
-                    _focus={{
-                      borderColor: "#1a365d",
-                      boxShadow: "0 0 0 1px #1a365d",
-                    }}
-                  />
-                </Flex>
-              </Box>
-
-              <Box w="full">
-                <Flex align="center" mb={2}>
-                  <Text fontWeight="medium" minW="120px">
-                    Origin:
-                  </Text>
-                  <Input
-                    name="origin"
-                    value={formData.origin}
-                    onChange={handleChange}
-                    placeholder=""
-                    borderRadius="10px"
-                    borderColor="gray.300"
-                    _focus={{
-                      borderColor: "#1a365d",
-                      boxShadow: "0 0 0 1px #1a365d",
-                    }}
-                  />
-                </Flex>
-              </Box>
-
-              <Box w="full">
-                <Flex align="start" mb={2}>
-                  <Text fontWeight="medium" minW="120px" pt={2}>
-                    History:
-                  </Text>
-                  <Textarea
-                    name="history"
-                    value={formData.history}
-                    onChange={handleChange}
-                    placeholder=""
-                    rows={5}
-                    borderRadius="10px"
-                    borderColor="gray.300"
-                    _focus={{
-                      borderColor: "#1a365d",
-                      boxShadow: "0 0 0 1px #1a365d",
-                    }}
-                  />
-                </Flex>
-              </Box>
-            </VStack>
-          </DialogBody>
-
-          <DialogFooter
-            px={10}
-            pb={6}
-            pt={0}
+            fontSize="lg"
+            py={4}
+            px={8}
             display="flex"
-            justifyContent="flex-end"
+            justifyContent="space-between"
+            alignItems="center"
+            position="relative"
           >
-            <Button
-              type="submit"
-              bg="#1a365d"
+            <Text fontWeight="600" letterSpacing="0.5px">
+              {familyData ? "EDIT FAMILY" : "ADD NEW FAMILY"}
+            </Text>
+            <DialogCloseTrigger
+              position="absolute"
+              right={4}
+              top={2}
               color="white"
-              borderRadius="10px"
-              px={8}
-              _hover={{ bg: "#0d1b2e" }}
-              isLoading={isLoading}
+              bg="whiteAlpha.200"
+              borderRadius="full"
+              _hover={{ bg: "whiteAlpha.400" }}
+              p={1}
+            />
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit}>
+            <DialogBody py={10} px={10}>
+              <VStack spacing={6} align="start">
+                <Box w="full">
+                  <Flex align="center">
+                    <Text
+                      fontWeight="600"
+                      minW="140px"
+                      fontSize="lg"
+                      color="gray.700"
+                    >
+                      Family Name:
+                    </Text>
+                    <Input
+                      name="family_name"
+                      value={formData.family_name}
+                      onChange={handleChange}
+                      required
+                      borderRadius="15px"
+                      borderColor="gray.300"
+                      h="50px"
+                      fontSize="lg"
+                      _focus={{
+                        borderColor: primaryBlue,
+                        boxShadow: `0 0 0 1px ${primaryBlue}`,
+                      }}
+                    />
+                  </Flex>
+                </Box>
+
+                <Box w="full">
+                  <Flex align="center">
+                    <Text
+                      fontWeight="600"
+                      minW="140px"
+                      fontSize="lg"
+                      color="gray.700"
+                    >
+                      Origin:
+                    </Text>
+                    <Input
+                      name="origin"
+                      value={formData.origin}
+                      onChange={handleChange}
+                      borderRadius="15px"
+                      borderColor="gray.300"
+                      h="50px"
+                      fontSize="lg"
+                      _focus={{
+                        borderColor: primaryBlue,
+                        boxShadow: `0 0 0 1px ${primaryBlue}`,
+                      }}
+                    />
+                  </Flex>
+                </Box>
+
+                <Box w="full">
+                  <Flex align="start">
+                    <Text
+                      fontWeight="600"
+                      minW="140px"
+                      fontSize="lg"
+                      color="gray.700"
+                      pt={2}
+                    >
+                      History:
+                    </Text>
+                    <Textarea
+                      name="history"
+                      value={formData.history}
+                      onChange={handleChange}
+                      rows={4}
+                      borderRadius="15px"
+                      borderColor="gray.300"
+                      fontSize="lg"
+                      _focus={{
+                        borderColor: primaryBlue,
+                        boxShadow: `0 0 0 1px ${primaryBlue}`,
+                      }}
+                    />
+                  </Flex>
+                </Box>
+              </VStack>
+            </DialogBody>
+
+            <DialogFooter
+              px={10}
+              pb={8}
+              pt={0}
+              display="flex"
+              justifyContent="flex-end"
             >
-              <Icon as={LuSave} mr={2} />
-              SAVE
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
+              <Button
+                type="submit"
+                bg={primaryBlue}
+                color="white"
+                borderRadius="10px"
+                h="45px"
+                px={6}
+                fontSize="lg"
+                fontWeight="bold"
+                _hover={{ bg: secondaryBlue }}
+                isLoading={isLoading}
+                display="flex"
+                alignItems="center"
+                gap={2}
+              >
+                <Icon as={LuSave} fontSize="20px" />
+                SAVE
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </DialogPositioner>
     </DialogRoot>
   );
 };
