@@ -14,7 +14,13 @@ import {
 } from "@chakra-ui/react";
 import { LuTriangleAlert, LuTrash2 } from "react-icons/lu";
 
-const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
+const ConfirmDeleteModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  isLoading,
+  entityName = "Record",
+}) => {
   return (
     <DialogRoot
       open={isOpen}
@@ -48,13 +54,13 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
             pb={2}
             pt={0}
           >
-            Delete Family?
+            Delete {entityName}?
           </DialogHeader>
 
           <DialogBody bg="white" textAlign="center" px={8} pb={6}>
             <Text color="gray.500" fontSize="md">
-              This action cannot be undone. The family record will be
-              permanently removed.
+              This action cannot be undone. The {entityName.toLowerCase()}{" "}
+              record will be permanently removed.
             </Text>
           </DialogBody>
 
@@ -86,10 +92,10 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
               h="44px"
               px={8}
               fontWeight="700"
-              bg="red.500"
+              bg="var(--primary-maroon)"
               color="white"
               _hover={{
-                bg: "red.600",
+                bg: "var(--primary-maroon)",
                 transform: "translateY(-1px)",
                 boxShadow: "md",
               }}

@@ -23,6 +23,7 @@ import authService from "../auth/authService";
 const ROUTE_MAP = {
   Family: "/family",
   Ward: "/ward",
+  Grade: "/grade",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

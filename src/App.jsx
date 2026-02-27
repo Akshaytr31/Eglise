@@ -8,6 +8,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import FamilyPage from "./pages/FamilyPage";
 import WardPage from "./pages/WardPage";
+import GradePage from "./pages/GradePage";
 import authService from "./auth/authService";
 
 const ProtectedRoute = ({ children }) => {
@@ -43,6 +44,14 @@ function App() {
           element={
             <ProtectedRoute>
               <WardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/grade"
+          element={
+            <ProtectedRoute>
+              <GradePage />
             </ProtectedRoute>
           }
         />

@@ -590,6 +590,7 @@ const RegistryTable = ({
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
+        entityName={title.replace(/\s*(Directory|Page)\s*/i, "").trim()}
       />
 
       <Footer />
