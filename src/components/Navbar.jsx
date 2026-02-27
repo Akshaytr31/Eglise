@@ -224,7 +224,9 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const activeSections = activeMenu ? MENU_DATA[activeMenu] : null;
+  const activeSections = activeMenu
+    ? MENU_DATA[activeMenu]
+    : Object.values(MENU_DATA)[0];
 
   return (
     <Box
@@ -251,7 +253,11 @@ const Navbar = () => {
         {isLoggedIn && (
           <>
             {/* Center: Nav triggers */}
-            <HStack spacing={10} display={{ base: "none", md: "flex" }}>
+            <HStack
+              spacing={10}
+              gap={"30px"}
+              display={{ base: "none", md: "flex" }}
+            >
               {Object.keys(MENU_DATA).map((label) => {
                 const isOpen = activeMenu === label;
                 return (
@@ -278,7 +284,7 @@ const Navbar = () => {
                       borderColor={isOpen ? "#6b0f1a" : primaryMaroon}
                       borderRadius="4px"
                       p="2px"
-                      transition="transform 0.2s"
+                      transition="transform 0.5s"
                       transform={isOpen ? "rotate(180deg)" : "rotate(0deg)"}
                     >
                       <Icon
@@ -352,36 +358,40 @@ const Navbar = () => {
       </Flex>
 
       {/* ── Full-width dropdown panel ─────────────────────────────────────── */}
-      {activeSections && (
-        <Box
-          position="absolute"
-          top="100%"
-          left={0}
-          right={0}
-          bg="white"
-          borderBottom="1px solid"
-          borderColor="gray.200"
-          boxShadow="md"
-          px={8}
-          py={5}
-          zIndex={49}
+      <Box
+        position="absolute"
+        top="100%"
+        left={0}
+        right={0}
+        bg="white"
+        borderBottom="1px solid"
+        borderColor="gray.200"
+        boxShadow="md"
+        px={8}
+        py={5}
+        zIndex={49}
+        style={{
+          opacity: activeMenu ? 1 : 0,
+          transform: activeMenu ? "translateY(0)" : "translateY(-10px)",
+          pointerEvents: activeMenu ? "auto" : "none",
+          transition: "opacity 0.25s ease, transform 0.5s ease",
+        }}
+      >
+        <SimpleGrid
+          columns={{ base: 2, md: activeSections.length }}
+          spacing={8}
+          alignItems="start"
         >
-          <SimpleGrid
-            columns={{ base: 2, md: activeSections.length }}
-            spacing={8}
-            alignItems="start"
-          >
-            {activeSections.map((section) => (
-              <CategoryColumn
-                key={section.title}
-                section={section}
-                onClose={() => setActiveMenu(null)}
-                primaryMaroon={primaryMaroon}
-              />
-            ))}
-          </SimpleGrid>
-        </Box>
-      )}
+          {activeSections.map((section) => (
+            <CategoryColumn
+              key={section.title}
+              section={section}
+              onClose={() => setActiveMenu(null)}
+              primaryMaroon={primaryMaroon}
+            />
+          ))}
+        </SimpleGrid>
+      </Box>
     </Box>
   );
 };

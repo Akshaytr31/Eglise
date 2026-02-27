@@ -51,3 +51,5 @@ export const updateMember = (id, data) =>
   apiClient.patch(`/api/registry/members/${id}/`, data);
 export const deleteMember = (id) =>
   apiClient.delete(`/api/registry/members/${id}/`);
+export const createHead = (data) =>
+  apiClient.post("/api/registry/members/create-head/", data);
