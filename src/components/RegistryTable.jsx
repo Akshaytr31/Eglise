@@ -27,11 +27,12 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
  *  - nameKey       {string}    Key in each item object that holds the display name. e.g. "family_name"
  *  - columnLabel   {string}    Column header label for the name column. e.g. "Family Name"
  *  - emptyMessage  {string}    Message shown when list is empty.
- *  - listFn        {function}  Async fn: ()           => response with response.data array
- *  - createFn      {function}  Async fn: (formData)   => creates item
+ *  - dataPropName  {string}    The prop name FormModal expects for the item data. e.g. "familyData". Default: "itemData"
+ *  - listFn        {function}  Async fn: ()             => response with response.data array
+ *  - createFn      {function}  Async fn: (formData)     => creates item
  *  - updateFn      {function}  Async fn: (id, formData) => updates item
- *  - deleteFn      {function}  Async fn: (id)         => deletes item
- *  - FormModal     {component} Modal component; receives { isOpen, onClose, onSave, itemData, isLoading }
+ *  - deleteFn      {function}  Async fn: (id)           => deletes item
+ *  - FormModal     {component} Modal component; receives { isOpen, onClose, onSave, [dataPropName], isLoading }
  *  - itemsPerPage  {number}    Rows per page. Default: 7
  */
 const RegistryTable = ({
@@ -46,7 +47,7 @@ const RegistryTable = ({
   updateFn,
   deleteFn,
   FormModal,
-  itemsPerPage = 7,
+  itemsPerPage = 10,
 }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +59,7 @@ const RegistryTable = ({
   const [currentPage, setCurrentPage] = useState(1);
 
   const primaryMaroon = "var(--primary-maroon)";
+  // Alternating column backgrounds
 
   const onClose = () => setIsOpen(false);
   const onOpen = () => setIsOpen(true);
@@ -157,11 +159,11 @@ const RegistryTable = ({
     <Box bg="white" minH="100vh" display="flex" flexDirection="column">
       <Navbar />
 
-      <Container maxW="container.xl" flex="1" py={8}>
+      <Container maxW="container.xl" flex="1" py={5}>
         <Box
           border="1px"
           borderColor="gray.200"
-          borderRadius="xl"
+          borderRadius="lg"
           overflow="hidden"
           boxShadow="sm"
           bg="white"
@@ -170,14 +172,15 @@ const RegistryTable = ({
           <Flex
             justify="space-between"
             align="center"
-            px={8}
-            py={6}
+            px={5}
+            py={3}
+            pb={0}
             borderBottom="2px"
             borderColor={primaryMaroon}
             bg="white"
           >
             <Heading
-              size="lg"
+              size="md"
               color={primaryMaroon}
               fontWeight="700"
               letterSpacing="tight"
@@ -187,10 +190,11 @@ const RegistryTable = ({
             <Button
               bg={primaryMaroon}
               color="white"
-              px={8}
-              h="48px"
-              borderRadius="lg"
+              px={3}
+              h="36px"
+              borderRadius="md"
               fontWeight="bold"
+              fontSize="sm"
               _hover={{
                 bg: "#6b0f1a",
                 transform: "translateY(-1px)",
@@ -200,26 +204,27 @@ const RegistryTable = ({
               onClick={handleAddNew}
               display="flex"
               alignItems="center"
-              gap={2}
+              gap={1.5}
               transition="all 0.2s"
             >
-              <Icon as={LuPlus} fontSize="20px" />
+              <Icon as={LuPlus} fontSize="15px" />
               {addLabel}
             </Button>
           </Flex>
 
           {/* Table Container */}
-          <Box p={8}>
-            <Flex justify="flex-end" mb={6} align="center" gap={3}>
-              <Text fontWeight="600" fontSize="md" color="gray.600">
+          <Box px={5} py={4}>
+            <Flex justify="flex-end" mb={3} align="center" gap={2}>
+              <Text fontWeight="600" fontSize="xs" color="gray.500">
                 Search:
               </Text>
               <Input
                 placeholder={`Search ${title.toLowerCase()}...`}
-                maxW="300px"
-                size="md"
-                borderRadius="lg"
+                maxW="240px"
+                size="sm"
+                borderRadius="md"
                 borderColor="gray.200"
+                fontSize="xs"
                 _focus={{
                   borderColor: primaryMaroon,
                   boxShadow: `0 0 0 1px ${primaryMaroon}`,
@@ -229,35 +234,38 @@ const RegistryTable = ({
 
             <Box
               border="1px"
-              borderColor="gray.100"
-              borderRadius="xl"
+              borderColor="gray.200"
+              borderRadius="lg"
               overflowX="auto"
-              boxShadow="inner"
+              overflow="hidden"
             >
-              <Table.Root variant="line">
-                <Table.Header bg="gray.50">
-                  <Table.Row borderBottom="2px" borderColor="gray.100">
+              <Table.Root variant="line" size="sm">
+                <Table.Header>
+                  <Table.Row borderBottom="2px" borderColor="gray.200">
                     <Table.ColumnHeader
                       textAlign="center"
                       borderRight="1px"
-                      borderColor="gray.100"
-                      py={5}
+                      borderColor="gray.200"
+                      py={0}
+                      px={4}
                       fontWeight="700"
-                      fontSize="md"
-                      color="gray.700"
+                      fontSize="xs"
+                      color="gray.600"
                       textTransform="uppercase"
                       letterSpacing="wider"
+                      w="80px"
                     >
                       SI No
                     </Table.ColumnHeader>
                     <Table.ColumnHeader
                       textAlign="center"
                       borderRight="1px"
-                      borderColor="gray.100"
-                      py={5}
+                      borderColor="gray.200"
+                      py={2.5}
+                      px={4}
                       fontWeight="700"
-                      fontSize="md"
-                      color="gray.700"
+                      fontSize="xs"
+                      color="gray.600"
                       textTransform="uppercase"
                       letterSpacing="wider"
                     >
@@ -265,13 +273,15 @@ const RegistryTable = ({
                     </Table.ColumnHeader>
                     <Table.ColumnHeader
                       textAlign="right"
-                      py={5}
-                      pr={20}
+                      py={2.5}
+                      pr={6}
+                      pl={4}
                       fontWeight="700"
-                      fontSize="md"
-                      color="gray.700"
+                      fontSize="xs"
+                      color="gray.600"
                       textTransform="uppercase"
                       letterSpacing="wider"
+                      w="180px"
                     >
                       Actions
                     </Table.ColumnHeader>
@@ -281,34 +291,49 @@ const RegistryTable = ({
                 <Table.Body>
                   {isLoading
                     ? Array.from({ length: itemsPerPage }).map((_, i) => (
-                        <Table.Row key={`skeleton-${i}`}>
+                        <Table.Row
+                          key={`skeleton-${i}`}
+                          bg={i % 2 === 0 ? "gray.100" : "white"}
+                        >
                           <Table.Cell
                             textAlign="center"
                             borderRight="1px"
-                            borderColor="gray.100"
-                            py={5}
+                            borderColor="gray.200"
+                            py={2.5}
+                            px={4}
                           >
-                            <Skeleton height="18px" mx="auto" width="30px" />
+                            <Skeleton
+                              height="14px"
+                              mx="auto"
+                              width="24px"
+                              borderRadius="sm"
+                            />
                           </Table.Cell>
                           <Table.Cell
                             textAlign="center"
                             borderRight="1px"
-                            borderColor="gray.100"
-                            py={5}
+                            borderColor="gray.200"
+                            py={2.5}
+                            px={4}
                           >
-                            <Skeleton height="18px" mx="auto" width="160px" />
+                            <Skeleton
+                              height="14px"
+                              mx="auto"
+                              width="140px"
+                              borderRadius="sm"
+                            />
                           </Table.Cell>
-                          <Table.Cell py={5} pr={4}>
-                            <HStack spacing={4} justify="flex-end">
+                          <Table.Cell py={2.5} pr={6} pl={4}>
+                            <HStack spacing={2} justify="flex-end">
                               <Skeleton
-                                height="28px"
-                                width="60px"
-                                borderRadius="lg"
+                                height="22px"
+                                width="50px"
+                                borderRadius="md"
                               />
                               <Skeleton
-                                height="28px"
-                                width="70px"
-                                borderRadius="lg"
+                                height="22px"
+                                width="58px"
+                                borderRadius="md"
                               />
                             </HStack>
                           </Table.Cell>
@@ -317,82 +342,99 @@ const RegistryTable = ({
                     : paginatedItems.map((item, index) => (
                         <Table.Row
                           key={item.id}
-                          _hover={{ bg: "gray.50" }}
-                          transition="background 0.2s"
+                          bg={index % 2 === 0 ? "gray.100" : "white"}
+                          _hover={{
+                            transform: "scale(1.01)",
+                            zIndex: 1,
+                            boxShadow: "sm",
+                          }}
+                          transition="transform 0.2s ease, box-shadow 0.2s ease"
+                          position="relative"
                         >
                           <Table.Cell
                             textAlign="center"
                             borderRight="1px"
-                            borderColor="gray.100"
-                            py={5}
-                            fontSize="md"
-                            color="gray.600"
+                            borderColor="gray.200"
+                            py={0}
+                            px={4}
+                            fontSize="xs"
+                            color="gray.500"
+                            fontWeight="600"
                           >
                             {indexOfFirstItem + index + 1}
                           </Table.Cell>
                           <Table.Cell
                             textAlign="center"
                             borderRight="1px"
-                            borderColor="gray.100"
-                            py={5}
-                            fontSize="md"
+                            borderColor="gray.200"
+                            py={0}
+                            px={4}
+                            fontSize="xs"
                             fontWeight="600"
                             color="gray.800"
                           >
                             {item[nameKey]}
                           </Table.Cell>
-                          <Table.Cell py={1} pr={4}>
-                            <HStack spacing={4} justify="flex-end">
-                              <Button
-                                size="xs"
-                                variant="outline"
-                                borderColor="#003399"
-                                color="#003399"
-                                borderRadius="lg"
-                                borderWidth="2px"
-                                fontWeight="800"
-                                px={3}
-                                py={1}
+                          <Table.Cell py={0} pr={4} pl={4}>
+                            <HStack spacing={2} justify="flex-end">
+                              {/* Edit Ghost Button */}
+                              <Box
+                                as="button"
                                 onClick={() => handleEdit(item)}
+                                display="inline-flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                w="28px"
+                                h="28px"
+                                borderRadius="full"
+                                color="blue.500"
+                                bg="transparent"
+                                border="1.5px solid transparent"
+                                transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
                                 _hover={{
-                                  bg: "#003399",
-                                  color: "white",
-                                  transform: "translateY(-2px)",
-                                  boxShadow:
-                                    "0 4px 12px rgba(68, 44, 162, 0.3)",
+                                  bg: "rgba(0, 51, 153, 0.08)",
+                                  border: "1.5px solid rgba(0,51,153,0.3)",
+                                  color: "#003399",
+                                  transform: "translateY(-2px) scale(1.15)",
+                                //   boxShadow: "0 4px 14px rgba(0,51,153,0.2)",
                                 }}
-                                _active={{ transform: "translateY(0)" }}
-                                transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-                                gap={2}
+                                _active={{
+                                  transform: "translateY(0) scale(0.95)",
+                                  boxShadow: "none",
+                                }}
+                                title="Edit"
                               >
-                                <Icon as={LuPencil} fontSize="14px" />
-                                EDIT
-                              </Button>
-                              <Button
-                                size="xs"
-                                variant="outline"
-                                borderColor="#d32f2f"
-                                color="#d32f2f"
-                                borderRadius="lg"
-                                borderWidth="2px"
-                                fontWeight="800"
-                                px={3}
-                                py={1}
+                                <Icon as={LuPencil} fontSize="13px" />
+                              </Box>
+
+                              {/* Delete Ghost Button */}
+                              <Box
+                                as="button"
                                 onClick={() => handleDelete(item.id)}
+                                display="inline-flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                w="28px"
+                                h="28px"
+                                borderRadius="full"
+                                color="red.400"
+                                bg="transparent"
+                                border="1.5px solid transparent"
+                                transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
                                 _hover={{
-                                  bg: "#d32f2f",
-                                  color: "white",
-                                  transform: "translateY(-2px)",
-                                  boxShadow:
-                                    "0 4px 12px rgba(211, 47, 47, 0.3)",
+                                  bg: "rgba(211, 47, 47, 0.08)",
+                                  border: "1.5px solid rgba(211,47,47,0.3)",
+                                  color: "#d32f2f",
+                                  transform: "translateY(-2px) scale(1.15)",
                                 }}
-                                _active={{ transform: "translateY(0)" }}
-                                transition="all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
-                                gap={2}
+                                _active={{
+                                  transform: "translateY(0) scale(0.95)",
+                                  boxShadow: "none",
+                                }}
+                                title="Delete"
                               >
-                                <Icon as={LuTrash2} fontSize="14px" />
-                                DELETE
-                              </Button>
+                                <Icon as={LuTrash2} fontSize="13px" />
+                              </Box>
                             </HStack>
                           </Table.Cell>
                         </Table.Row>
@@ -400,14 +442,15 @@ const RegistryTable = ({
 
                   {!isLoading && items.length === 0 && (
                     <Table.Row>
-                      <Table.Cell colSpan={3} textAlign="center" py={12}>
-                        <VStack spacing={2}>
-                          <Text color="gray.400" fontSize="lg">
+                      <Table.Cell colSpan={3} textAlign="center" py={10}>
+                        <VStack spacing={1.5}>
+                          <Text color="gray.400" fontSize="sm">
                             {emptyMessage}
                           </Text>
                           <Button
                             variant="link"
                             color={primaryMaroon}
+                            fontSize="sm"
                             onClick={handleAddNew}
                           >
                             Add your first entry
@@ -421,20 +464,21 @@ const RegistryTable = ({
             </Box>
 
             {/* Pagination */}
-            <Flex justify="space-between" align="center" mt={8}>
-              <Text fontSize="sm" color="gray.500" fontWeight="500">
-                Showing {items.length > 0 ? indexOfFirstItem + 1 : 0} to{" "}
+            <Flex justify="space-between" align="center" mt={4}>
+              <Text fontSize="xs" color="gray.400" fontWeight="500">
+                Showing {items.length > 0 ? indexOfFirstItem + 1 : 0}–
                 {Math.min(indexOfLastItem, items.length)} of {items.length}{" "}
                 entries
               </Text>
-              <HStack spacing={2}>
+              <HStack spacing={1}>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   borderRadius="full"
-                  px={4}
+                  px={3}
                   borderColor="gray.200"
-                  color="gray.600"
+                  color="gray.500"
+                  fontSize="xs"
                   onClick={() => handlePageChange(currentPage - 1)}
                   isDisabled={currentPage === 1}
                   _hover={{ bg: "gray.50" }}
@@ -447,7 +491,7 @@ const RegistryTable = ({
                     <Text
                       key={`ellipsis-${idx}`}
                       px={1}
-                      fontSize="sm"
+                      fontSize="xs"
                       color="gray.400"
                       userSelect="none"
                       alignSelf="center"
@@ -458,11 +502,12 @@ const RegistryTable = ({
                     <Button
                       key={page}
                       bg={currentPage === page ? primaryMaroon : "transparent"}
-                      color={currentPage === page ? "white" : "gray.600"}
+                      color={currentPage === page ? "white" : "gray.500"}
                       variant={currentPage === page ? "solid" : "ghost"}
-                      size="sm"
+                      size="xs"
                       borderRadius="full"
-                      w="36px"
+                      w="28px"
+                      fontSize="xs"
                       onClick={() => handlePageChange(page)}
                       _hover={{
                         bg: currentPage === page ? "#6b0f1a" : "gray.100",
@@ -475,11 +520,12 @@ const RegistryTable = ({
 
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="xs"
                   borderRadius="full"
-                  px={4}
+                  px={3}
                   borderColor="gray.200"
-                  color="gray.600"
+                  color="gray.500"
+                  fontSize="xs"
                   onClick={() => handlePageChange(currentPage + 1)}
                   isDisabled={currentPage === totalPages || totalPages === 0}
                   _hover={{ bg: "gray.50" }}
