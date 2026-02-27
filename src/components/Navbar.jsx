@@ -9,10 +9,6 @@ import {
   SimpleGrid,
   VStack,
   Heading,
-  MenuRoot,
-  MenuTrigger,
-  MenuContent,
-  MenuItem,
 } from "@chakra-ui/react";
 import { LuChevronDown, LuMenu, LuLogOut } from "react-icons/lu";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
@@ -205,6 +201,7 @@ const Navbar = () => {
 
   // Which menu label is open; null = closed
   const [activeMenu, setActiveMenu] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navbarRef = useRef(null);
 
   // Close when clicking outside the entire navbar
@@ -212,6 +209,7 @@ const Navbar = () => {
     const handler = (e) => {
       if (navbarRef.current && !navbarRef.current.contains(e.target)) {
         setActiveMenu(null);
+        setMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -294,46 +292,60 @@ const Navbar = () => {
               })}
             </HStack>
 
-            {/* Right: Hamburger + logout */}
-            <Box>
-              <MenuRoot positioning={{ placement: "bottom-end", gutter: 12 }}>
-                <MenuTrigger asChild>
-                  <Flex
-                    align="center"
-                    justify="center"
-                    border="2px solid"
-                    borderColor={primaryMaroon}
-                    borderRadius="12px"
-                    p={2}
-                    cursor="pointer"
-                    _hover={{ opacity: 0.8 }}
-                    _active={{ bg: "transparent" }}
-                    _focus={{ outline: "none" }}
-                    _focusVisible={{ outline: "none" }}
-                  >
-                    <Icon as={LuMenu} color={primaryMaroon} boxSize={6} />
-                  </Flex>
-                </MenuTrigger>
-                <MenuContent
-                  borderColor="gray.200"
-                  boxShadow="lg"
-                  py={2}
-                  borderRadius="12px"
-                  minW="150px"
-                  zIndex={60}
+            {/* Right: Hamburger + absolute logout dropdown */}
+            <Box position="relative">
+              <Flex
+                align="center"
+                justify="center"
+                border="2px solid"
+                borderColor={primaryMaroon}
+                borderRadius="12px"
+                p={2}
+                cursor="pointer"
+                onClick={() => setMenuOpen((o) => !o)}
+                _hover={{ opacity: 0.8 }}
+              >
+                <Icon as={LuMenu} color={primaryMaroon} boxSize={6} />
+              </Flex>
+
+              <Box
+                position="absolute"
+                top="calc(100% + 10px)"
+                right={0}
+                bg="white"
+                border="1px solid"
+                borderColor="gray.200"
+                borderRadius="12px"
+                boxShadow="sm"
+                py={1}
+                minW="150px"
+                zIndex={200}
+                style={{
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? "translateY(0)" : "translateY(-8px)",
+                  pointerEvents: menuOpen ? "auto" : "none",
+                  transition: "opacity 0.2s ease, transform 0.2s ease",
+                }}
+              >
+                <Flex
+                  align="center"
+                  gap={2}
+                  px={4}
+                  py={2.5}
+                  cursor="pointer"
+                  color={primaryMaroon}
+                  fontWeight="medium"
+                  fontSize="sm"
+                  _hover={{ bg: "gray.50" }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleLogout();
+                  }}
                 >
-                  <MenuItem
-                    value="logout"
-                    onClick={handleLogout}
-                    color={primaryMaroon}
-                    fontWeight="medium"
-                    _hover={{ bg: "gray.50" }}
-                  >
-                    <Icon as={LuLogOut} color={primaryMaroon} mr={2} />
-                    Logout
-                  </MenuItem>
-                </MenuContent>
-              </MenuRoot>
+                  <Icon as={LuLogOut} fontSize="15px" />
+                  Logout
+                </Flex>
+              </Box>
             </Box>
           </>
         )}
