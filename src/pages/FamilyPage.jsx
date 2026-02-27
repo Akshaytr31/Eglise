@@ -11,8 +11,8 @@ import {
 const FamilyPage = () => {
   return (
     <RegistryTable
-      title="Family Directory"
-      addLabel="Add New Family"
+      title="Family"
+      addLabel="Add New"
       nameKey="family_name"
       columnLabel="Family Name"
       emptyMessage="No families found."

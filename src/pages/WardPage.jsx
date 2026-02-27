@@ -22,7 +22,7 @@ const WARD_FIELDS = [
 const WardPage = () => (
   <RegistryTable
     title="Ward Directory"
-    addLabel="Add New Ward"
+    addLabel="Add New"
     nameKey="ward_name"
     columnLabel="Ward Name"
     emptyMessage="No wards found."

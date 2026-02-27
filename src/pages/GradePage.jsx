@@ -14,7 +14,7 @@ const GRADE_FIELDS = [
 const GradePage = () => (
   <RegistryTable
     title="Grade Directory"
-    addLabel="Add New Grade"
+    addLabel="Add New"
     nameKey="name"
     columnLabel="Grade Name"
     emptyMessage="No grades found."

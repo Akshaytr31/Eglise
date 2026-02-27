@@ -13,7 +13,15 @@ import {
   Icon,
   Skeleton,
 } from "@chakra-ui/react";
-import { LuPlus, LuPencil, LuTrash2 } from "react-icons/lu";
+import {
+  LuPlus,
+  LuPencil,
+  LuTrash2,
+  LuChevronLeft,
+  LuChevronRight,
+  LuChevronsLeft,
+  LuChevronsRight,
+} from "react-icons/lu";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
@@ -199,22 +207,59 @@ const RegistryTable = ({
             borderColor={primaryMaroon}
             bg="white"
           >
-            <Heading
-              size="md"
-              color={primaryMaroon}
-              fontWeight="700"
-              letterSpacing="tight"
-            >
-              {title}
-            </Heading>
+            <HStack spacing={3} align="center">
+              {/* Gradient accent bar */}
+              <Box
+                w="4px"
+                h="26px"
+                borderRadius="full"
+                bg="linear-gradient(180deg, #9b1b30 0%, #6b0f1a 100%)"
+                flexShrink={0}
+              />
+              <Box>
+                <Heading
+                  size="md"
+                  fontWeight="800"
+                  letterSpacing="tight"
+                  lineHeight="1"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #7b0d1e 30%, #c0392b 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  {title}
+                </Heading>
+              </Box>
+              {/* Live count chip */}
+              <Box
+                px={2}
+                py="1px"
+                borderRadius="full"
+                bg="rgba(123,13,30,0.08)"
+                border="1px solid rgba(123,13,30,0.15)"
+              >
+                <Text
+                  fontSize="10px"
+                  fontWeight="700"
+                  color={primaryMaroon}
+                  lineHeight="1.6"
+                >
+                  {filteredItems.length}
+                </Text>
+              </Box>
+            </HStack>
             <Button
               bg={primaryMaroon}
               color="white"
-              px={3}
-              h="36px"
+              px={2}
+              py={1}
+              h="30px"
               borderRadius="md"
               fontWeight="bold"
-              fontSize="sm"
+              fontSize="xs"
               _hover={{
                 bg: "#6b0f1a",
                 transform: "translateY(-1px)",
@@ -227,7 +272,7 @@ const RegistryTable = ({
               gap={1.5}
               transition="all 0.2s"
             >
-              <Icon as={LuPlus} fontSize="15px" />
+              <Icon as={LuPlus} fontSize="2px" />
               {addLabel}
             </Button>
           </Flex>
@@ -498,19 +543,42 @@ const RegistryTable = ({
                   : " entries"}
               </Text>
               <HStack spacing={1}>
+                {/* Go to First Page */}
                 <Button
                   variant="outline"
                   size="xs"
                   borderRadius="full"
-                  px={3}
+                  w="28px"
+                  h="24px"
+                  minW="unset"
+                  px={0}
                   borderColor="gray.200"
                   color="gray.500"
-                  fontSize="xs"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  isDisabled={currentPage === 1}
-                  _hover={{ bg: "gray.50" }}
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1}
+                  _hover={{ bg: "gray.50", color: "gray.700" }}
+                  title="First page"
                 >
-                  Previous
+                  <Icon as={LuChevronsLeft} fontSize="13px" />
+                </Button>
+
+                {/* Previous Page */}
+                <Button
+                  variant="outline"
+                  size="xs"
+                  borderRadius="full"
+                  w="28px"
+                  h="24px"
+                  minW="unset"
+                  px={0}
+                  borderColor="gray.200"
+                  color="gray.500"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  _hover={{ bg: "gray.50", color: "gray.700" }}
+                  title="Previous page"
+                >
+                  <Icon as={LuChevronLeft} fontSize="13px" />
                 </Button>
 
                 {getPageNumbers().map((page, idx) =>
@@ -532,8 +600,11 @@ const RegistryTable = ({
                       color={currentPage === page ? "white" : "gray.500"}
                       variant={currentPage === page ? "solid" : "ghost"}
                       size="xs"
-                      borderRadius="full"
+                      borderRadius="lg"
                       w="28px"
+                      h="24px"
+                      minW="unset"
+                      px={0}
                       fontSize="xs"
                       onClick={() => handlePageChange(page)}
                       _hover={{
@@ -545,19 +616,42 @@ const RegistryTable = ({
                   ),
                 )}
 
+                {/* Next Page */}
                 <Button
                   variant="outline"
                   size="xs"
                   borderRadius="full"
-                  px={3}
+                  w="28px"
+                  h="24px"
+                  minW="unset"
+                  px={0}
                   borderColor="gray.200"
                   color="gray.500"
-                  fontSize="xs"
                   onClick={() => handlePageChange(currentPage + 1)}
-                  isDisabled={currentPage === totalPages || totalPages === 0}
-                  _hover={{ bg: "gray.50" }}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  _hover={{ bg: "gray.50", color: "gray.700" }}
+                  title="Next page"
                 >
-                  Next
+                  <Icon as={LuChevronRight} fontSize="13px" />
+                </Button>
+
+                {/* Go to Last Page */}
+                <Button
+                  variant="outline"
+                  size="xs"
+                  borderRadius="full"
+                  w="28px"
+                  h="24px"
+                  minW="unset"
+                  px={0}
+                  borderColor="gray.200"
+                  color="gray.500"
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  _hover={{ bg: "gray.50", color: "gray.700" }}
+                  title="Last page"
+                >
+                  <Icon as={LuChevronsRight} fontSize="13px" />
                 </Button>
               </HStack>
             </Flex>

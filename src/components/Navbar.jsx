@@ -242,12 +242,12 @@ const Navbar = () => {
       <Flex
         align="center"
         justify={isLoggedIn ? "space-between" : "center"}
-        py={4}
+        py={'10px'}
         px={8}
       >
         {/* Logo */}
         <Box>
-          <Image src={EgliseLogo} alt="Eglise Logo" maxH="60px" />
+          <Image src={EgliseLogo} alt="Eglise Logo" maxH="40px" />
         </Box>
 
         {isLoggedIn && (
@@ -303,15 +303,15 @@ const Navbar = () => {
               <Flex
                 align="center"
                 justify="center"
-                border="2px solid"
+                // border="2px solid"
                 borderColor={primaryMaroon}
-                borderRadius="12px"
+                borderRadius="8px"
                 p={2}
                 cursor="pointer"
                 onClick={() => setMenuOpen((o) => !o)}
                 _hover={{ opacity: 0.8 }}
               >
-                <Icon as={LuMenu} color={primaryMaroon} boxSize={6} />
+                <Icon as={LuMenu} color={primaryMaroon} boxSize={5} />
               </Flex>
 
               <Box

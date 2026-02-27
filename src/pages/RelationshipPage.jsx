@@ -14,7 +14,7 @@ const RELATIONSHIP_FIELDS = [
 const RelationshipPage = () => (
   <RegistryTable
     title="Relationship Directory"
-    addLabel="Add New Relationship"
+    addLabel="Add New"
     nameKey="name"
     columnLabel="Relationship Name"
     emptyMessage="No relationships found."
