@@ -1,12 +1,17 @@
 import React from "react";
 import RegistryTable from "../components/RegistryTable";
-import FamilyFormModal from "../components/FamilyFormModal";
 import {
   listFamilies,
   createFamily,
   updateFamily,
   deleteFamily,
 } from "../api/registryServices";
+
+const familyFields = [
+  { name: "family_name", label: "Family Name", required: true },
+  { name: "origin", label: "Origin" },
+  { name: "history", label: "History", type: "textarea", rows: 3 },
+];
 
 const FamilyPage = () => {
   return (
@@ -16,12 +21,11 @@ const FamilyPage = () => {
       nameKey="family_name"
       columnLabel="Family Name"
       emptyMessage="No families found."
-      dataPropName="familyData"
       listFn={listFamilies}
       createFn={createFamily}
       updateFn={updateFamily}
       deleteFn={deleteFamily}
-      FormModal={FamilyFormModal}
+      fields={familyFields}
     />
   );
 };

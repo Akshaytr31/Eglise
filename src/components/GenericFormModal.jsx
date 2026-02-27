@@ -6,6 +6,7 @@ import {
   Text,
   Flex,
   Input,
+  Textarea,
   Icon,
   DialogRoot,
   DialogBackdrop,
@@ -16,7 +17,7 @@ import {
   DialogCloseTrigger,
   DialogPositioner,
 } from "@chakra-ui/react";
-import { LuSave, LuX } from "react-icons/lu";
+import { LuSave, LuPlus, LuX } from "react-icons/lu";
 
 /**
  * GenericFormModal — reusable add/edit modal driven by a field config array.
@@ -77,77 +78,93 @@ const GenericFormModal = ({
     boxShadow: `0 0 0 1px ${primaryMaroon}`,
   };
 
+  const isEditing = Boolean(itemData);
+
   return (
     <DialogRoot
       open={isOpen}
       onOpenChange={(e) => !e.open && onClose()}
       placement="center"
-      size="lg"
+      size="sm"
     >
       <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
-      <DialogPositioner pt="80px" alignItems="flex-start">
-        <DialogContent borderRadius="20px" overflow="hidden" boxShadow="2xl">
+      <DialogPositioner alignItems="center">
+        <DialogContent borderRadius="14px" overflow="hidden" boxShadow="2xl">
           <DialogHeader
             bg={primaryMaroon}
             color="white"
-            fontSize="lg"
-            py={4}
-            px={8}
+            fontSize="sm"
+            py={3}
+            px={5}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
             position="relative"
             borderBottom="1px solid rgba(255,255,255,0.1)"
           >
-            <Text fontWeight="600" letterSpacing="0.5px">
-              {itemData
+            <Text fontWeight="600" letterSpacing="0.5px" fontSize="sm">
+              {isEditing
                 ? `EDIT ${title.toUpperCase()}`
                 : `ADD NEW ${title.toUpperCase()}`}
             </Text>
             <DialogCloseTrigger
               position="absolute"
-              right={4}
+              right={3}
               top="50%"
               transform="translateY(-50%)"
               color="white"
               bg="whiteAlpha.200"
               borderRadius="full"
               _hover={{ bg: "whiteAlpha.400" }}
-              p={1.5}
+              p={1}
               display="flex"
               alignItems="center"
               justifyContent="center"
             >
-              <Icon as={LuX} fontSize="18px" />
+              <Icon as={LuX} fontSize="14px" />
             </DialogCloseTrigger>
           </DialogHeader>
 
           <form onSubmit={handleSubmit}>
-            <DialogBody py={10} px={10} bg="white">
-              <VStack spacing={6} align="start">
+            <DialogBody py={5} px={6} bg="white">
+              <VStack spacing={5} align="start">
                 {fields.map((f) => (
                   <Box key={f.name} w="full">
-                    <Flex align="center">
+                    <Flex align="center" gap={5}>
                       <Text
                         fontWeight="600"
-                        minW="150px"
-                        fontSize="lg"
+                        minW="110px"
+                        fontSize="xs"
                         color="gray.700"
                       >
                         {f.label}:
                       </Text>
-                      <Input
-                        name={f.name}
-                        type={f.type || "text"}
-                        value={formData[f.name]}
-                        onChange={handleChange}
-                        required={f.required}
-                        borderRadius="xl"
-                        borderColor="gray.200"
-                        h="54px"
-                        fontSize="lg"
-                        _focus={fieldFocus}
-                      />
+                      {f.type === "textarea" ? (
+                        <Textarea
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleChange}
+                          required={f.required}
+                          rows={f.rows || 3}
+                          borderRadius="md"
+                          borderColor="gray.200"
+                          fontSize="xs"
+                          _focus={fieldFocus}
+                        />
+                      ) : (
+                        <Input
+                          name={f.name}
+                          type={f.type || "text"}
+                          value={formData[f.name]}
+                          onChange={handleChange}
+                          required={f.required}
+                          borderRadius="md"
+                          borderColor="gray.200"
+                          h="28px"
+                          fontSize="xs"
+                          _focus={fieldFocus}
+                        />
+                      )}
                     </Flex>
                   </Box>
                 ))}
@@ -155,9 +172,9 @@ const GenericFormModal = ({
             </DialogBody>
 
             <DialogFooter
-              px={10}
-              pb={8}
-              pt={0}
+              px={6}
+              pb={5}
+              pt={2}
               bg="white"
               display="flex"
               justifyContent="flex-end"
@@ -166,25 +183,25 @@ const GenericFormModal = ({
                 type="submit"
                 bg={primaryMaroon}
                 color="white"
-                borderRadius="full"
-                h="50px"
-                px={10}
-                fontSize="lg"
+                borderRadius="lg"
+                h="30px"
+                px={2}
+                fontSize="xs"
                 fontWeight="bold"
                 _hover={{
                   bg: "#6b0f1a",
-                  boxShadow: "lg",
+                  boxShadow: "md",
                   transform: "translateY(-1px)",
                 }}
                 _active={{ transform: "translateY(0)" }}
-                isLoading={isLoading}
+                loading={isLoading}
                 display="flex"
                 alignItems="center"
-                gap={2}
+                gap={1.5}
                 transition="all 0.2s"
               >
-                <Icon as={LuSave} fontSize="22px" />
-                SAVE CHANGES
+                <Icon as={isEditing ? LuSave : LuPlus} fontSize="10px" />
+                {isEditing ? "Save Changes" : "Add New"}
               </Button>
             </DialogFooter>
           </form>
