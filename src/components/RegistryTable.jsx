@@ -57,6 +57,7 @@ const RegistryTable = ({
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const primaryMaroon = "var(--primary-maroon)";
   // Alternating column backgrounds
@@ -127,11 +128,25 @@ const RegistryTable = ({
     onOpen();
   };
 
-  // Pagination
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+  // Search filter
+  const filteredItems = searchQuery.trim()
+    ? items.filter((item) =>
+        String(item[nameKey] ?? "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()),
+      )
+    : items;
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Pagination (based on filtered results)
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const paginatedItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const paginatedItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -225,6 +240,8 @@ const RegistryTable = ({
                 borderRadius="md"
                 borderColor="gray.200"
                 fontSize="xs"
+                value={searchQuery}
+                onChange={handleSearchChange}
                 _focus={{
                   borderColor: primaryMaroon,
                   boxShadow: `0 0 0 1px ${primaryMaroon}`,
@@ -392,11 +409,9 @@ const RegistryTable = ({
                                 border="1.5px solid transparent"
                                 transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
                                 _hover={{
-                                  bg: "rgba(0, 51, 153, 0.08)",
-                                  border: "1.5px solid rgba(0,51,153,0.3)",
                                   color: "#003399",
                                   transform: "translateY(-2px) scale(1.15)",
-                                //   boxShadow: "0 4px 14px rgba(0,51,153,0.2)",
+                                  //   boxShadow: "0 4px 14px rgba(0,51,153,0.2)",
                                 }}
                                 _active={{
                                   transform: "translateY(0) scale(0.95)",
@@ -422,8 +437,8 @@ const RegistryTable = ({
                                 border="1.5px solid transparent"
                                 transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
                                 _hover={{
-                                  bg: "rgba(211, 47, 47, 0.08)",
-                                  border: "1.5px solid rgba(211,47,47,0.3)",
+                                  // bg: "rgba(211, 47, 47, 0.08)",
+                                  // border: "1.5px solid rgba(211,47,47,0.3)",
                                   color: "#d32f2f",
                                   transform: "translateY(-2px) scale(1.15)",
                                 }}
@@ -440,21 +455,25 @@ const RegistryTable = ({
                         </Table.Row>
                       ))}
 
-                  {!isLoading && items.length === 0 && (
+                  {!isLoading && filteredItems.length === 0 && (
                     <Table.Row>
                       <Table.Cell colSpan={3} textAlign="center" py={10}>
                         <VStack spacing={1.5}>
                           <Text color="gray.400" fontSize="sm">
-                            {emptyMessage}
+                            {searchQuery.trim()
+                              ? `No results for "${searchQuery}".`
+                              : emptyMessage}
                           </Text>
-                          <Button
-                            variant="link"
-                            color={primaryMaroon}
-                            fontSize="sm"
-                            onClick={handleAddNew}
-                          >
-                            Add your first entry
-                          </Button>
+                          {!searchQuery.trim() && (
+                            <Button
+                              variant="link"
+                              color={primaryMaroon}
+                              fontSize="sm"
+                              onClick={handleAddNew}
+                            >
+                              Add your first entry
+                            </Button>
+                          )}
                         </VStack>
                       </Table.Cell>
                     </Table.Row>
@@ -466,9 +485,12 @@ const RegistryTable = ({
             {/* Pagination */}
             <Flex justify="space-between" align="center" mt={4}>
               <Text fontSize="xs" color="gray.400" fontWeight="500">
-                Showing {items.length > 0 ? indexOfFirstItem + 1 : 0}–
-                {Math.min(indexOfLastItem, items.length)} of {items.length}{" "}
-                entries
+                Showing {filteredItems.length > 0 ? indexOfFirstItem + 1 : 0}–
+                {Math.min(indexOfLastItem, filteredItems.length)} of{" "}
+                {filteredItems.length}
+                {searchQuery.trim() && items.length !== filteredItems.length
+                  ? ` (filtered from ${items.length})`
+                  : " entries"}
               </Text>
               <HStack spacing={1}>
                 <Button
