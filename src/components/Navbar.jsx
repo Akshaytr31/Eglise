@@ -10,7 +10,7 @@ import {
   VStack,
   Heading,
 } from "@chakra-ui/react";
-import { LuChevronDown, LuMenu, LuLogOut } from "react-icons/lu";
+import { LuChevronDown, LuLogOut, LuMenu } from "react-icons/lu";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import EgliseLogo from "../assets/logo.png";
 import authService from "../auth/authService";
@@ -199,12 +199,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const isLoggedIn = authService.isAuthenticated();
 
-  // Which menu label is open; null = closed
   const [activeMenu, setActiveMenu] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const navbarRef = useRef(null);
 
-  // Close when clicking outside the entire navbar
   useEffect(() => {
     const handler = (e) => {
       if (navbarRef.current && !navbarRef.current.contains(e.target)) {
@@ -234,103 +232,129 @@ const Navbar = () => {
       position="sticky"
       top={0}
       zIndex={50}
-      borderBottom="1px solid"
-      borderColor="gray.200"
       bg="white"
+      boxShadow="0 1px 0 0 rgba(0,0,0,0.08), 0 2px 8px 0 rgba(0,0,0,0.04)"
+      _before={{
+        content: '""',
+        display: "block",
+        h: "3px",
+        bg: "linear-gradient(90deg, #7b0d1e 0%, #c0392b 50%, #7b0d1e 100%)",
+      }}
     >
       {/* ── Main bar ─────────────────────────────────────────────────────── */}
       <Flex
         align="center"
         justify={isLoggedIn ? "space-between" : "center"}
-        py={'10px'}
+        py={2}
         px={8}
+        gap={6}
       >
         {/* Logo */}
-        <Box>
-          <Image src={EgliseLogo} alt="Eglise Logo" maxH="40px" />
+        <Box flexShrink={0}>
+          <Image src={EgliseLogo} alt="Eglise Logo" maxH="36px" />
         </Box>
 
         {isLoggedIn && (
           <>
             {/* Center: Nav triggers */}
-            <HStack
-              spacing={10}
-              gap={"30px"}
-              display={{ base: "none", md: "flex" }}
-            >
+            <HStack spacing={1} display={{ base: "none", md: "flex" }}>
               {Object.keys(MENU_DATA).map((label) => {
                 const isOpen = activeMenu === label;
                 return (
-                  <HStack
+                  <Box
                     key={label}
-                    spacing={1.5}
+                    position="relative"
+                    onClick={() => toggle(label)}
                     cursor="pointer"
                     userSelect="none"
-                    onClick={() => toggle(label)}
-                    _hover={{ opacity: 0.8 }}
-                    transition="all 0.2s"
+                    px={4}
+                    py={2}
+                    borderRadius="md"
+                    transition="background 0.18s"
+                    bg={isOpen ? "rgba(123,13,30,0.07)" : "transparent"}
+                    _hover={{ bg: "rgba(123,13,30,0.06)" }}
+                    role="group"
                   >
-                    <Text
-                      fontWeight="medium"
-                      color={isOpen ? "#6b0f1a" : primaryMaroon}
-                      fontSize="1.05rem"
-                    >
-                      {label}
-                    </Text>
-                    <Flex
-                      align="center"
-                      justify="center"
-                      border="1px solid"
-                      borderColor={isOpen ? "#6b0f1a" : primaryMaroon}
-                      borderRadius="4px"
-                      p="2px"
-                      transition="transform 0.5s"
-                      transform={isOpen ? "rotate(180deg)" : "rotate(0deg)"}
-                    >
+                    <HStack spacing={1.5}>
+                      <Text
+                        fontWeight="600"
+                        fontSize="sm"
+                        color={isOpen ? "#7b0d1e" : "gray.700"}
+                        transition="color 0.18s"
+                        _groupHover={{ color: "#7b0d1e" }}
+                        letterSpacing="0.01em"
+                      >
+                        {label}
+                      </Text>
                       <Icon
                         as={LuChevronDown}
-                        color={isOpen ? "#6b0f1a" : primaryMaroon}
-                        boxSize={3}
+                        boxSize={3.5}
+                        color={isOpen ? "#7b0d1e" : "gray.400"}
+                        transition="transform 0.3s, color 0.18s"
+                        transform={isOpen ? "rotate(180deg)" : "rotate(0deg)"}
+                        _groupHover={{ color: "#7b0d1e" }}
                       />
-                    </Flex>
-                  </HStack>
+                    </HStack>
+
+                    {/* Active underline indicator */}
+                    <Box
+                      position="absolute"
+                      bottom="0"
+                      left="50%"
+                      transform={
+                        isOpen
+                          ? "translateX(-50%) scaleX(1)"
+                          : "translateX(-50%) scaleX(0)"
+                      }
+                      transformOrigin="center"
+                      h="2px"
+                      w="60%"
+                      bg="linear-gradient(90deg, #7b0d1e, #c0392b)"
+                      borderRadius="full"
+                      transition="transform 0.25s ease"
+                    />
+                  </Box>
                 );
               })}
             </HStack>
 
-            {/* Right: Hamburger + absolute logout dropdown */}
-            <Box position="relative">
+            {/* Right: Hamburger + logout dropdown */}
+            <Box position="relative" flexShrink={0}>
               <Flex
                 align="center"
                 justify="center"
-                // border="2px solid"
-                borderColor={primaryMaroon}
-                borderRadius="8px"
-                p={2}
+                w="34px"
+                h="34px"
+                borderRadius="md"
+                border="1px solid"
+                borderColor="rgba(123,13,30,0.25)"
                 cursor="pointer"
+                color={primaryMaroon}
+                transition="all 0.18s"
+                _hover={{ bg: "rgba(123,13,30,0.07)" }}
                 onClick={() => setMenuOpen((o) => !o)}
-                _hover={{ opacity: 0.8 }}
               >
-                <Icon as={LuMenu} color={primaryMaroon} boxSize={5} />
+                <Icon as={LuMenu} boxSize={4} />
               </Flex>
 
+              {/* Dropdown */}
               <Box
                 position="absolute"
-                top="calc(100% + 10px)"
+                top="calc(100% + 8px)"
                 right={0}
                 bg="white"
                 border="1px solid"
                 borderColor="gray.200"
-                borderRadius="12px"
-                boxShadow="sm"
+                borderRadius="10px"
+                boxShadow="0 4px 16px rgba(0,0,0,0.10)"
                 py={1}
-                minW="150px"
+                minW="140px"
                 zIndex={200}
                 style={{
                   opacity: menuOpen ? 1 : 0,
-                  transform: menuOpen ? "translateY(0)" : "translateY(-8px)",
+                  transform: menuOpen ? "translateY(0)" : "translateY(-6px)",
                   pointerEvents: menuOpen ? "auto" : "none",
-                  transition: "opacity 0.2s ease, transform 0.2s ease",
+                  transition: "opacity 0.18s ease, transform 0.18s ease",
                 }}
               >
                 <Flex
@@ -340,15 +364,16 @@ const Navbar = () => {
                   py={2.5}
                   cursor="pointer"
                   color={primaryMaroon}
-                  fontWeight="medium"
+                  fontWeight="600"
                   fontSize="sm"
-                  _hover={{ bg: "gray.50" }}
+                  borderRadius="md"
+                  _hover={{ bg: "red.50" }}
                   onClick={() => {
                     setMenuOpen(false);
                     handleLogout();
                   }}
                 >
-                  <Icon as={LuLogOut} fontSize="15px" />
+                  <Icon as={LuLogOut} boxSize={3.5} />
                   Logout
                 </Flex>
               </Box>
@@ -365,8 +390,8 @@ const Navbar = () => {
         right={0}
         bg="white"
         borderBottom="1px solid"
-        borderColor="gray.200"
-        boxShadow="md"
+        borderColor="gray.100"
+        boxShadow="0 8px 24px rgba(0,0,0,0.08)"
         px={8}
         py={5}
         zIndex={49}
@@ -374,7 +399,7 @@ const Navbar = () => {
           opacity: activeMenu ? 1 : 0,
           transform: activeMenu ? "translateY(0)" : "translateY(-10px)",
           pointerEvents: activeMenu ? "auto" : "none",
-          transition: "opacity 0.25s ease, transform 0.5s ease",
+          transition: "opacity 0.25s ease, transform 0.25s ease",
         }}
       >
         <SimpleGrid
