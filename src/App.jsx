@@ -7,6 +7,7 @@ import {
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import FamilyPage from "./pages/FamilyPage";
+import WardPage from "./pages/WardPage";
 import authService from "./auth/authService";
 
 const ProtectedRoute = ({ children }) => {
@@ -34,6 +35,14 @@ function App() {
           element={
             <ProtectedRoute>
               <FamilyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ward"
+          element={
+            <ProtectedRoute>
+              <WardPage />
             </ProtectedRoute>
           }
         />

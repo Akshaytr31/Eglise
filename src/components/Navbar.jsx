@@ -22,6 +22,7 @@ import authService from "../auth/authService";
 // ─── Route map: item label → path (only items with a real page) ───────────────
 const ROUTE_MAP = {
   Family: "/family",
+  Ward: "/ward",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

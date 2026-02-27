@@ -17,23 +17,27 @@ import { LuPlus, LuPencil, LuTrash2 } from "react-icons/lu";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import GenericFormModal from "./GenericFormModal";
 
 /**
  * RegistryTable — a reusable CRUD table page component.
  *
  * Props:
- *  - title         {string}    Page/section heading. e.g. "Family Directory"
- *  - addLabel      {string}    Add button text. e.g. "Add New Family"
- *  - nameKey       {string}    Key in each item object that holds the display name. e.g. "family_name"
- *  - columnLabel   {string}    Column header label for the name column. e.g. "Family Name"
+ *  - title         {string}    Page/section heading. e.g. "Ward Directory"
+ *  - addLabel      {string}    Add button text. e.g. "Add New Ward"
+ *  - nameKey       {string}    Key in each item object for the display name. e.g. "ward_name"
+ *  - columnLabel   {string}    Column header label. e.g. "Ward Name"
  *  - emptyMessage  {string}    Message shown when list is empty.
- *  - dataPropName  {string}    The prop name FormModal expects for the item data. e.g. "familyData". Default: "itemData"
+ *  - dataPropName  {string}    The prop name FormModal expects for item data. Default: "itemData"
  *  - listFn        {function}  Async fn: ()             => response with response.data array
  *  - createFn      {function}  Async fn: (formData)     => creates item
  *  - updateFn      {function}  Async fn: (id, formData) => updates item
  *  - deleteFn      {function}  Async fn: (id)           => deletes item
- *  - FormModal     {component} Modal component; receives { isOpen, onClose, onSave, [dataPropName], isLoading }
- *  - itemsPerPage  {number}    Rows per page. Default: 7
+ *  - FormModal     {component} Custom modal (for complex forms like Family). Mutually exclusive with `fields`.
+ *  - fields        {Array}     Simple field definitions for the built-in GenericFormModal:
+ *                              [{ name, label, type?, required?, coerce? }]
+ *                              Use this instead of FormModal for simple forms.
+ *  - itemsPerPage  {number}    Rows per page. Default: 10
  */
 const RegistryTable = ({
   title = "Directory",
@@ -47,6 +51,7 @@ const RegistryTable = ({
   updateFn,
   deleteFn,
   FormModal,
+  fields,
   itemsPerPage = 10,
 }) => {
   const [items, setItems] = useState([]);
@@ -560,7 +565,17 @@ const RegistryTable = ({
         </Box>
       </Container>
 
-      {FormModal && (
+      {fields && !FormModal ? (
+        <GenericFormModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onSave={handleCreateOrUpdate}
+          itemData={selectedItem}
+          isLoading={isLoading}
+          fields={fields}
+          title={title.replace(/ Directory| Page/i, "").trim()}
+        />
+      ) : FormModal ? (
         <FormModal
           isOpen={isOpen}
           onClose={onClose}
@@ -568,7 +583,7 @@ const RegistryTable = ({
           {...{ [dataPropName]: selectedItem }}
           isLoading={isLoading}
         />
-      )}
+      ) : null}
 
       <ConfirmDeleteModal
         isOpen={isDeleteOpen}
