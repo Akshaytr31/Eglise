@@ -21,6 +21,7 @@ import {
   LuChevronRight,
   LuChevronsLeft,
   LuChevronsRight,
+  LuSearch,
 } from "react-icons/lu";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -251,6 +252,50 @@ const RegistryTable = ({
                 </Text>
               </Box>
             </HStack>
+            <HStack
+              flex="1"
+              justify="flex-end"
+              px={4}
+              maxW="450px"
+              role="group"
+            >
+              <Box position="relative" w="full">
+                <Input
+                  placeholder={`Search ${title.toLowerCase()}...`}
+                  size="sm"
+                  borderRadius="lg"
+                  bg="rgba(174,32,80,0.03)"
+                  borderWidth="1px"
+                  borderColor="rgba(174,32,80,0.1)"
+                  fontSize="xs"
+                  pl={10}
+                  h="34px"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  _placeholder={{ color: "gray.400", fontSize: "xs" }}
+                  _focus={{
+                    bg: "white",
+                    borderColor: primaryMaroon,
+                  }}
+                  transition="all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
+                />
+                <Box
+                  position="absolute"
+                  left={3.5}
+                  top="45%"
+                  transform="translateY(-50%)"
+                  color="gray.400"
+                  pointerEvents="none"
+                  transition="all 0.2s"
+                  _groupFocusWithin={{
+                    color: primaryMaroon,
+                    transform: "translateY(-50%) scale(1.1)",
+                  }}
+                >
+                  <Icon as={LuSearch} fontSize="14px" />
+                </Box>
+              </Box>
+            </HStack>
             <Button
               bg={primaryMaroon}
               color="white"
@@ -279,26 +324,6 @@ const RegistryTable = ({
 
           {/* Table Container */}
           <Box px={5} py={4}>
-            <Flex justify="flex-end" mb={3} align="center" gap={2}>
-              <Text fontWeight="600" fontSize="xs" color="gray.500">
-                Search:
-              </Text>
-              <Input
-                placeholder={`Search ${title.toLowerCase()}...`}
-                maxW="240px"
-                size="sm"
-                borderRadius="md"
-                borderColor="gray.200"
-                fontSize="xs"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                _focus={{
-                  borderColor: primaryMaroon,
-                  boxShadow: `0 0 0 1px ${primaryMaroon}`,
-                }}
-              />
-            </Flex>
-
             <Box
               border="1px"
               borderColor="gray.200"
@@ -317,6 +342,7 @@ const RegistryTable = ({
                       px={4}
                       fontWeight="700"
                       fontSize="xs"
+                      fontFamily="'Outfit', sans-serif"
                       color="gray.600"
                       textTransform="uppercase"
                       letterSpacing="wider"
@@ -332,6 +358,7 @@ const RegistryTable = ({
                       px={4}
                       fontWeight="700"
                       fontSize="xs"
+                      fontFamily="'Outfit', sans-serif"
                       color="gray.600"
                       textTransform="uppercase"
                       letterSpacing="wider"
@@ -345,6 +372,7 @@ const RegistryTable = ({
                       pl={4}
                       fontWeight="700"
                       fontSize="xs"
+                      fontFamily="'Outfit', sans-serif"
                       color="gray.600"
                       textTransform="uppercase"
                       letterSpacing="wider"
@@ -425,6 +453,7 @@ const RegistryTable = ({
                             py={0}
                             px={4}
                             fontSize="xs"
+                            fontFamily="'Outfit', sans-serif"
                             color="gray.500"
                             fontWeight="600"
                           >
@@ -437,6 +466,7 @@ const RegistryTable = ({
                             py={0}
                             px={4}
                             fontSize="xs"
+                            fontFamily="'Outfit', sans-serif"
                             fontWeight="600"
                             color="gray.800"
                           >

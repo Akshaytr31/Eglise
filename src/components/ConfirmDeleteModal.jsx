@@ -32,8 +32,8 @@ const ConfirmDeleteModal = ({
       size="sm"
     >
       <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
-      <DialogPositioner alignItems="center">
-        <DialogContent borderRadius="14px" overflow="hidden" boxShadow="2xl">
+      <DialogPositioner alignItems="center" >
+        <DialogContent borderRadius="14px" overflow="hidden" boxShadow="2xl"  maxWidth="400px">
           {/* Maroon header — matches GenericFormModal */}
           <DialogHeader
             bg={primaryMaroon}

@@ -13,7 +13,7 @@ const GRADE_FIELDS = [
 
 const GradePage = () => (
   <RegistryTable
-    title="Grade Directory"
+    title="Grade"
     addLabel="Add New"
     nameKey="name"
     columnLabel="Grade Name"

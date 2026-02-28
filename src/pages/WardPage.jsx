@@ -21,7 +21,7 @@ const WARD_FIELDS = [
 
 const WardPage = () => (
   <RegistryTable
-    title="Ward Directory"
+    title="Ward"
     addLabel="Add New"
     nameKey="ward_name"
     columnLabel="Ward Name"

@@ -46,6 +46,7 @@ const GenericFormModal = ({
   const buildEmpty = () => Object.fromEntries(fields.map((f) => [f.name, ""]));
 
   const [formData, setFormData] = useState(buildEmpty);
+  const [focusedField, setFocusedField] = useState(null);
 
   useEffect(() => {
     if (itemData) {
@@ -126,30 +127,58 @@ const GenericFormModal = ({
           </DialogHeader>
 
           <form onSubmit={handleSubmit}>
-            <DialogBody py={5} px={6} bg="white">
-              <VStack spacing={5} align="start">
-                {fields.map((f) => (
-                  <Box key={f.name} w="full">
-                    <Flex align="center" gap={5}>
+            <DialogBody py={6} px={6} bg="white">
+              <VStack spacing={6} gap={3} align="start">
+                {fields.map((f) => {
+                  const hasValue = String(formData[f.name] || "").length > 0;
+                  const isFocused = focusedField === f.name;
+                  const shouldFloat = isFocused || hasValue;
+
+                  return (
+                    <Box key={f.name} w="full" position="relative">
+                      {/* Floating Label */}
                       <Text
-                        fontWeight="600"
-                        minW="110px"
-                        fontSize="xs"
-                        color="gray.700"
+                        as="label"
+                        position="absolute"
+                        left={shouldFloat ? "10px" : "12px"}
+                        top={shouldFloat ? "0" : "50%"}
+                        transform={
+                          shouldFloat
+                            ? "translateY(-50%) scale(0.85)"
+                            : "translateY(-50%)"
+                        }
+                        transformOrigin="left top"
+                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                        color={isFocused ? primaryMaroon : "gray.500"}
+                        bg="white"
+                        px={1}
+                        zIndex={2}
+                        fontSize={shouldFloat ? "xs" : "xs"}
+                        fontWeight={shouldFloat ? "700" : "500"}
+                        pointerEvents="none"
+                        letterSpacing="0.3px"
                       >
-                        {f.label}:
+                        {f.label}
                       </Text>
+
                       {f.type === "textarea" ? (
                         <Textarea
                           name={f.name}
                           value={formData[f.name]}
                           onChange={handleChange}
+                          onFocus={() => setFocusedField(f.name)}
+                          onBlur={() => setFocusedField(null)}
                           required={f.required}
                           rows={f.rows || 3}
-                          borderRadius="md"
+                          borderRadius="8px"
                           borderColor="gray.200"
                           fontSize="xs"
-                          _focus={fieldFocus}
+                          pt={3}
+                          _focus={{
+                            borderColor: primaryMaroon,
+                            boxShadow: "none",
+                            borderWidth: "1px",
+                          }}
                         />
                       ) : (
                         <Input
@@ -157,17 +186,23 @@ const GenericFormModal = ({
                           type={f.type || "text"}
                           value={formData[f.name]}
                           onChange={handleChange}
+                          onFocus={() => setFocusedField(f.name)}
+                          onBlur={() => setFocusedField(null)}
                           required={f.required}
-                          borderRadius="md"
+                          borderRadius="8px"
                           borderColor="gray.200"
-                          h="28px"
+                          h="38px"
                           fontSize="xs"
-                          _focus={fieldFocus}
+                          _focus={{
+                            borderColor: primaryMaroon,
+                            boxShadow: "none",
+                            borderWidth: "1px",
+                          }}
                         />
                       )}
-                    </Flex>
-                  </Box>
-                ))}
+                    </Box>
+                  );
+                })}
               </VStack>
             </DialogBody>
 
@@ -186,7 +221,7 @@ const GenericFormModal = ({
                 borderRadius="lg"
                 h="30px"
                 px={2}
-                fontSize="xs"
+                fontSize="sm"
                 fontWeight="bold"
                 _hover={{
                   bg: "#6b0f1a",
@@ -201,7 +236,7 @@ const GenericFormModal = ({
                 transition="all 0.2s"
               >
                 <Icon as={isEditing ? LuSave : LuPlus} fontSize="10px" />
-                {isEditing ? "Save Changes" : "Add New"}
+                {isEditing ? "Save Changes" : "Save"}
               </Button>
             </DialogFooter>
           </form>

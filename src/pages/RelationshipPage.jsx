@@ -13,7 +13,7 @@ const RELATIONSHIP_FIELDS = [
 
 const RelationshipPage = () => (
   <RegistryTable
-    title="Relationship Directory"
+    title="Relationship"
     addLabel="Add New"
     nameKey="name"
     columnLabel="Relationship Name"
