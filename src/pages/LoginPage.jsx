@@ -25,13 +25,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import authService from "../auth/authService";
+import { forgotPassword, resetPassword } from "../api/authServices";
 import loginIllustration from "../assets/133748214_10221134.jpg";
 
 const LoginPage = () => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -82,6 +87,50 @@ const LoginPage = () => {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setError("Please enter your email first.");
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    setMessage("");
+    try {
+      await forgotPassword({ email });
+      setMessage("OTP sent to your email.");
+      setStep(4);
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "Failed to send OTP. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    setIsLoading(true);
+    setError("");
+    try {
+      await resetPassword({ email, otp, new_password: newPassword });
+      setMessage("Password reset successfully. You can now log in.");
+      setStep(2); // Go back to password entry step
+    } catch (err) {
+      setError(
+        err.response?.data?.error ||
+          "Failed to reset password. Check your OTP.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const primaryMaroon = "var(--primary-maroon)";
   const white = "var(--white)";
   const lightGray = "var(--light-gray)";
@@ -117,10 +166,10 @@ const LoginPage = () => {
       >
         {/* Left Side: Illustration */}
         <Box
-          // flex="1"
-          // display="flex"
-          // justifyContent="center"
-          // alignItems="center"
+        // flex="1"
+        // display="flex"
+        // justifyContent="center"
+        // alignItems="center"
         >
           <Image
             src={loginIllustration}
@@ -154,10 +203,33 @@ const LoginPage = () => {
               </Box>
             )}
 
+            {message && (
+              <Box
+                p={3}
+                bg="green.50"
+                color="green.600"
+                borderRadius="md"
+                w="full"
+                textAlign="center"
+                border="1px solid"
+                borderColor="green.200"
+              >
+                <Text fontSize="sm">{message}</Text>
+              </Box>
+            )}
+
             <Box w="full" position="relative">
               <form
                 style={{ width: "100%" }}
-                onSubmit={step === 1 ? handleNext : handleLogin}
+                onSubmit={
+                  step === 1
+                    ? handleNext
+                    : step === 2
+                      ? handleLogin
+                      : step === 3
+                        ? handleForgotPassword
+                        : handleResetPassword
+                }
               >
                 <AnimatePresence mode="wait" custom={step}>
                   {step === 1 ? (
@@ -206,7 +278,7 @@ const LoginPage = () => {
                         </Button>
                       </VStack>
                     </motion.div>
-                  ) : (
+                  ) : step === 2 ? (
                     <motion.div
                       key="step2"
                       custom={-1}
@@ -231,7 +303,11 @@ const LoginPage = () => {
                             variant="ghost"
                             size="xs"
                             color={primaryMaroon}
-                            onClick={() => setStep(1)}
+                            onClick={() => {
+                              setStep(1);
+                              setError("");
+                              setMessage("");
+                            }}
                             _hover={{
                               bg: "transparent",
                               textDecoration: "underline",
@@ -280,6 +356,11 @@ const LoginPage = () => {
                             fontSize="sm"
                             fontWeight="semibold"
                             color={primaryMaroon}
+                            onClick={() => {
+                              setError("");
+                              setMessage("");
+                              setStep(3);
+                            }}
                             _hover={{ textDecoration: "underline" }}
                           >
                             Forgot Password
@@ -336,6 +417,161 @@ const LoginPage = () => {
                             <Icon as={LuCircleHelp} boxSize={3} />
                           </HStack>
                         </HStack>
+                      </VStack>
+                    </motion.div>
+                  ) : step === 3 ? (
+                    <motion.div
+                      key="step3"
+                      custom={1}
+                      variants={stepVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                      <VStack spacing={6} align="start" w="full">
+                        <Heading as="h3" size="md">
+                          Forgot Password
+                        </Heading>
+                        <Text fontSize="sm" color="gray.600">
+                          Enter your email address and we'll send you an OTP to
+                          reset your password.
+                        </Text>
+                        <Field.Root w="full">
+                          <Field.Label fontWeight="medium" mb={2}>
+                            Email Address
+                          </Field.Label>
+                          <Input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="your@email.com"
+                            required
+                            size="lg"
+                            borderRadius="md"
+                            borderColor="gray.400"
+                            _focus={{
+                              borderColor: primaryMaroon,
+                              boxShadow: "none",
+                            }}
+                          />
+                        </Field.Root>
+
+                        <Button
+                          type="submit"
+                          w="full"
+                          bg={primaryMaroon}
+                          color={white}
+                          size="lg"
+                          borderRadius="md"
+                          _hover={{ bg: "#901a42" }}
+                          isLoading={isLoading}
+                        >
+                          Send OTP
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          w="full"
+                          onClick={() => {
+                            setStep(1);
+                            setError("");
+                            setMessage("");
+                          }}
+                        >
+                          Back to Login
+                        </Button>
+                      </VStack>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="step4"
+                      custom={1}
+                      variants={stepVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                      <VStack spacing={4} align="start" w="full">
+                        <Heading as="h3" size="md">
+                          Reset Password
+                        </Heading>
+                        <Text fontSize="xs" color="gray.500">
+                          Resetting password for: <b>{email}</b>
+                        </Text>
+
+                        <Field.Root w="full">
+                          <Field.Label fontWeight="bold">OTP</Field.Label>
+                          <Input
+                            type="text"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            placeholder="Enter 6-digit OTP"
+                            required
+                            size="md"
+                            borderRadius="md"
+                            borderColor="gray.400"
+                          />
+                        </Field.Root>
+
+                        <Field.Root w="full">
+                          <Field.Label fontWeight="bold">
+                            New Password
+                          </Field.Label>
+                          <Input
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="New Password"
+                            required
+                            size="md"
+                            borderRadius="md"
+                            borderColor="gray.400"
+                          />
+                        </Field.Root>
+
+                        <Field.Root w="full">
+                          <Field.Label fontWeight="bold">
+                            Confirm Password
+                          </Field.Label>
+                          <Input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm Password"
+                            required
+                            size="md"
+                            borderRadius="md"
+                            borderColor="gray.400"
+                          />
+                        </Field.Root>
+
+                        <Button
+                          type="submit"
+                          w="full"
+                          bg={primaryMaroon}
+                          color={white}
+                          size="lg"
+                          borderRadius="md"
+                          _hover={{ bg: "#901a42" }}
+                          isLoading={isLoading}
+                          mt={2}
+                        >
+                          Reset Password
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          w="full"
+                          onClick={() => {
+                            setStep(3);
+                            setError("");
+                            setMessage("");
+                          }}
+                        >
+                          Back
+                        </Button>
                       </VStack>
                     </motion.div>
                   )}
