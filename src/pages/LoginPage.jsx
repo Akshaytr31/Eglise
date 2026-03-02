@@ -493,7 +493,7 @@ const LoginPage = () => {
                       exit="exit"
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <VStack gap={10} align="start" w="full">
+                      <VStack gap={2} align="start" w="full">
                         <Heading as="h3" size="md">
                           Reset Password
                         </Heading>

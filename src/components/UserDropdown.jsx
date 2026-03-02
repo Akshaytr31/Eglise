@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Flex, Icon, Text } from "@chakra-ui/react";
 import { LuUser, LuSettings, LuKey, LuLogOut } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 const DropdownItem = ({ icon, label, onClick, primaryMaroon, isLogout }) => (
   <Flex
@@ -23,6 +24,7 @@ const DropdownItem = ({ icon, label, onClick, primaryMaroon, isLogout }) => (
 );
 
 const UserDropdown = ({ isOpen, onClose, onLogout, primaryMaroon }) => {
+  const navigate = useNavigate();
   const menuItems = [
     {
       icon: LuUser,
@@ -44,7 +46,7 @@ const UserDropdown = ({ isOpen, onClose, onLogout, primaryMaroon }) => {
       icon: LuKey,
       label: "Change Password",
       action: () => {
-        console.log("Password clicked");
+        navigate("/change-password");
         onClose();
       },
     },

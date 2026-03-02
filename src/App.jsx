@@ -13,6 +13,7 @@ import RelationshipPage from "./pages/RelationshipPage";
 import MembersPage from "./pages/MembersPage";
 import MemberDetailsPage from "./pages/MemberDetailsPage";
 import authService from "./auth/authService";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -26,6 +27,15 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        {/* Debug: Moved change-password route up */}
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePasswordPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/"
           element={
