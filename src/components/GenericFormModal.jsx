@@ -8,6 +8,7 @@ import {
   Input,
   Textarea,
   Icon,
+  SimpleGrid,
   DialogRoot,
   DialogBackdrop,
   DialogContent,
@@ -65,13 +66,35 @@ const GenericFormModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const coerced = Object.fromEntries(
-      fields.map((f) => [
-        f.name,
-        f.coerce ? f.coerce(formData[f.name]) : formData[f.name],
-      ]),
-    );
-    onSave(coerced);
+
+    const hasFile = fields.some((f) => f.type === "file" && formData[f.name]);
+
+    if (hasFile) {
+      const fd = new FormData();
+      fields.forEach((f) => {
+        if (isEditing && f.disabledOnEdit) return;
+
+        let val = formData[f.name];
+        if (val !== undefined && val !== "") {
+          if (f.coerce) val = f.coerce(val);
+          fd.append(f.name, val);
+        }
+      });
+      onSave(fd);
+    } else {
+      const coerced = Object.fromEntries(
+        fields
+          .filter((f) => !(isEditing && f.disabledOnEdit))
+          .map((f) => {
+            let val = formData[f.name];
+            if (val === "" || val === undefined) return [f.name, undefined];
+            if (f.coerce) val = f.coerce(val);
+            return [f.name, val];
+          })
+          .filter(([name, value]) => value !== undefined),
+      );
+      onSave(coerced);
+    }
   };
 
   const fieldFocus = {
@@ -128,14 +151,20 @@ const GenericFormModal = ({
 
           <form onSubmit={handleSubmit}>
             <DialogBody py={6} px={6} bg="white">
-              <VStack spacing={6} gap={3} align="start">
+              <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
                 {fields.map((f) => {
                   const hasValue = String(formData[f.name] || "").length > 0;
                   const isFocused = focusedField === f.name;
-                  const shouldFloat = isFocused || hasValue;
+                  const shouldFloat =
+                    isFocused || hasValue || f.type === "select";
 
                   return (
-                    <Box key={f.name} w="full" position="relative">
+                    <Box
+                      key={f.name}
+                      w="full"
+                      position="relative"
+                      gridColumn={f.fullWidth ? "span 2" : "auto"}
+                    >
                       {/* Floating Label */}
                       <Text
                         as="label"
@@ -169,6 +198,7 @@ const GenericFormModal = ({
                           onFocus={() => setFocusedField(f.name)}
                           onBlur={() => setFocusedField(null)}
                           required={f.required}
+                          disabled={isEditing && f.disabledOnEdit}
                           rows={f.rows || 3}
                           borderRadius="8px"
                           borderColor="gray.200"
@@ -180,19 +210,67 @@ const GenericFormModal = ({
                             borderWidth: "1px",
                           }}
                         />
-                      ) : (
-                        <Input
+                      ) : f.type === "select" ? (
+                        <Box
+                          as="select"
                           name={f.name}
-                          type={f.type || "text"}
                           value={formData[f.name]}
                           onChange={handleChange}
                           onFocus={() => setFocusedField(f.name)}
                           onBlur={() => setFocusedField(null)}
                           required={f.required}
+                          disabled={isEditing && f.disabledOnEdit}
+                          style={{
+                            width: "100%",
+                            height: "38px",
+                            borderRadius: "8px",
+                            borderColor: "var(--chakra-colors-gray-200)",
+                            borderWidth: "1px",
+                            fontSize: "var(--chakra-fontSizes-xs)",
+                            paddingLeft: "8px",
+                            appearance: "none",
+                            background: "white",
+                          }}
+                        >
+                          <option value="">Select {f.label}</option>
+                          {f.options?.map((opt, i) => {
+                            const isObj =
+                              typeof opt === "object" && opt !== null;
+                            const val = isObj ? opt.value : opt;
+                            const lbl = isObj ? opt.label : opt;
+                            return (
+                              <option key={i} value={val}>
+                                {lbl}
+                              </option>
+                            );
+                          })}
+                        </Box>
+                      ) : (
+                        <Input
+                          name={f.name}
+                          type={f.type || "text"}
+                          value={
+                            f.type === "file" ? undefined : formData[f.name]
+                          }
+                          onChange={(e) => {
+                            if (f.type === "file") {
+                              setFormData((prev) => ({
+                                ...prev,
+                                [f.name]: e.target.files[0],
+                              }));
+                            } else {
+                              handleChange(e);
+                            }
+                          }}
+                          onFocus={() => setFocusedField(f.name)}
+                          onBlur={() => setFocusedField(null)}
+                          required={f.required}
+                          disabled={isEditing && f.disabledOnEdit}
                           borderRadius="8px"
                           borderColor="gray.200"
                           h="38px"
                           fontSize="xs"
+                          pt={f.type === "file" ? "6px" : "auto"}
                           _focus={{
                             borderColor: primaryMaroon,
                             boxShadow: "none",
@@ -203,7 +281,7 @@ const GenericFormModal = ({
                     </Box>
                   );
                 })}
-              </VStack>
+              </SimpleGrid>
             </DialogBody>
 
             <DialogFooter

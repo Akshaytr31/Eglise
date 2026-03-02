@@ -44,6 +44,8 @@ export const deleteFamily = (id) =>
 
 // Members APIs
 export const listMembers = () => apiClient.get("/api/registry/members/");
+export const listFamilyMembers = (familyId) =>
+  apiClient.get(`/api/registry/members/?family=${familyId}`);
 export const createMember = (data) =>
   apiClient.post("/api/registry/members/", data);
 export const getMember = (id) => apiClient.get(`/api/registry/members/${id}/`);

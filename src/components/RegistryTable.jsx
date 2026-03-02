@@ -62,6 +62,7 @@ const RegistryTable = ({
   FormModal,
   fields,
   itemsPerPage = 10,
+  extraActions = [], // Array of { label, icon, onClick, color, title }
 }) => {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,6 +99,15 @@ const RegistryTable = ({
 
   const handleCreateOrUpdate = async (formData) => {
     setIsLoading(true);
+    console.log(
+      "Submitting form data:",
+      formData instanceof FormData ? "FormData object" : formData,
+    );
+    if (formData instanceof FormData) {
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+    }
     try {
       if (selectedItem) {
         await updateFn(selectedItem.id, formData);
@@ -108,6 +118,11 @@ const RegistryTable = ({
       onClose();
     } catch (error) {
       console.error("Error saving item:", error);
+      const serverMsg = error.response?.data
+        ? JSON.stringify(error.response.data, null, 2)
+        : error.message;
+      const status = error.response?.status ? `(${error.response.status})` : "";
+      alert(`Error saving item ${status}:\n${serverMsg}`);
     } finally {
       setIsLoading(false);
     }
@@ -317,7 +332,7 @@ const RegistryTable = ({
               gap={1.5}
               transition="all 0.2s"
             >
-              <Icon as={LuPlus} fontSize="2px" />
+              <Icon as={LuPlus} fontSize="16px" />
               {addLabel}
             </Button>
           </Flex>
@@ -474,6 +489,34 @@ const RegistryTable = ({
                           </Table.Cell>
                           <Table.Cell py={0} pr={4} pl={4}>
                             <HStack spacing={2} justify="flex-end">
+                              {extraActions.map((action, idx) => (
+                                <Box
+                                  key={`extra-action-${idx}`}
+                                  as="button"
+                                  onClick={() => action.onClick(item)}
+                                  display="inline-flex"
+                                  alignItems="center"
+                                  justifyContent="center"
+                                  w="28px"
+                                  h="28px"
+                                  borderRadius="full"
+                                  color={action.color || "gray.500"}
+                                  bg="transparent"
+                                  border="1.5px solid transparent"
+                                  transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
+                                  _hover={{
+                                    color: action.hoverColor || "gray.700",
+                                    transform: "translateY(-2px) scale(1.15)",
+                                  }}
+                                  _active={{
+                                    transform: "translateY(0) scale(0.95)",
+                                    boxShadow: "none",
+                                  }}
+                                  title={action.title}
+                                >
+                                  <Icon as={action.icon} fontSize="13px" />
+                                </Box>
+                              ))}
                               {/* Edit Ghost Button */}
                               <Box
                                 as="button"

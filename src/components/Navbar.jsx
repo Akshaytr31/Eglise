@@ -21,6 +21,7 @@ const ROUTE_MAP = {
   Ward: "/ward",
   Grade: "/grade",
   Relationship: "/relationship",
+  "Member Info": "/members",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

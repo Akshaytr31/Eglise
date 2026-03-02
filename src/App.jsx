@@ -10,6 +10,8 @@ import FamilyPage from "./pages/FamilyPage";
 import WardPage from "./pages/WardPage";
 import GradePage from "./pages/GradePage";
 import RelationshipPage from "./pages/RelationshipPage";
+import MembersPage from "./pages/MembersPage";
+import MemberDetailsPage from "./pages/MemberDetailsPage";
 import authService from "./auth/authService";
 
 const ProtectedRoute = ({ children }) => {
@@ -61,6 +63,22 @@ function App() {
           element={
             <ProtectedRoute>
               <RelationshipPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/members"
+          element={
+            <ProtectedRoute>
+              <MembersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/members/:headId"
+          element={
+            <ProtectedRoute>
+              <MemberDetailsPage />
             </ProtectedRoute>
           }
         />
