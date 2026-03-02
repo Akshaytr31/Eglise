@@ -181,7 +181,7 @@ const LoginPage = () => {
 
         {/* Right Side: Form */}
         <Box flex="1" maxW="400px" w="full" px={4} overflow="hidden">
-          <VStack align="start" spacing={8} w="full">
+          <VStack align="start" gap={"10px"} w="full">
             <Box>
               <Heading as="h2" size="xl" fontWeight="semibold" mb={2}>
                 Welcome to Eglise
@@ -242,7 +242,7 @@ const LoginPage = () => {
                       exit="exit"
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <VStack spacing={6} align="start" w="full">
+                      <VStack gap={"10px"} align="start" w="full">
                         <Field.Root w="full">
                           <Field.Label fontWeight="medium" mb={2}>
                             Enter Email Address
@@ -288,9 +288,9 @@ const LoginPage = () => {
                       exit="exit"
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <VStack spacing={6} align="start" w="full">
+                      <VStack gap={"18px"} align="start" w="full">
                         {/* Registered Email Display */}
-                        <HStack spacing={3} w="full" py={2}>
+                        <HStack gap={3} w="full" py={2}>
                           <Icon
                             as={LuCircleUser}
                             color={primaryMaroon}
@@ -343,7 +343,7 @@ const LoginPage = () => {
                         </Field.Root>
 
                         <Flex w="full" justify="space-between" align="center">
-                          <HStack spacing={2}>
+                          <HStack gap={2}>
                             <input
                               type="checkbox"
                               style={{ accentColor: primaryMaroon }}
@@ -382,39 +382,39 @@ const LoginPage = () => {
                         </Button>
 
                         {/* Secondary Links */}
-                        <HStack justify="center" w="full" spacing={6} pt={4}>
+                        <HStack justify="center" w="full" gap="25px" pt={1}>
                           <HStack
-                            spacing={1}
+                            gap={1}
                             color="gray.600"
                             cursor="pointer"
                             _hover={{ color: primaryMaroon }}
                           >
+                            <Icon as={LuShieldCheck} boxSize={3} />
                             <Text fontSize="xs" fontWeight="medium">
                               Privacy
                             </Text>
-                            <Icon as={LuShieldCheck} boxSize={3} />
                           </HStack>
                           <HStack
-                            spacing={1}
+                            gap={1}
                             color="gray.600"
                             cursor="pointer"
                             _hover={{ color: primaryMaroon }}
                           >
+                            <Icon as={LuScale} boxSize={3} />
                             <Text fontSize="xs" fontWeight="medium">
                               Terms
                             </Text>
-                            <Icon as={LuScale} boxSize={3} />
                           </HStack>
                           <HStack
-                            spacing={1}
+                            gap={1}
                             color="gray.600"
                             cursor="pointer"
                             _hover={{ color: primaryMaroon }}
                           >
+                            <Icon as={LuCircleHelp} boxSize={3} />
                             <Text fontSize="xs" fontWeight="medium">
                               FAQ
                             </Text>
-                            <Icon as={LuCircleHelp} boxSize={3} />
                           </HStack>
                         </HStack>
                       </VStack>
@@ -493,7 +493,7 @@ const LoginPage = () => {
                       exit="exit"
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <VStack spacing={4} align="start" w="full">
+                      <VStack gap={10} align="start" w="full">
                         <Heading as="h3" size="md">
                           Reset Password
                         </Heading>

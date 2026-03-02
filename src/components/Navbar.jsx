@@ -10,10 +10,11 @@ import {
   VStack,
   Heading,
 } from "@chakra-ui/react";
-import { LuChevronDown, LuLogOut, LuMenu } from "react-icons/lu";
+import { LuChevronDown, LuMenu } from "react-icons/lu";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import EgliseLogo from "../assets/logo.png";
 import authService from "../auth/authService";
+import UserDropdown from "./UserDropdown";
 
 // ─── Route map: item label → path (only items with a real page) ───────────────
 const ROUTE_MAP = {
@@ -338,46 +339,12 @@ const Navbar = () => {
                 <Icon as={LuMenu} boxSize={4} />
               </Flex>
 
-              {/* Dropdown */}
-              <Box
-                position="absolute"
-                top="calc(100% + 8px)"
-                right={0}
-                bg="white"
-                border="1px solid"
-                borderColor="gray.200"
-                borderRadius="10px"
-                boxShadow="0 4px 16px rgba(0,0,0,0.10)"
-                py={1}
-                minW="140px"
-                zIndex={200}
-                style={{
-                  opacity: menuOpen ? 1 : 0,
-                  transform: menuOpen ? "translateY(0)" : "translateY(-6px)",
-                  pointerEvents: menuOpen ? "auto" : "none",
-                  transition: "opacity 0.18s ease, transform 0.18s ease",
-                }}
-              >
-                <Flex
-                  align="center"
-                  gap={2}
-                  px={4}
-                  py={2.5}
-                  cursor="pointer"
-                  color={primaryMaroon}
-                  fontWeight="600"
-                  fontSize="sm"
-                  borderRadius="md"
-                  _hover={{ bg: "red.50" }}
-                  onClick={() => {
-                    setMenuOpen(false);
-                    handleLogout();
-                  }}
-                >
-                  <Icon as={LuLogOut} boxSize={3.5} />
-                  Logout
-                </Flex>
-              </Box>
+              <UserDropdown
+                isOpen={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                onLogout={handleLogout}
+                primaryMaroon={primaryMaroon}
+              />
             </Box>
           </>
         )}
