@@ -14,6 +14,7 @@ import MembersPage from "./pages/MembersPage";
 import MemberDetailsPage from "./pages/MemberDetailsPage";
 import authService from "./auth/authService";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import BaptismPage from "./pages/BaptismPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -89,6 +90,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MemberDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/baptism"
+          element={
+            <ProtectedRoute>
+              <BaptismPage />
             </ProtectedRoute>
           }
         />

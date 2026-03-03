@@ -23,6 +23,7 @@ const ROUTE_MAP = {
   Grade: "/grade",
   Relationship: "/relationship",
   "Member Info": "/members",
+  "Baptism Register": "/baptism",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────
