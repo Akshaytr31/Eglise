@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
@@ -64,6 +65,7 @@ const RegistryTable = ({
   itemsPerPage = 10,
   extraActions = [], // Array of { label, icon, onClick, color, title }
 }) => {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -224,6 +226,31 @@ const RegistryTable = ({
             bg="white"
           >
             <HStack spacing={3} align="center">
+              <Box
+                as="button"
+                onClick={() => navigate(-1)}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                w="28px"
+                h="28px"
+                borderRadius="full"
+                border="1px solid"
+                borderColor="rgba(123,13,30,0.2)"
+                bg={primaryMaroon}
+                color="white"
+                transition="all 0.2s"
+                _hover={{
+                  transform: "translateX(-2px)",
+                  color: {primaryMaroon},
+                }}
+                _active={{ transform: "translateX(0)" }}
+                title="Go Back"
+                mr={1}
+              >
+                <Icon as={LuChevronLeft} fontSize="16px" />
+              </Box>
+
               {/* Gradient accent bar */}
               <Box
                 w="4px"
@@ -232,6 +259,7 @@ const RegistryTable = ({
                 bg="linear-gradient(180deg, #9b1b30 0%, #6b0f1a 100%)"
                 flexShrink={0}
               />
+
               <Box>
                 <Heading
                   size="md"
