@@ -219,7 +219,7 @@ const RegistryTable = ({
             justify="space-between"
             align="center"
             px={5}
-            py={3}
+            py={2}
             pb={0}
             borderBottom="2px"
             borderColor={primaryMaroon}
@@ -242,7 +242,7 @@ const RegistryTable = ({
                 transition="all 0.2s"
                 _hover={{
                   transform: "translateX(-2px)",
-                  color: {primaryMaroon},
+                  color: { primaryMaroon },
                 }}
                 _active={{ transform: "translateX(0)" }}
                 title="Go Back"
@@ -381,7 +381,7 @@ const RegistryTable = ({
                       textAlign="center"
                       borderRight="1px"
                       borderColor="gray.200"
-                      py={0}
+                      py={"3px"}
                       px={4}
                       fontWeight="700"
                       fontSize="xs"
@@ -493,7 +493,7 @@ const RegistryTable = ({
                             textAlign="center"
                             borderRight="1px"
                             borderColor="gray.200"
-                            py={0}
+                            py={"3px"}
                             px={4}
                             fontSize="xs"
                             fontFamily="'Outfit', sans-serif"
@@ -506,7 +506,7 @@ const RegistryTable = ({
                             textAlign="center"
                             borderRight="1px"
                             borderColor="gray.200"
-                            py={0}
+                            py={"3px"}
                             px={4}
                             fontSize="xs"
                             fontFamily="'Outfit', sans-serif"
@@ -515,7 +515,7 @@ const RegistryTable = ({
                           >
                             {item[nameKey]}
                           </Table.Cell>
-                          <Table.Cell py={0} pr={4} pl={4}>
+                          <Table.Cell py={"3px"} pr={4} pl={4}>
                             <HStack spacing={2} justify="flex-end">
                               {extraActions.map((action, idx) => (
                                 <Box

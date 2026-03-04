@@ -134,7 +134,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
         key={name}
         w="full"
         position="relative"
-        gridColumn={fullWidth ? "span 2" : "auto"}
+        gridColumn={fullWidth ? "span 3" : "auto"}
       >
         <Text
           as="label"
@@ -150,7 +150,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
           bg="white"
           px={1}
           zIndex={2}
-          fontSize="xs"
+          fontSize="sm"
           fontWeight={shouldFloat ? "700" : "500"}
           pointerEvents="none"
           letterSpacing="0.3px"
@@ -172,8 +172,8 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
               borderRadius: "8px",
               borderColor: "var(--chakra-colors-gray-200)",
               borderWidth: "1px",
-              fontSize: "var(--chakra-fontSizes-xs)",
-              paddingLeft: "8px",
+              fontSize: "var(--chakra-fontSizes-sm)",
+              paddingLeft: "12px",
               appearance: "none",
               background: "white",
             }}
@@ -195,7 +195,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
             rows={3}
             borderRadius="8px"
             borderColor="gray.200"
-            fontSize="xs"
+            fontSize="sm"
             pt={3}
             _focus={{
               borderColor: primaryMaroon,
@@ -214,7 +214,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
             borderRadius="8px"
             borderColor="gray.200"
             h="38px"
-            fontSize="xs"
+            fontSize="sm"
             _focus={{
               borderColor: primaryMaroon,
               boxShadow: "none",
@@ -231,31 +231,77 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
       open={isOpen}
       onOpenChange={(e) => !e.open && onClose()}
       placement="center"
-      size="md"
+      size="xl"
     >
       <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
       <DialogPositioner alignItems="center">
-        <DialogContent borderRadius="14px" overflow="hidden" boxShadow="2xl">
+        <DialogContent
+          borderRadius="14px"
+          overflow="hidden"
+          boxShadow="2xl"
+          h="95vh"
+          maxH="95vh"
+          display="flex"
+          flexDirection="column"
+        >
           <DialogHeader
             bg={primaryMaroon}
             color="white"
-            fontSize="sm"
-            py={3}
-            px={5}
+            fontSize="md"
+            py={4}
+            px={8}
             display="flex"
             justifyContent="space-between"
             alignItems="center"
             position="relative"
+            borderBottom="1px solid rgba(255,255,255,0.1)"
           >
-            <Text fontWeight="600" letterSpacing="0.5px">
+            <Text fontWeight="600" letterSpacing="0.5px" fontSize="md">
               {isEditing ? "EDIT BAPTISM RECORD" : "ADD BAPTISM RECORD"}
             </Text>
-            <DialogCloseTrigger color="white" />
+            <DialogCloseTrigger
+              position="absolute"
+              right={3}
+              top="50%"
+              transform="translateY(-50%)"
+              color="white"
+              bg="whiteAlpha.200"
+              borderRadius="full"
+              _hover={{ bg: "whiteAlpha.400" }}
+              p={1}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Icon as={LuX} fontSize="18px" />
+            </DialogCloseTrigger>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit}>
-            <DialogBody py={6} px={6} bg="white">
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+            }}
+          >
+            <DialogBody
+              py={8}
+              px={8}
+              bg="white"
+              flex="1"
+              overflowY="auto"
+              css={{
+                "&::-webkit-scrollbar": { width: "4px" },
+                "&::-webkit-scrollbar-track": { background: "transparent" },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "rgba(0,0,0,0.1)",
+                  borderRadius: "10px",
+                },
+              }}
+            >
+              <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
                 {renderField("baptism_category", "Baptism Category", "select", [
                   { value: "PARISH", label: "Parish" },
                   { value: "OTHER", label: "Other" },
@@ -263,7 +309,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                 {renderField("register_number", "Register Number")}
                 {renderField("date_of_baptism", "Date of Baptism", "date")}
                 {renderField("dob", "Date of Birth", "date")}
-                {renderField("name", "Name", "text", null, true)}
+                {renderField("name", "Name")}
                 {renderField("baptismal_name", "Baptismal Name")}
                 {renderField("gender", "Gender", "select", [
                   { value: "MALE", label: "Male" },
@@ -280,14 +326,14 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                 {isParish && (
                   <>
                     <Box
-                      gridColumn="span 2"
+                      gridColumn="span 3"
                       borderBottom="1px solid"
                       borderColor="gray.100"
                       my={1}
                     />
                     <Text
-                      gridColumn="span 2"
-                      fontSize="xs"
+                      gridColumn="span 3"
+                      fontSize="sm"
                       fontWeight="bold"
                       color={primaryMaroon}
                     >
@@ -325,16 +371,36 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
               </SimpleGrid>
             </DialogBody>
 
-            <DialogFooter px={6} pb={5} pt={2} bg="white">
+            <DialogFooter
+              px={8}
+              pb={6}
+              pt={2}
+              bg="white"
+              display="flex"
+              justifyContent="flex-end"
+            >
               <Button
                 type="submit"
                 bg={primaryMaroon}
                 color="white"
                 borderRadius="lg"
+                h="40px"
+                px={4}
+                fontSize="md"
+                fontWeight="bold"
+                _hover={{
+                  bg: "#6b0f1a",
+                  boxShadow: "md",
+                  transform: "translateY(-1px)",
+                }}
+                _active={{ transform: "translateY(0)" }}
                 loading={isLoading}
-                _hover={{ bg: "#6b0f1a" }}
+                display="flex"
+                alignItems="center"
+                gap={1.5}
+                transition="all 0.2s"
               >
-                <Icon as={isEditing ? LuSave : LuPlus} mr={2} />
+                <Icon as={isEditing ? LuSave : LuPlus} fontSize="14px" />
                 {isEditing ? "Save Changes" : "Save Record"}
               </Button>
             </DialogFooter>
