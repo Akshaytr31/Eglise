@@ -64,6 +64,7 @@ const RegistryTable = ({
   fields,
   itemsPerPage = 10,
   extraActions = [], // Array of { label, icon, onClick, color, title }
+  columns = [], // Array of { header, key, textAlign }
 }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -393,21 +394,42 @@ const RegistryTable = ({
                     >
                       SI No
                     </Table.ColumnHeader>
-                    <Table.ColumnHeader
-                      textAlign="center"
-                      borderRight="1px"
-                      borderColor="gray.200"
-                      py={2.5}
-                      px={4}
-                      fontWeight="700"
-                      fontSize="xs"
-                      fontFamily="'Outfit', sans-serif"
-                      color="gray.600"
-                      textTransform="uppercase"
-                      letterSpacing="wider"
-                    >
-                      {columnLabel}
-                    </Table.ColumnHeader>
+                    {columns && columns.length > 0 ? (
+                      columns.map((col, idx) => (
+                        <Table.ColumnHeader
+                          key={`header-${idx}`}
+                          textAlign={col.textAlign || "center"}
+                          borderRight="1px"
+                          borderColor="gray.200"
+                          py={2.5}
+                          px={4}
+                          fontWeight="700"
+                          fontSize="xs"
+                          fontFamily="'Outfit', sans-serif"
+                          color="gray.600"
+                          textTransform="uppercase"
+                          letterSpacing="wider"
+                        >
+                          {col.header}
+                        </Table.ColumnHeader>
+                      ))
+                    ) : (
+                      <Table.ColumnHeader
+                        textAlign="center"
+                        borderRight="1px"
+                        borderColor="gray.200"
+                        py={2.5}
+                        px={4}
+                        fontWeight="700"
+                        fontSize="xs"
+                        fontFamily="'Outfit', sans-serif"
+                        color="gray.600"
+                        textTransform="uppercase"
+                        letterSpacing="wider"
+                      >
+                        {columnLabel}
+                      </Table.ColumnHeader>
+                    )}
                     <Table.ColumnHeader
                       textAlign="right"
                       py={2.5}
@@ -447,20 +469,40 @@ const RegistryTable = ({
                               borderRadius="sm"
                             />
                           </Table.Cell>
-                          <Table.Cell
-                            textAlign="center"
-                            borderRight="1px"
-                            borderColor="gray.200"
-                            py={2.5}
-                            px={4}
-                          >
-                            <Skeleton
-                              height="14px"
-                              mx="auto"
-                              width="140px"
-                              borderRadius="sm"
-                            />
-                          </Table.Cell>
+                          {columns && columns.length > 0 ? (
+                            columns.map((_, idx) => (
+                              <Table.Cell
+                                key={`skeleton-cell-${idx}`}
+                                textAlign="center"
+                                borderRight="1px"
+                                borderColor="gray.200"
+                                py={2.5}
+                                px={4}
+                              >
+                                <Skeleton
+                                  height="14px"
+                                  mx="auto"
+                                  width="80%"
+                                  borderRadius="sm"
+                                />
+                              </Table.Cell>
+                            ))
+                          ) : (
+                            <Table.Cell
+                              textAlign="center"
+                              borderRight="1px"
+                              borderColor="gray.200"
+                              py={2.5}
+                              px={4}
+                            >
+                              <Skeleton
+                                height="14px"
+                                mx="auto"
+                                width="140px"
+                                borderRadius="sm"
+                              />
+                            </Table.Cell>
+                          )}
                           <Table.Cell py={2.5} pr={6} pl={4}>
                             <HStack spacing={2} justify="flex-end">
                               <Skeleton
@@ -502,19 +544,38 @@ const RegistryTable = ({
                           >
                             {indexOfFirstItem + index + 1}
                           </Table.Cell>
-                          <Table.Cell
-                            textAlign="center"
-                            borderRight="1px"
-                            borderColor="gray.200"
-                            py={"3px"}
-                            px={4}
-                            fontSize="xs"
-                            fontFamily="'Outfit', sans-serif"
-                            fontWeight="600"
-                            color="gray.800"
-                          >
-                            {item[nameKey]}
-                          </Table.Cell>
+                          {columns && columns.length > 0 ? (
+                            columns.map((col, idx) => (
+                              <Table.Cell
+                                key={`cell-${idx}`}
+                                textAlign={col.textAlign || "center"}
+                                borderRight="1px"
+                                borderColor="gray.200"
+                                py={"3px"}
+                                px={4}
+                                fontSize="xs"
+                                fontFamily="'Outfit', sans-serif"
+                                fontWeight="600"
+                                color="gray.800"
+                              >
+                                {item[col.key]}
+                              </Table.Cell>
+                            ))
+                          ) : (
+                            <Table.Cell
+                              textAlign="center"
+                              borderRight="1px"
+                              borderColor="gray.200"
+                              py={"3px"}
+                              px={4}
+                              fontSize="xs"
+                              fontFamily="'Outfit', sans-serif"
+                              fontWeight="600"
+                              color="gray.800"
+                            >
+                              {item[nameKey]}
+                            </Table.Cell>
+                          )}
                           <Table.Cell py={"3px"} pr={4} pl={4}>
                             <HStack spacing={2} justify="flex-end">
                               {extraActions.map((action, idx) => (

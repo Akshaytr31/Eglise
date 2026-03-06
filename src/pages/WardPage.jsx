@@ -19,12 +19,18 @@ const WARD_FIELDS = [
   { name: "place", label: "Place", type: "text" },
 ];
 
+const WARD_COLUMNS = [
+  { header: "Ward Number", key: "ward_number", textAlign: "center" },
+  { header: "Ward Name", key: "ward_name", textAlign: "center" },
+  { header: "Place", key: "place", textAlign: "center" },
+];
+
 const WardPage = () => (
   <RegistryTable
     title="Ward"
     addLabel="Add New"
     nameKey="ward_name"
-    columnLabel="Ward Name"
+    columns={WARD_COLUMNS}
     emptyMessage="No wards found."
     listFn={listWards}
     createFn={createWard}
