@@ -166,15 +166,15 @@ const LoginPage = () => {
       >
         {/* Left Side: Illustration */}
         <Box
-        // flex="1"
-        // display="flex"
-        // justifyContent="center"
-        // alignItems="center"
+          flex="1"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
         >
           <Image
             src={loginIllustration}
             alt="Login Illustration"
-            maxW={{ base: "300px", md: "500px" }}
+            maxW={{ base: "300px", md: "680px" }}
             opacity={0.9}
           />
         </Box>
