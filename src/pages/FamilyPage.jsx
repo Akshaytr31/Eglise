@@ -10,7 +10,13 @@ import {
 const familyFields = [
   { name: "family_name", label: "Family Name", required: true },
   { name: "origin", label: "Origin" },
-  { name: "history", label: "History", type: "textarea", rows: 3 },
+  {
+    name: "history",
+    label: "History",
+    type: "textarea",
+    rows: 3,
+    fullWidth: true,
+  },
 ];
 
 const FamilyPage = () => {

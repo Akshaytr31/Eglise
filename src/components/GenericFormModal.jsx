@@ -199,7 +199,7 @@ const GenericFormModal = ({
                 },
               }}
             >
-              <SimpleGrid columns={{ base: 1, md: columnCount }} gap={8}>
+              <SimpleGrid columns={{ base: 1, md: columnCount }} gap={5}>
                 {fields.map((f) => {
                   const hasValue = String(formData[f.name] || "").length > 0;
                   const isFocused = focusedField === f.name;
