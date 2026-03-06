@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import authService from "../auth/authService";
-import { forgotPassword, resetPassword } from "../api/authServices";
+import { forgotPassword, resetPassword, checkEmail } from "../api/authServices";
 import loginIllustration from "../assets/133748214_10221134.jpg";
 
 const LoginPage = () => {
@@ -40,11 +40,57 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
+    if (!email) return;
+
+    setIsLoading(true);
     setError("");
-    if (email) {
+    setMessage("");
+
+    try {
+      const response = await checkEmail({ email });
+      console.log("Email check response:", response.data);
+
+      // Simple check: if the API returns a response that explicitly says it doesn't exist
+      // or if it returns an error status in the body
+      if (
+        response.data &&
+        (response.data.exists === false ||
+          response.data.status === "error" ||
+          response.data.error)
+      ) {
+        setError(
+          response.data.error ||
+            response.data.message ||
+            "This email is not registered. Please check and try again.",
+        );
+        return;
+      }
+
+      // If the request succeeds and we have no reason to believe otherwise
       setStep(2);
+    } catch (err) {
+      console.error("Email check failed:", err);
+      const backendError = err.response?.data;
+      let errorMessage =
+        "This email is not registered. Please check and try again.";
+
+      if (backendError) {
+        if (typeof backendError === "string") {
+          errorMessage = backendError;
+        } else if (backendError.detail) {
+          errorMessage = backendError.detail;
+        } else if (backendError.error) {
+          errorMessage = backendError.error;
+        } else if (backendError.message) {
+          errorMessage = backendError.message;
+        }
+      }
+
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 

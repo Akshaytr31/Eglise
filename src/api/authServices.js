@@ -20,3 +20,9 @@ export const forgotPassword = (data) =>
  */
 export const resetPassword = (data) =>
   apiClient.post("/api/accounts/auth/reset-password/", data);
+/**
+ * Check if an email exists in the system.
+ * @param {Object} data - { email }
+ */
+export const checkEmail = (data) =>
+  apiClient.post("/api/accounts/auth/check-email/", data);
