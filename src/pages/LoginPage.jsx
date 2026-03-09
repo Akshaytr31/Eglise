@@ -221,6 +221,10 @@ const LoginPage = () => {
             src={loginIllustration}
             alt="Login Illustration"
             maxW={{ base: "300px", md: "680px" }}
+            w="full"
+            aspectRatio="1/1"
+            objectFit="contain"
+            maxH={{ base: "300px", md: "450px" }}
             opacity={0.9}
           />
         </Box>
