@@ -26,14 +26,14 @@ const DropdownItem = ({ icon, label, onClick, primaryMaroon, isLogout }) => (
 const UserDropdown = ({ isOpen, onClose, onLogout, primaryMaroon }) => {
   const navigate = useNavigate();
   const menuItems = [
-    {
-      icon: LuUser,
-      label: "Profile",
-      action: () => {
-        console.log("Profile clicked");
-        onClose();
-      },
-    },
+    // {
+    //   icon: LuUser,
+    //   label: "Profile",
+    //   action: () => {
+    //     console.log("Profile clicked");
+    //     onClose();
+    //   },
+    // },
     {
       icon: LuSettings,
       label: "Settings",

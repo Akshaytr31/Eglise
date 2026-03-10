@@ -6,7 +6,6 @@ import {
   updateFamily,
   deleteFamily,
 } from "../api/registryServices";
-import { BiAlignMiddle } from "react-icons/bi";
 
 const FamilyPage = () => {
   const familyFields = [
