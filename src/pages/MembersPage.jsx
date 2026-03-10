@@ -10,6 +10,7 @@ import {
   listFamilies,
   listWards,
   listGrades,
+  updateHead,
 } from "../api/registryServices";
 
 const MembersPage = () => {
@@ -44,7 +45,6 @@ const MembersPage = () => {
       required: true,
       options: families.map((f) => ({ value: f.id, label: f.family_name })),
       coerce: Number,
-      disabledOnEdit: true,
     },
     {
       name: "ward",
@@ -53,7 +53,6 @@ const MembersPage = () => {
       required: true,
       options: wards.map((w) => ({ value: w.id, label: w.ward_name })),
       coerce: Number,
-      disabledOnEdit: true,
     },
     { name: "house_name", label: "House Name", required: true },
     { name: "name", label: "Name", required: true },
@@ -134,15 +133,63 @@ const MembersPage = () => {
   // If listMembers returns all, we might need to filter.
   // However, for now I'll list all and let the user see.
 
-  const listHeadsOnly = async () => {
-    const res = await listMembers();
-    if (res.data && Array.isArray(res.data)) {
-      return {
-        ...res,
-        data: res.data.filter((m) => !m.relationship),
-      };
+  const handleUpdateHead = async (id, formData) => {
+    // 1. Prepare data
+    let ward, familyId, memberData;
+    if (formData instanceof FormData) {
+      ward = formData.get("ward");
+      familyId = formData.get("family");
+      // We leave ward and family in formData for updateHead, but we'll needs a clean one for updateMember later if it's Multipart
+      memberData = formData;
+    } else {
+      const { ward: w, family: f, ...rest } = formData;
+      ward = w;
+      familyId = f;
+      memberData = rest;
     }
-    return res;
+
+    // 2. Call updateHead (handles Ward and other fields)
+    const hRes = await updateHead(id, formData);
+
+    // 3. Call updateMember (specifically for Family field which updateHead ignores)
+    if (familyId) {
+      // If it was FormData, we don't want to resend the whole file again if possible,
+      // but simple JSON update for family should work.
+      await updateMember(id, { family: Number(familyId) });
+    }
+
+    return hRes;
+  };
+
+  const listHeadsWithNames = async () => {
+    // Fetch fresh options to ensure names are correct after an update
+    const [wRes, fRes, mRes] = await Promise.all([
+      listWards(),
+      listFamilies(),
+      listMembers(),
+    ]);
+
+    const freshWards = wRes.data || [];
+    const freshFamilies = fRes.data || [];
+    const allMembers = mRes.data || [];
+
+    // Filter for heads
+    const heads = allMembers.filter((m) => !m.relationship);
+
+    // Map names
+    const mapped = heads.map((h) => {
+      const familyObj = freshFamilies.find(
+        (f) => f.id === (h.family?.id || h.family),
+      );
+      const wardObj = freshWards.find((w) => w.id === (h.ward?.id || h.ward));
+      return {
+        ...h,
+        family_name: h.family?.family_name || familyObj?.family_name || "N/A",
+        ward_name: h.ward?.ward_name || wardObj?.ward_name || "N/A",
+      };
+    });
+
+    return { ...mRes, data: mapped };
   };
 
   return (
@@ -152,9 +199,9 @@ const MembersPage = () => {
       nameKey="name"
       columnLabel="Head of Family"
       emptyMessage="No members found."
-      listFn={listHeadsOnly}
+      listFn={listHeadsWithNames}
       createFn={createHead}
-      updateFn={updateMember}
+      updateFn={handleUpdateHead}
       deleteFn={deleteMember}
       fields={headFields}
       extraActions={extraActions}

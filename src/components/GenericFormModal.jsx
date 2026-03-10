@@ -68,7 +68,16 @@ const GenericFormModal = ({
   useEffect(() => {
     if (itemData) {
       setFormData(
-        Object.fromEntries(fields.map((f) => [f.name, itemData[f.name] ?? ""])),
+        Object.fromEntries(
+          fields.map((f) => {
+            let val = itemData[f.name];
+            // If the value is an object (common for foreign keys), try to get the ID
+            if (val && typeof val === "object" && val.id !== undefined) {
+              val = val.id;
+            }
+            return [f.name, val ?? ""];
+          }),
+        ),
       );
       // If there's an existing image URL, we could show it, but for now we focus on new uploads
       setPreviews({});
@@ -86,7 +95,11 @@ const GenericFormModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const hasFile = fields.some((f) => f.type === "file" && formData[f.name]);
+    const hasFile = fields.some(
+      (f) =>
+        f.type === "file" &&
+        (formData[f.name] instanceof File || formData[f.name] instanceof Blob),
+    );
 
     if (hasFile) {
       const fd = new FormData();
@@ -95,15 +108,32 @@ const GenericFormModal = ({
 
         let val = formData[f.name];
         if (val !== undefined && val !== "") {
-          if (f.coerce) val = f.coerce(val);
-          fd.append(f.name, val);
+          if (f.type === "file") {
+            if (val instanceof File || val instanceof Blob) {
+              fd.append(f.name, val);
+            }
+          } else {
+            if (f.coerce) val = f.coerce(val);
+            fd.append(f.name, val);
+          }
         }
       });
+      console.log("Submitting FormData to onSave:", fd);
       onSave(fd);
     } else {
       const coerced = Object.fromEntries(
         fields
           .filter((f) => !(isEditing && f.disabledOnEdit))
+          .filter((f) => {
+            // Skip file fields if they are not actual File/Blob objects
+            if (f.type === "file") {
+              return (
+                formData[f.name] instanceof File ||
+                formData[f.name] instanceof Blob
+              );
+            }
+            return true;
+          })
           .map((f) => {
             let val = formData[f.name];
             if (val === "" || val === undefined) return [f.name, undefined];
@@ -112,6 +142,7 @@ const GenericFormModal = ({
           })
           .filter(([name, value]) => value !== undefined),
       );
+      console.log("Submitting JSON object to onSave:", coerced);
       onSave(coerced);
     }
   };

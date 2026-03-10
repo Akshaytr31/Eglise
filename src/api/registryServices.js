@@ -55,6 +55,8 @@ export const deleteMember = (id) =>
   apiClient.delete(`/api/registry/members/${id}/`);
 export const createHead = (data) =>
   apiClient.post("/api/registry/members/create-head/", data);
+export const updateHead = (id, data) =>
+  apiClient.patch(`/api/registry/family-head/${id}/`, data);
 
 // Baptism APIs
 export const listBaptisms = () => apiClient.get("/api/registry/baptisms/");

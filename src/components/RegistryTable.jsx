@@ -121,9 +121,23 @@ const RegistryTable = ({
       onClose();
     } catch (error) {
       console.error("Error saving item:", error);
-      const serverMsg = error.response?.data
-        ? JSON.stringify(error.response.data, null, 2)
-        : error.message;
+      let serverMsg = error.message;
+
+      if (error.response?.data) {
+        if (typeof error.response.data === "object") {
+          // Format Django REST framework style errors: { field: [msg], ... }
+          serverMsg = Object.entries(error.response.data)
+            .map(([field, msgs]) => {
+              const messages = Array.isArray(msgs) ? msgs.join(" ") : msgs;
+              return `${field}: ${messages}`;
+            })
+            .join("\n");
+        } else {
+          serverMsg = JSON.stringify(error.response.data, null, 2);
+        }
+      }
+
+      console.log("Formatted server error message:", serverMsg);
       const status = error.response?.status ? `(${error.response.status})` : "";
       alert(`Error saving item ${status}:\n${serverMsg}`);
     } finally {
