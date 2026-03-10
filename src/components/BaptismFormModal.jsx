@@ -58,7 +58,29 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
 
   useEffect(() => {
     if (itemData) {
-      setFormData(itemData);
+      // Create a copy and handle nested objects for select fields
+      const cleanedData = {
+        priest_name: "",
+        panchayath: "",
+        ...itemData,
+      };
+      if (cleanedData.family && typeof cleanedData.family === "object") {
+        cleanedData.family = cleanedData.family.id;
+      }
+      if (
+        cleanedData.main_member &&
+        typeof cleanedData.main_member === "object"
+      ) {
+        cleanedData.main_member = cleanedData.main_member.id;
+      }
+      if (
+        cleanedData.relation_with_main_member &&
+        typeof cleanedData.relation_with_main_member === "object"
+      ) {
+        cleanedData.relation_with_main_member =
+          cleanedData.relation_with_main_member.id;
+      }
+      setFormData(cleanedData);
     } else {
       setFormData({
         baptism_category: "PARISH",
@@ -75,6 +97,9 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
         god_mother: "",
         father_name: "",
         mother_name: "",
+        priest_name: "",
+        panchayath: "",
+        house_name: "",
         remarks: "",
         family: "",
         main_member: "",
@@ -94,15 +119,48 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
     // Process and coerce
     const submissionData = { ...formData };
 
-    // Coerce numbers if present
-    if (submissionData.family)
-      submissionData.family = Number(submissionData.family);
-    if (submissionData.main_member)
-      submissionData.main_member = Number(submissionData.main_member);
-    if (submissionData.relation_with_main_member)
-      submissionData.relation_with_main_member = Number(
-        submissionData.relation_with_main_member,
-      );
+    // Ensure strings are not null/undefined
+    const stringFields = [
+      "name",
+      "baptismal_name",
+      "father_name",
+      "mother_name",
+      "priest_name",
+      "panchayath",
+      "house_name",
+      "place_of_birth",
+      "address",
+      "parish_of_baptism",
+      "god_father",
+      "god_mother",
+      "remarks",
+    ];
+    stringFields.forEach((field) => {
+      if (
+        submissionData[field] === null ||
+        submissionData[field] === undefined
+      ) {
+        submissionData[field] = "";
+      }
+    });
+
+    // Remove immutable fields if editing (Server prohibits modification)
+    if (isEditing) {
+      delete submissionData.baptism_category;
+      delete submissionData.family;
+      delete submissionData.main_member;
+      delete submissionData.relation_with_main_member;
+    } else {
+      // Coerce numbers if present (only for creation)
+      if (submissionData.family)
+        submissionData.family = Number(submissionData.family);
+      if (submissionData.main_member)
+        submissionData.main_member = Number(submissionData.main_member);
+      if (submissionData.relation_with_main_member)
+        submissionData.relation_with_main_member = Number(
+          submissionData.relation_with_main_member,
+        );
+    }
 
     // Clean up if category is OTHER
     if (submissionData.baptism_category === "OTHER") {
@@ -307,6 +365,9 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                   { value: "OTHER", label: "Other" },
                 ])}
                 {renderField("register_number", "Register Number")}
+                {renderField("priest_name", "Priest Name")}
+                {renderField("panchayath", "Panchayath")}
+                {renderField("house_name", "House Name")}
                 {renderField("date_of_baptism", "Date of Baptism", "date")}
                 {renderField("dob", "Date of Birth", "date")}
                 {renderField("name", "Name")}
