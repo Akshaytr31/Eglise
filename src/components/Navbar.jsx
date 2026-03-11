@@ -254,8 +254,13 @@ const Navbar = () => {
         gap={6}
       >
         {/* Logo */}
-        <Box flexShrink={0}>
-          <Image src={EgliseLogo} alt="Eglise Logo" maxH="36px" />
+        <Box flexShrink={0} as={RouterLink} to="/">
+          <Image
+            src={EgliseLogo}
+            alt="Eglise Logo"
+            maxH="36px"
+            cursor="pointer"
+          />
         </Box>
 
         {isLoggedIn && (
