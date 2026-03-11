@@ -7,7 +7,7 @@ import {
   VStack,
   HStack,
   Button,
-  Table,
+  SimpleGrid,
   Text,
   Flex,
   Input,
@@ -62,7 +62,7 @@ const RegistryTable = ({
   deleteFn,
   FormModal,
   fields,
-  itemsPerPage = 10,
+  itemsPerPage = 9,
   extraActions = [], // Array of { label, icon, onClick, color, title }
   columns = [], // Array of { header, key, textAlign }
 }) => {
@@ -380,333 +380,250 @@ const RegistryTable = ({
             </Button>
           </Flex>
 
-          {/* Table Container */}
-          <Box px={5} py={4}>
-            <Box
-              border="1px"
-              borderColor="gray.200"
-              borderRadius="lg"
-              overflowX="auto"
-              overflow="hidden"
-            >
-              <Table.Root variant="line" size="sm">
-                <Table.Header>
-                  <Table.Row borderBottom="2px" borderColor="gray.200">
-                    <Table.ColumnHeader
-                      textAlign="center"
-                      borderRight="1px"
-                      borderColor="gray.200"
-                      py={"3px"}
-                      px={4}
-                      fontWeight="700"
-                      fontSize="xs"
-                      fontFamily="'Outfit', sans-serif"
-                      color="gray.600"
-                      textTransform="uppercase"
-                      letterSpacing="wider"
-                      w="80px"
-                    >
-                      SI No
-                    </Table.ColumnHeader>
-                    {columns && columns.length > 0 ? (
-                      columns.map((col, idx) => (
-                        <Table.ColumnHeader
-                          key={`header-${idx}`}
-                          textAlign={col.textAlign || "center"}
-                          borderRight="1px"
-                          borderColor="gray.200"
-                          py={2.5}
-                          px={4}
-                          fontWeight="700"
-                          fontSize="xs"
-                          fontFamily="'Outfit', sans-serif"
-                          color="gray.600"
-                          textTransform="uppercase"
-                          letterSpacing="wider"
+          {/* Card Grid Container */}
+          <Box px={5} py={6}>
+            {isLoading ? (
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
+                {Array.from({ length: itemsPerPage }).map((_, i) => (
+                  <Box
+                    key={`skeleton-${i}`}
+                    p={5}
+                    borderRadius="xl"
+                    border="1px solid"
+                    borderColor="gray.100"
+                    bg="white"
+                    boxShadow="sm"
+                  >
+                    <VStack align="start" spacing={3}>
+                      <HStack w="full" justify="space-between">
+                        <Skeleton height="20px" width="60%" borderRadius="md" />
+                        <Skeleton
+                          height="16px"
+                          width="30px"
+                          borderRadius="full"
+                        />
+                      </HStack>
+                      <Skeleton height="14px" width="40%" borderRadius="md" />
+                      <Box w="full" h="1px" bg="gray.50" my={1} />
+                      <HStack w="full" justify="flex-end" spacing={2}>
+                        <Skeleton
+                          height="28px"
+                          width="28px"
+                          borderRadius="full"
+                        />
+                        <Skeleton
+                          height="28px"
+                          width="28px"
+                          borderRadius="full"
+                        />
+                      </HStack>
+                    </VStack>
+                  </Box>
+                ))}
+              </SimpleGrid>
+            ) : filteredItems.length > 0 ? (
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={4}>
+                {paginatedItems.map((item, index) => (
+                  <Box
+                    key={item.id}
+                    position="relative"
+                    borderRadius="lg"
+                    overflow="hidden"
+                    bg="white"
+                    borderWidth="1px"
+                    borderColor="purple.100"
+                    boxShadow="0 2px 12px -5px rgba(0,0,0,0.05), 0 1px 4px -5px rgba(0,0,0,0.02)"
+                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                    _hover={{
+                      transform: "translateY(-4px)",
+                      boxShadow:
+                        "0 15px 30px -10px rgba(123, 13, 30, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.03)",
+                      borderColor: "rgba(13, 11, 11, 0.1)",
+                    }}
+                  >
+                    {/* Compact Card Header (No Avatar) */}
+                    <Box p={3} pb={1}>
+                      <Flex align="center" justify="space-between" mb={2}>
+                        <HStack
+                          align="start"
+                          spacing={0}
+                          w="full"
+                          justify="space-between"
                         >
-                          {col.header}
-                        </Table.ColumnHeader>
-                      ))
-                    ) : (
-                      <Table.ColumnHeader
-                        textAlign="center"
-                        borderRight="1px"
-                        borderColor="gray.200"
-                        py={2.5}
-                        px={4}
-                        fontWeight="700"
-                        fontSize="xs"
-                        fontFamily="'Outfit', sans-serif"
-                        color="gray.600"
-                        textTransform="uppercase"
-                        letterSpacing="wider"
-                      >
-                        {columnLabel}
-                      </Table.ColumnHeader>
-                    )}
-                    <Table.ColumnHeader
-                      textAlign="right"
-                      py={2.5}
-                      pr={6}
-                      pl={4}
-                      fontWeight="700"
-                      fontSize="xs"
-                      fontFamily="'Outfit', sans-serif"
-                      color="gray.600"
-                      textTransform="uppercase"
-                      letterSpacing="wider"
-                      w="180px"
-                    >
-                      Actions
-                    </Table.ColumnHeader>
-                  </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                  {isLoading
-                    ? Array.from({ length: itemsPerPage }).map((_, i) => (
-                        <Table.Row
-                          key={`skeleton-${i}`}
-                          bg={i % 2 === 0 ? "gray.100" : "white"}
-                        >
-                          <Table.Cell
-                            textAlign="center"
-                            borderRight="1px"
-                            borderColor="gray.200"
-                            py={2.5}
-                            px={4}
+                          <Text
+                            fontSize="sm"
+                            fontWeight="800"
+                            color="gray.800"
+                            letterSpacing="tight"
+                            lineHeight="1.1"
+                            noOfLines={1}
                           >
-                            <Skeleton
-                              height="14px"
-                              mx="auto"
-                              width="24px"
-                              borderRadius="sm"
-                            />
-                          </Table.Cell>
-                          {columns && columns.length > 0 ? (
-                            columns.map((_, idx) => (
-                              <Table.Cell
-                                key={`skeleton-cell-${idx}`}
-                                textAlign="center"
-                                borderRight="1px"
-                                borderColor="gray.200"
-                                py={2.5}
-                                px={4}
-                              >
-                                <Skeleton
-                                  height="14px"
-                                  mx="auto"
-                                  width="80%"
-                                  borderRadius="sm"
-                                />
-                              </Table.Cell>
-                            ))
-                          ) : (
-                            <Table.Cell
-                              textAlign="center"
-                              borderRight="1px"
-                              borderColor="gray.200"
-                              py={2.5}
-                              px={4}
-                            >
-                              <Skeleton
-                                height="14px"
-                                mx="auto"
-                                width="140px"
-                                borderRadius="sm"
-                              />
-                            </Table.Cell>
-                          )}
-                          <Table.Cell py={2.5} pr={6} pl={4}>
-                            <HStack spacing={2} justify="flex-end">
-                              <Skeleton
-                                height="22px"
-                                width="50px"
-                                borderRadius="md"
-                              />
-                              <Skeleton
-                                height="22px"
-                                width="58px"
-                                borderRadius="md"
-                              />
-                            </HStack>
-                          </Table.Cell>
-                        </Table.Row>
-                      ))
-                    : paginatedItems.map((item, index) => (
-                        <Table.Row
-                          key={item.id}
-                          bg={index % 2 === 0 ? "gray.100" : "white"}
-                          _hover={{
-                            transform: "scale(1.01)",
-                            zIndex: 1,
-                            boxShadow: "sm",
-                          }}
-                          transition="transform 0.2s ease, box-shadow 0.2s ease"
-                          position="relative"
-                        >
-                          <Table.Cell
-                            textAlign="center"
-                            borderRight="1px"
-                            borderColor="gray.200"
-                            py={"3px"}
-                            px={4}
-                            fontSize="xs"
-                            fontFamily="'Outfit', sans-serif"
-                            color="gray.500"
-                            fontWeight="600"
-                          >
-                            {indexOfFirstItem + index + 1}
-                          </Table.Cell>
-                          {columns && columns.length > 0 ? (
-                            columns.map((col, idx) => (
-                              <Table.Cell
-                                key={`cell-${idx}`}
-                                textAlign={col.textAlign || "center"}
-                                borderRight="1px"
-                                borderColor="gray.200"
-                                py={"3px"}
-                                px={4}
-                                fontSize="xs"
-                                fontFamily="'Outfit', sans-serif"
-                                fontWeight="600"
-                                color="gray.800"
-                              >
-                                {item[col.key]}
-                              </Table.Cell>
-                            ))
-                          ) : (
-                            <Table.Cell
-                              textAlign="center"
-                              borderRight="1px"
-                              borderColor="gray.200"
-                              py={"3px"}
-                              px={4}
-                              fontSize="xs"
-                              fontFamily="'Outfit', sans-serif"
-                              fontWeight="600"
-                              color="gray.800"
-                            >
-                              {item[nameKey]}
-                            </Table.Cell>
-                          )}
-                          <Table.Cell py={"3px"} pr={4} pl={4}>
-                            <HStack spacing={2} justify="flex-end">
-                              {extraActions.map((action, idx) => (
-                                <Box
-                                  key={`extra-action-${idx}`}
-                                  as="button"
-                                  onClick={() => action.onClick(item)}
-                                  display="inline-flex"
-                                  alignItems="center"
-                                  justifyContent="center"
-                                  w="28px"
-                                  h="28px"
-                                  borderRadius="full"
-                                  color={action.color || "gray.500"}
-                                  bg="transparent"
-                                  border="1.5px solid transparent"
-                                  transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
-                                  _hover={{
-                                    color: action.hoverColor || "gray.700",
-                                    transform: "translateY(-2px) scale(1.15)",
-                                  }}
-                                  _active={{
-                                    transform: "translateY(0) scale(0.95)",
-                                    boxShadow: "none",
-                                  }}
-                                  title={action.title}
-                                >
-                                  <Icon as={action.icon} fontSize="13px" />
-                                </Box>
-                              ))}
-                              {/* Edit Ghost Button */}
-                              <Box
-                                as="button"
-                                onClick={() => handleEdit(item)}
-                                display="inline-flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                w="28px"
-                                h="28px"
-                                borderRadius="full"
-                                color="blue.500"
-                                bg="transparent"
-                                border="1.5px solid transparent"
-                                transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
-                                _hover={{
-                                  color: "#003399",
-                                  transform: "translateY(-2px) scale(1.15)",
-                                  //   boxShadow: "0 4px 14px rgba(0,51,153,0.2)",
-                                }}
-                                _active={{
-                                  transform: "translateY(0) scale(0.95)",
-                                  boxShadow: "none",
-                                }}
-                                title="Edit"
-                              >
-                                <Icon as={LuPencil} fontSize="13px" />
-                              </Box>
-
-                              {/* Delete Ghost Button */}
-                              <Box
-                                as="button"
-                                onClick={() => handleDelete(item.id)}
-                                display="inline-flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                w="28px"
-                                h="28px"
-                                borderRadius="full"
-                                color="red.400"
-                                bg="transparent"
-                                border="1.5px solid transparent"
-                                transition="all 0.25s cubic-bezier(0.4,0,0.2,1)"
-                                _hover={{
-                                  // bg: "rgba(211, 47, 47, 0.08)",
-                                  // border: "1.5px solid rgba(211,47,47,0.3)",
-                                  color: "#d32f2f",
-                                  transform: "translateY(-2px) scale(1.15)",
-                                }}
-                                _active={{
-                                  transform: "translateY(0) scale(0.95)",
-                                  boxShadow: "none",
-                                }}
-                                title="Delete"
-                              >
-                                <Icon as={LuTrash2} fontSize="13px" />
-                              </Box>
-                            </HStack>
-                          </Table.Cell>
-                        </Table.Row>
-                      ))}
-
-                  {!isLoading && filteredItems.length === 0 && (
-                    <Table.Row>
-                      <Table.Cell colSpan={3} textAlign="center" py={10}>
-                        <VStack spacing={1.5}>
-                          <Text color="gray.400" fontSize="sm">
-                            {searchQuery.trim()
-                              ? `No results for "${searchQuery}".`
-                              : emptyMessage}
+                            {item[nameKey]}
                           </Text>
-                          {!searchQuery.trim() && (
-                            <Button
-                              variant="link"
-                              color={primaryMaroon}
-                              fontSize="sm"
-                              onClick={handleAddNew}
+                          <Text
+                            fontSize="8px"
+                            fontWeight="700"
+                            color="gray.400"
+                            textTransform="uppercase"
+                            letterSpacing="widest"
+                            mt={0.5}
+                          >
+                            {title.replace(/ Directory| Page/i, "").trim()} #
+                            {indexOfFirstItem + index + 1}
+                          </Text>
+                        </HStack>
+                      </Flex>
+
+                      {/* Detail Rows */}
+                      <HStack align="start" spacing={2} w="full" px={0.5}>
+                        {columns
+                          .filter((col) => col.key !== nameKey)
+                          .map((col, idx) => (
+                            <HStack key={`card-field-compact-${idx}`} w="full">
+                              <Box w="100%">
+                                <Text
+                                  fontSize="7px"
+                                  fontWeight="800"
+                                  color="gray.400"
+                                  textTransform="uppercase"
+                                  letterSpacing="wider"
+                                  mb={-0.5}
+                                >
+                                  {col.header}
+                                </Text>
+                                <Text
+                                  fontSize="9px"
+                                  fontWeight="700"
+                                  color="gray.600"
+                                  noOfLines={1}
+                                  lineHeight="1.2"
+                                >
+                                  {item[col.key] || "—"}
+                                </Text>
+                              </Box>
+                            </HStack>
+                          ))}
+                      </HStack>
+                    </Box>
+
+                    {/* Compact Action Bar */}
+                    <Box mt={2} bg="gray.50" px={4} py={1.5}>
+                      <Flex justify="space-between" align="center">
+                        <HStack spacing={1.5}>
+                          {extraActions.map((action, idx) => (
+                            <Box
+                              key={`extra-action-compact-${idx}`}
+                              as="button"
+                              onClick={() => action.onClick(item)}
+                              display="inline-flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              w="24px"
+                              h="24px"
+                              borderRadius="full"
+                              color={action.color || "gray.600"}
+                              bg="white"
+                              boxShadow="xs"
+                              border="1px solid"
+                              borderColor="gray.100"
+                              transition="all 0.2s"
+                              _hover={{
+                                transform: "translateY(-1px)",
+                                color: "white",
+                                bg: action.color || primaryMaroon,
+                                boxShadow: "sm",
+                                border: "none",
+                              }}
+                              title={action.title}
                             >
-                              Add your first entry
-                            </Button>
-                          )}
-                        </VStack>
-                      </Table.Cell>
-                    </Table.Row>
+                              <Icon as={action.icon} fontSize="12px" />
+                            </Box>
+                          ))}
+                        </HStack>
+
+                        <HStack spacing={2}>
+                          <Box
+                            as="button"
+                            onClick={() => handleEdit(item)}
+                            display="inline-flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            w="26px"
+                            h="26px"
+                            borderRadius="full"
+                            color="blue.500"
+                            bg="white"
+                            boxShadow="xs"
+                            border="1px solid"
+                            borderColor="blue.50"
+                            transition="all 0.2s"
+                            _hover={{
+                              transform: "translateY(-1px)",
+                              color: "white",
+                              bg: "blue.500",
+                              boxShadow: "0 3px 8px rgba(49, 130, 206, 0.2)",
+                              border: "none",
+                            }}
+                            title="Edit"
+                          >
+                            <Icon as={LuPencil} fontSize="12px" />
+                          </Box>
+
+                          <Box
+                            as="button"
+                            onClick={() => handleDelete(item.id)}
+                            display="inline-flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            w="26px"
+                            h="26px"
+                            borderRadius="full"
+                            color="red.500"
+                            bg="white"
+                            boxShadow="xs"
+                            border="1px solid"
+                            borderColor="red.50"
+                            transition="all 0.2s"
+                            _hover={{
+                              transform: "translateY(-1px)",
+                              color: "white",
+                              bg: "red.500",
+                              boxShadow: "0 3px 8px rgba(229, 62, 62, 0.2)",
+                              border: "none",
+                            }}
+                            title="Delete"
+                          >
+                            <Icon as={LuTrash2} fontSize="12px" />
+                          </Box>
+                        </HStack>
+                      </Flex>
+                    </Box>
+                  </Box>
+                ))}
+              </SimpleGrid>
+            ) : (
+              <Box textAlign="center" py={20} bg="gray.50" borderRadius="xl">
+                <VStack spacing={3}>
+                  <Text color="gray.400" fontSize="md" fontWeight="500">
+                    {searchQuery.trim()
+                      ? `No results for "${searchQuery}".`
+                      : emptyMessage}
+                  </Text>
+                  {!searchQuery.trim() && (
+                    <Button
+                      variant="solid"
+                      bg={primaryMaroon}
+                      color="white"
+                      size="sm"
+                      onClick={handleAddNew}
+                      _hover={{ bg: "#6b0f1a" }}
+                    >
+                      Add your first entry
+                    </Button>
                   )}
-                </Table.Body>
-              </Table.Root>
-            </Box>
+                </VStack>
+              </Box>
+            )}
 
             {/* Pagination */}
             <Flex justify="space-between" align="center" mt={4}>
