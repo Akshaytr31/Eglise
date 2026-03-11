@@ -18,6 +18,7 @@ import UserDropdown from "./UserDropdown";
 
 // ─── Route map: item label → path (only items with a real page) ───────────────
 const ROUTE_MAP = {
+  "Church Info": "/church-info",
   Family: "/family",
   Ward: "/ward",
   Grade: "/grade",
