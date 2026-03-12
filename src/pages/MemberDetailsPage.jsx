@@ -16,7 +16,9 @@ const MemberDetailsPage = () => {
   const { headId } = useParams();
   const location = useLocation();
   const [head, setHead] = useState(location.state?.head || null);
-  const [familyId, setFamilyId] = useState(head?.family || null);
+  const [familyId, setFamilyId] = useState(
+    head?.family?.id ?? head?.family ?? null,
+  );
 
   const [relationships, setRelationships] = useState([]);
   const [grades, setGrades] = useState([]);
@@ -39,9 +41,11 @@ const MemberDetailsPage = () => {
           const hRes = await getMember(headId);
           fetchedHead = hRes.data;
           setHead(fetchedHead);
-          setFamilyId(fetchedHead?.family);
+          const f = fetchedHead?.family;
+          setFamilyId(f?.id ?? f ?? null);
         } else {
-          setFamilyId(fetchedHead?.family);
+          const f = fetchedHead?.family;
+          setFamilyId(f?.id ?? f ?? null);
         }
 
         const [rRes, gRes, fRes, wRes] = await Promise.all(promises);
@@ -138,10 +142,9 @@ const MemberDetailsPage = () => {
   ];
 
   const handleCreateMember = (formData) => {
-    // Ensure family and house_name are included from head if creating new
     const data = {
       ...formData,
-      family: typeof familyId === "object" ? familyId?.id : familyId,
+      family: familyId,
       house_name: head?.house_name,
       is_active: true,
     };
@@ -153,19 +156,37 @@ const MemberDetailsPage = () => {
   const listFamilyMembersStrict = async () => {
     const res = await listFamilyMembers(familyId);
     if (res.data && Array.isArray(res.data)) {
-      return {
-        ...res,
-        data: res.data.filter((m) => {
-          const mFamilyId =
-            typeof m.family === "object" ? m.family?.id : m.family;
-          const targetFamilyId =
-            typeof familyId === "object" ? familyId?.id : familyId;
-          return mFamilyId === targetFamilyId;
-        }),
-      };
+      // familyId is always a plain integer now
+      const filtered = res.data.filter(
+        (m) =>
+          (m.family?.id ?? m.family) === familyId && m.id !== Number(headId),
+      );
+
+      if (filtered.length > 0) {
+        console.log("[MemberDetailsPage] sample member:", filtered[0]);
+        console.log("[MemberDetailsPage] relationships list:", relationships);
+      }
+      const mapped = filtered.map((m) => {
+        const relId =
+          typeof m.relationship === "object"
+            ? Number(m.relationship?.id)
+            : Number(m.relationship);
+        const relObj = relationships.find((r) => Number(r.id) === relId);
+        return {
+          ...m,
+          relationship_name: m.relationship?.name || relObj?.name || "—",
+        };
+      });
+
+      return { ...res, data: mapped };
     }
     return res;
   };
+
+  const memberColumns = [
+    { header: "Name", key: "name" },
+    { header: "Relationship", key: "relationship_name" },
+  ];
 
   return (
     <RegistryTable
@@ -179,6 +200,7 @@ const MemberDetailsPage = () => {
       updateFn={updateMember}
       deleteFn={deleteMember}
       fields={memberFields}
+      columns={memberColumns}
     />
   );
 };

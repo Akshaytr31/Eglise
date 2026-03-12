@@ -62,7 +62,7 @@ const RegistryTable = ({
   deleteFn,
   FormModal,
   fields,
-  itemsPerPage = 9,
+  itemsPerPage = 12,
   extraActions = [], // Array of { label, icon, onClick, color, title }
   columns = [], // Array of { header, key, textAlign }
 }) => {
