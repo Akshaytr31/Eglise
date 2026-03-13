@@ -9,7 +9,6 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import {
-  LuChurch,
   LuUsers,
   LuCircleCheck,
   LuCalendarHeart,
@@ -145,28 +144,16 @@ const LoginInfo = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <HStack gap={3} mb={1}>
-            <Box
-              p={2.5}
-              borderRadius="xl"
+          <HStack marginLeft={-3} mb={1}>
+            <img
+              src="src/assets/logo.png"
+              alt="Eglise Logo"
               style={{
-                background: "rgba(255,255,255,0.15)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+                height: "50px",
+                objectFit: "contain",
+                filter: "brightness(0) invert(1)",
               }}
-            >
-              <Icon as={LuChurch} boxSize={6} color="white" />
-            </Box>
-            <Heading
-              as="h1"
-              fontSize="2xl"
-              fontWeight="800"
-              letterSpacing="-0.5px"
-              color="white"
-            >
-              Eglise
-            </Heading>
+            />
           </HStack>
         </motion.div>
 
