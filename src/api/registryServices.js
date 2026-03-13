@@ -70,16 +70,27 @@ export const deleteBaptism = (id) =>
   apiClient.delete(`/api/registry/baptisms/${id}/`);
 
 // Marriage APIs (Pre-announcement)
-export const listMarriages = () =>
+export const listPreAnnouncements = () =>
   apiClient.get("/api/registry/marriages/vilich-chollu-kuri/");
-export const createMarriage = (data) =>
+export const createPreAnnouncement = (data) =>
   apiClient.post("/api/registry/marriages/vilich-chollu-kuri/", data);
-export const getMarriage = (id) =>
+export const getPreAnnouncement = (id) =>
   apiClient.get(`/api/registry/marriages/vilich-chollu-kuri/${id}/`);
-export const updateMarriage = (id, data) =>
+export const updatePreAnnouncement = (id, data) =>
   apiClient.patch(
     `/api/registry/marriages/vilich-chollu-kuri/${id}/detail/`,
     data,
   );
-export const deleteMarriage = (id) =>
+export const deletePreAnnouncement = (id) =>
   apiClient.delete(`/api/registry/marriages/vilich-chollu-kuri/${id}/`);
+
+// Marriage APIs
+export const listMarriages = () => apiClient.get("/api/registry/marriages/");
+export const createMarriage = (data) =>
+  apiClient.post("/api/registry/marriages/", data);
+export const getMarriage = (id) =>
+  apiClient.get(`/api/registry/marriages/${id}/`);
+export const updateMarriage = (id, data) =>
+  apiClient.patch(`/api/registry/marriages/${id}/`, data);
+export const deleteMarriage = (id) =>
+  apiClient.delete(`/api/registry/marriages/${id}/`);

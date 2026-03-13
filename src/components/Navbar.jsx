@@ -25,7 +25,8 @@ const ROUTE_MAP = {
   Relationship: "/relationship",
   "Member Info": "/members",
   "Baptism Register": "/baptism",
-  "Marriage Register": "/pre-announcement",
+  "Marriage Register": "/marriage",
+  "Pre-Announcement": "/pre-announcement",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────
@@ -72,6 +73,7 @@ const MENU_DATA = {
         "Member Info",
         "Baptism Register",
         "Marriage Register",
+        "Pre-Announcement",
         "Death Register",
       ],
     },
@@ -95,7 +97,12 @@ const MENU_DATA = {
       subSections: [
         {
           title: "Registers",
-          items: ["Baptism Register", "Marriage Register", "Death Register"],
+          items: [
+            "Baptism Register",
+            "Marriage Register",
+            "Pre-Announcement",
+            "Death Register",
+          ],
         },
       ],
     },

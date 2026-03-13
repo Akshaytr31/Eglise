@@ -2,19 +2,19 @@ import React from "react";
 import RegistryTable from "../components/RegistryTable";
 import GenericFormModal from "../components/GenericFormModal";
 import {
-  listPreAnnouncements,
-  createPreAnnouncement,
-  updatePreAnnouncement,
-  deletePreAnnouncement,
+  listMarriages,
+  createMarriage,
+  updateMarriage,
+  deleteMarriage,
 } from "../api/registryServices";
 
-const PRE_ANNOUNCEMENT_COLUMNS = [
+const MARRIAGE_COLUMNS = [
   { header: "Groom", key: "groom_name" },
   { header: "Bride", key: "bride_name" },
   { header: "Marriage Date", key: "marriage_date" },
 ];
 
-const PRE_ANNOUNCEMENT_FIELDS = [
+const MARRIAGE_FIELDS = [
   {
     name: "marriage_date",
     label: "Marriage Date",
@@ -56,28 +56,28 @@ const PRE_ANNOUNCEMENT_FIELDS = [
   },
 ];
 
-const PreAnnouncementPage = () => {
+const MarriagePage = () => {
   return (
     <RegistryTable
       title="Marriage Register"
       addLabel="Add Record"
-      nameKey="groom_name" // RegistryTable uses this for some display/delete prompts
-      columns={PRE_ANNOUNCEMENT_COLUMNS}
+      nameKey="groom_name"
+      columns={MARRIAGE_COLUMNS}
       columnLabel="Marriage Info"
-      emptyMessage="No marriage register records found."
-      listFn={listPreAnnouncements}
-      createFn={createPreAnnouncement}
-      updateFn={updatePreAnnouncement}
-      deleteFn={deletePreAnnouncement}
+      emptyMessage="No marriage records found."
+      listFn={listMarriages}
+      createFn={createMarriage}
+      updateFn={updateMarriage}
+      deleteFn={deleteMarriage}
       FormModal={(props) => (
         <GenericFormModal
           {...props}
           title="Marriage Register"
-          fields={PRE_ANNOUNCEMENT_FIELDS}
+          fields={MARRIAGE_FIELDS}
         />
       )}
     />
   );
 };
 
-export default PreAnnouncementPage;
+export default MarriagePage;
