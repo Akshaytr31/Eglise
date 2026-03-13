@@ -139,7 +139,6 @@ const MembersPage = () => {
     if (formData instanceof FormData) {
       ward = formData.get("ward");
       familyId = formData.get("family");
-      // We leave ward and family in formData for updateHead, but we'll needs a clean one for updateMember later if it's Multipart
       memberData = formData;
     } else {
       const { ward: w, family: f, ...rest } = formData;

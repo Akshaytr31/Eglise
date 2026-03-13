@@ -9,7 +9,6 @@ import {
   listRelationships,
   listGrades,
   listFamilies,
-  listWards,
 } from "../api/registryServices";
 
 const MemberDetailsPage = () => {
@@ -23,18 +22,12 @@ const MemberDetailsPage = () => {
   const [relationships, setRelationships] = useState([]);
   const [grades, setGrades] = useState([]);
   const [families, setFamilies] = useState([]);
-  const [wards, setWards] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
     const fetchOptionsAndHead = async () => {
       try {
-        const promises = [
-          listRelationships(),
-          listGrades(),
-          listFamilies(),
-          listWards(),
-        ];
+        const promises = [listRelationships(), listGrades(), listFamilies()];
 
         let fetchedHead = head;
         if (!fetchedHead) {
@@ -48,11 +41,10 @@ const MemberDetailsPage = () => {
           setFamilyId(f?.id ?? f ?? null);
         }
 
-        const [rRes, gRes, fRes, wRes] = await Promise.all(promises);
+        const [rRes, gRes, fRes] = await Promise.all(promises);
         setRelationships(rRes.data || []);
         setGrades(gRes.data || []);
         setFamilies(fRes.data || []);
-        setWards(wRes.data || []);
         setIsDataLoaded(true);
       } catch (error) {
         console.error("Error fetching options or head:", error);
@@ -68,14 +60,6 @@ const MemberDetailsPage = () => {
       type: "select",
       required: true,
       options: families.map((f) => ({ value: f.id, label: f.family_name })),
-      coerce: Number,
-    },
-    {
-      name: "ward",
-      label: "Ward",
-      type: "select",
-      required: true,
-      options: wards.map((w) => ({ value: w.id, label: w.ward_name })),
       coerce: Number,
     },
     { name: "name", label: "Name", required: true },

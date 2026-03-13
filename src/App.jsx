@@ -16,6 +16,7 @@ import authService from "./auth/authService";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import BaptismPage from "./pages/BaptismPage";
 import ChurchInfoPage from "./pages/ChurchInfoPage";
+import PreAnnouncementPage from "./pages/PreAnnouncementPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -107,6 +108,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ChurchInfoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pre-announcement"
+          element={
+            <ProtectedRoute>
+              <PreAnnouncementPage />
             </ProtectedRoute>
           }
         />

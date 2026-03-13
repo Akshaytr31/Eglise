@@ -68,3 +68,18 @@ export const updateBaptism = (id, data) =>
   apiClient.patch(`/api/registry/baptisms/${id}/`, data);
 export const deleteBaptism = (id) =>
   apiClient.delete(`/api/registry/baptisms/${id}/`);
+
+// Marriage APIs (Pre-announcement)
+export const listMarriages = () =>
+  apiClient.get("/api/registry/marriages/vilich-chollu-kuri/");
+export const createMarriage = (data) =>
+  apiClient.post("/api/registry/marriages/vilich-chollu-kuri/", data);
+export const getMarriage = (id) =>
+  apiClient.get(`/api/registry/marriages/vilich-chollu-kuri/${id}/`);
+export const updateMarriage = (id, data) =>
+  apiClient.patch(
+    `/api/registry/marriages/vilich-chollu-kuri/${id}/detail/`,
+    data,
+  );
+export const deleteMarriage = (id) =>
+  apiClient.delete(`/api/registry/marriages/vilich-chollu-kuri/${id}/`);

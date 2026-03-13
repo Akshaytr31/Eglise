@@ -25,6 +25,7 @@ const ROUTE_MAP = {
   Relationship: "/relationship",
   "Member Info": "/members",
   "Baptism Register": "/baptism",
+  "Marriage Register": "/pre-announcement",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────
