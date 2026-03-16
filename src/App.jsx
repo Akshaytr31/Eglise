@@ -21,6 +21,7 @@ import MarriagePage from "./pages/MarriagePage";
 import TombTypePage from "./pages/TombTypePage";
 import TombFeesPage from "./pages/TombFeesPage";
 import DesignationPage from "./pages/DesignationPage";
+import PriestPage from "./pages/PriestPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -152,6 +153,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DesignationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/priest-master"
+          element={
+            <ProtectedRoute>
+              <PriestPage />
             </ProtectedRoute>
           }
         />

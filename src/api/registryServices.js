@@ -110,3 +110,13 @@ export const updateDesignation = (id, data) =>
   apiClient.patch(`/api/registry/designations/${id}/`, data);
 export const deleteDesignation = (id) =>
   apiClient.delete(`/api/registry/designations/${id}/`);
+
+// Priest APIs
+export const listPriests = () => apiClient.get("/api/registry/priests/");
+export const createPriest = (data) =>
+  apiClient.post("/api/registry/priests/", data);
+export const getPriest = (id) => apiClient.get(`/api/registry/priests/${id}/`);
+export const updatePriest = (id, data) =>
+  apiClient.patch(`/api/registry/priests/${id}/`, data);
+export const deletePriest = (id) =>
+  apiClient.delete(`/api/registry/priests/${id}/`);
