@@ -98,3 +98,15 @@ export const deleteMarriage = (id) =>
 // Dhesha Kuri
 export const getDheshaKuri = (id) =>
   apiClient.get(`/api/registry/marriages/${id}/dhesha-kuri`);
+
+// Designation APIs
+export const listDesignations = () =>
+  apiClient.get("/api/registry/designations/");
+export const createDesignation = (data) =>
+  apiClient.post("/api/registry/designations/", data);
+export const getDesignation = (id) =>
+  apiClient.get(`/api/registry/designations/${id}/`);
+export const updateDesignation = (id, data) =>
+  apiClient.patch(`/api/registry/designations/${id}/`, data);
+export const deleteDesignation = (id) =>
+  apiClient.delete(`/api/registry/designations/${id}/`);

@@ -29,6 +29,7 @@ const ROUTE_MAP = {
   "Pre-Announcement": "/pre-announcement",
   "Tomb Type": "/tomb-type",
   "Tomb Fees": "/tomb-fees",
+  Designation: "/designation",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

@@ -20,6 +20,7 @@ import PreAnnouncementPage from "./pages/PreAnnouncementPage";
 import MarriagePage from "./pages/MarriagePage";
 import TombTypePage from "./pages/TombTypePage";
 import TombFeesPage from "./pages/TombFeesPage";
+import DesignationPage from "./pages/DesignationPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -143,6 +144,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TombFeesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/designation"
+          element={
+            <ProtectedRoute>
+              <DesignationPage />
             </ProtectedRoute>
           }
         />
