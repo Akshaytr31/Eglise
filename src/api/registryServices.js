@@ -94,3 +94,7 @@ export const updateMarriage = (id, data) =>
   apiClient.patch(`/api/registry/marriages/${id}/`, data);
 export const deleteMarriage = (id) =>
   apiClient.delete(`/api/registry/marriages/${id}/`);
+
+// Dhesha Kuri
+export const getDheshaKuri = (id) =>
+  apiClient.get(`/api/registry/marriages/${id}/dhesha-kuri`);

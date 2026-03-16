@@ -510,35 +510,39 @@ const RegistryTable = ({
                     <Box mt={2} bg="gray.50" px={4} py={1.5}>
                       <Flex justify="space-between" align="center">
                         <HStack spacing={1.5}>
-                          {extraActions.map((action, idx) => (
-                            <Box
-                              key={`extra-action-compact-${idx}`}
-                              as="button"
-                              onClick={() => action.onClick(item)}
-                              display="inline-flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              w="24px"
-                              h="24px"
-                              borderRadius="full"
-                              color={action.color || "gray.600"}
-                              bg="white"
-                              boxShadow="xs"
-                              border="1px solid"
-                              borderColor="gray.100"
-                              transition="all 0.2s"
-                              _hover={{
-                                transform: "translateY(-1px)",
-                                color: "white",
-                                bg: action.color || primaryMaroon,
-                                boxShadow: "sm",
-                                border: "none",
-                              }}
-                              title={action.title}
-                            >
-                              <Icon as={action.icon} fontSize="12px" />
-                            </Box>
-                          ))}
+                          {extraActions.map((action, idx) => {
+                            if (action.showIf && !action.showIf(item))
+                              return null;
+                            return (
+                              <Box
+                                key={`extra-action-compact-${idx}`}
+                                as="button"
+                                onClick={() => action.onClick(item)}
+                                display="inline-flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                w="24px"
+                                h="24px"
+                                borderRadius="full"
+                                color={action.color || "gray.600"}
+                                bg="white"
+                                boxShadow="xs"
+                                border="1px solid"
+                                borderColor="gray.100"
+                                transition="all 0.2s"
+                                _hover={{
+                                  transform: "translateY(-1px)",
+                                  color: "white",
+                                  bg: action.color || primaryMaroon,
+                                  boxShadow: "sm",
+                                  border: "none",
+                                }}
+                                title={action.title}
+                              >
+                                <Icon as={action.icon} fontSize="12px" />
+                              </Box>
+                            );
+                          })}
                         </HStack>
 
                         <HStack spacing={2}>

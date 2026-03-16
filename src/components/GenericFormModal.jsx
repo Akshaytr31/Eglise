@@ -51,10 +51,12 @@ const GenericFormModal = ({
   title = "",
 }) => {
   const primaryMaroon = "var(--primary-maroon)";
-  const buildEmpty = () => Object.fromEntries(fields.map((f) => [f.name, ""]));
-  const columnCount = fields.length > 6 ? 3 : 2;
+  const buildEmpty = () => {
+    const initialFields = typeof fields === "function" ? fields({}) : fields;
+    return Object.fromEntries(initialFields.map((f) => [f.name, ""]));
+  };
 
-  const [formData, setFormData] = useState(buildEmpty);
+  const [formData, setFormData] = useState({});
   const [focusedField, setFocusedField] = useState(null);
   const [previews, setPreviews] = useState({});
 
@@ -67,9 +69,11 @@ const GenericFormModal = ({
 
   useEffect(() => {
     if (itemData) {
+      const initialFields =
+        typeof fields === "function" ? fields(itemData) : fields;
       setFormData(
         Object.fromEntries(
-          fields.map((f) => {
+          initialFields.map((f) => {
             let val = itemData[f.name];
             // If the value is an object (common for foreign keys), try to get the ID
             if (val && typeof val === "object" && val.id !== undefined) {
@@ -92,10 +96,14 @@ const GenericFormModal = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const activeFields = typeof fields === "function" ? fields(formData) : fields;
+  const columnCount = activeFields.length > 6 ? 3 : 2;
+  const isEditing = Boolean(itemData);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const hasFile = fields.some(
+    const hasFile = activeFields.some(
       (f) =>
         f.type === "file" &&
         (formData[f.name] instanceof File || formData[f.name] instanceof Blob),
@@ -103,7 +111,7 @@ const GenericFormModal = ({
 
     if (hasFile) {
       const fd = new FormData();
-      fields.forEach((f) => {
+      activeFields.forEach((f) => {
         if (isEditing && f.disabledOnEdit) return;
 
         let val = formData[f.name];
@@ -122,7 +130,7 @@ const GenericFormModal = ({
       onSave(fd);
     } else {
       const coerced = Object.fromEntries(
-        fields
+        activeFields
           .filter((f) => !(isEditing && f.disabledOnEdit))
           .filter((f) => {
             // Skip file fields if they are not actual File/Blob objects
@@ -152,14 +160,12 @@ const GenericFormModal = ({
     boxShadow: `0 0 0 1px ${primaryMaroon}`,
   };
 
-  const isEditing = Boolean(itemData);
-
   return (
     <DialogRoot
       open={isOpen}
       onOpenChange={(e) => !e.open && onClose()}
       placement="center"
-      size={fields.length > 6 ? "xl" : "md"}
+      size={activeFields.length > 6 ? "xl" : "md"}
     >
       <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
       <DialogPositioner alignItems="center">
@@ -230,8 +236,11 @@ const GenericFormModal = ({
                 },
               }}
             >
-              <SimpleGrid columns={{ base: 1, md: columnCount }} gap={5}>
-                {fields.map((f) => {
+              <SimpleGrid
+                columns={{ base: 1, md: activeFields.length > 6 ? 3 : 2 }}
+                gap={5}
+              >
+                {activeFields.map((f) => {
                   const hasValue = String(formData[f.name] || "").length > 0;
                   const isFocused = focusedField === f.name;
                   const shouldFloat =

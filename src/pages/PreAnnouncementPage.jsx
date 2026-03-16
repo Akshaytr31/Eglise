@@ -1,5 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import RegistryTable from "../components/RegistryTable";
+import { LuUsers } from "react-icons/lu";
 import GenericFormModal from "../components/GenericFormModal";
 import {
   listPreAnnouncements,
@@ -57,6 +59,21 @@ const PRE_ANNOUNCEMENT_FIELDS = [
 ];
 
 const PreAnnouncementPage = () => {
+  const navigate = useNavigate();
+
+  const extraActions = [
+    {
+      icon: LuUsers,
+      title: "Create Marriage",
+      color: "pink.500",
+      hoverColor: "pink.700",
+      onClick: (item) => {
+        // Navigate to marriage page with this pre-announcement data
+        navigate("/marriage", { state: { preAnnouncement: item } });
+      },
+    },
+  ];
+
   return (
     <RegistryTable
       title="Marriage Register"
@@ -76,6 +93,7 @@ const PreAnnouncementPage = () => {
           fields={PRE_ANNOUNCEMENT_FIELDS}
         />
       )}
+      extraActions={extraActions}
     />
   );
 };
