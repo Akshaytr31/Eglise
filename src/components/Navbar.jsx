@@ -27,6 +27,7 @@ const ROUTE_MAP = {
   "Baptism Register": "/baptism",
   "Marriage Register": "/marriage",
   "Pre-Announcement": "/pre-announcement",
+  "Tomb Type": "/tomb-type",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

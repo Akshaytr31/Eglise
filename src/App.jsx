@@ -18,6 +18,7 @@ import BaptismPage from "./pages/BaptismPage";
 import ChurchInfoPage from "./pages/ChurchInfoPage";
 import PreAnnouncementPage from "./pages/PreAnnouncementPage";
 import MarriagePage from "./pages/MarriagePage";
+import TombTypePage from "./pages/TombTypePage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -125,6 +126,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MarriagePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tomb-type"
+          element={
+            <ProtectedRoute>
+              <TombTypePage />
             </ProtectedRoute>
           }
         />
