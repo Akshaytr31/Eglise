@@ -31,6 +31,7 @@ const ROUTE_MAP = {
   "Tomb Fees": "/tomb-fees",
   Designation: "/designation",
   "Priest Master": "/priest-master",
+  "Priest Change": "/priest-change",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

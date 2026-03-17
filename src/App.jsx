@@ -22,6 +22,7 @@ import TombTypePage from "./pages/TombTypePage";
 import TombFeesPage from "./pages/TombFeesPage";
 import DesignationPage from "./pages/DesignationPage";
 import PriestPage from "./pages/PriestPage";
+import PriestChangesPage from "./pages/PriestChangesPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -161,6 +162,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PriestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/priest-change"
+          element={
+            <ProtectedRoute>
+              <PriestChangesPage />
             </ProtectedRoute>
           }
         />
