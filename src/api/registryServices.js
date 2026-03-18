@@ -132,3 +132,11 @@ export const updatePriestChange = (id, data) =>
   apiClient.put(`/api/registry/priest-changes/${id}/`, data);
 export const deletePriestChange = (id) =>
   apiClient.delete(`/api/registry/priest-changes/${id}/`);
+
+// Register Settings APIs
+export const listRegisterSettings = () =>
+  apiClient.get("/api/registry/register-settings/");
+export const createRegisterSettings = (data) =>
+  apiClient.post("/api/registry/register-settings/create/", data);
+export const updateRegisterSettings = (type, data) =>
+  apiClient.patch(`/api/registry/register-settings/${type}/`, data);

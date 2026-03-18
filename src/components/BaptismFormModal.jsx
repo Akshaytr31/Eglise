@@ -127,7 +127,6 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
       "mother_name",
       "priest_name",
       "panchayath",
-      "house_name",
       "place_of_birth",
       "address",
       "parish_of_baptism",
@@ -364,12 +363,8 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                   { value: "PARISH", label: "Parish" },
                   { value: "OTHER", label: "Other" },
                 ])}
-                {renderField("register_number", "Register Number")}
-                {renderField("priest_name", "Priest Name")}
-                {renderField("panchayath", "Panchayath")}
-                {renderField("house_name", "House Name")}
                 {renderField("date_of_baptism", "Date of Baptism", "date")}
-                {renderField("dob", "Date of Birth", "date")}
+                {renderField("place_of_birth", "Place of Birth")}
                 {renderField("name", "Name")}
                 {renderField("baptismal_name", "Baptismal Name")}
                 {renderField("gender", "Gender", "select", [
@@ -377,8 +372,10 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                   { value: "FEMALE", label: "Female" },
                   { value: "OTHER", label: "Other" },
                 ])}
-                {renderField("place_of_birth", "Place of Birth")}
+                {renderField("dob", "Date of Birth", "date")}
                 {renderField("parish_of_baptism", "Parish of Baptism")}
+                {renderField("priest_name", "Priest Name")}
+                {renderField("panchayath", "Panchayath")}
                 {renderField("god_father", "God Father")}
                 {renderField("god_mother", "God Mother")}
                 {renderField("father_name", "Father Name")}
@@ -428,7 +425,8 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                 )}
 
                 {renderField("address", "Address", "textarea", null, true)}
-                {renderField("remarks", "Remarks", "textarea", null, true)}
+                {isParish &&
+                  renderField("remarks", "Remarks", "textarea", null, true)}
               </SimpleGrid>
             </DialogBody>
 

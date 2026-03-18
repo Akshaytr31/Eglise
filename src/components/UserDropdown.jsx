@@ -38,7 +38,7 @@ const UserDropdown = ({ isOpen, onClose, onLogout, primaryMaroon }) => {
       icon: LuSettings,
       label: "Settings",
       action: () => {
-        console.log("Settings clicked");
+        navigate("/register-settings");
         onClose();
       },
     },

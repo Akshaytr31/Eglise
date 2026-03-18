@@ -10,8 +10,9 @@ import {
 
 const BAPTISM_COLUMNS = [
   { header: "Reg No", key: "register_number" },
-  // { header: "Date", key: "date_of_baptism" },
-  // { header: "Category", key: "baptism_category" },
+  { header: "Date", key: "date_of_baptism" },
+  { header: "Category", key: "baptism_category" },
+  { header: "Gender", key: "gender" },
 ];
 
 const BaptismPage = () => {
