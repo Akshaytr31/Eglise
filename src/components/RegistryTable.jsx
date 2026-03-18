@@ -441,73 +441,89 @@ const RegistryTable = ({
                       borderColor: "rgba(13, 11, 11, 0.1)",
                     }}
                   >
-                    {/* Compact Card Header (No Avatar) */}
-                    <Box p={3} pb={1}>
-                      <Flex align="center" justify="space-between" mb={2}>
-                        <HStack
-                          align="start"
-                          spacing={0}
-                          w="full"
-                          justify="space-between"
-                        >
+                    {/* Modern SaaS Tile Card Content */}
+                    <Box position="relative" p={4} pl={6} pb={0}>
+
+                      {/* Header Section */}
+                      <Flex align="start" justify="space-between" mb={4}>
+                        <VStack align="start" spacing={0}>
                           <Text
-                            fontSize="sm"
-                            fontWeight="800"
-                            color="gray.800"
-                            letterSpacing="tight"
-                            lineHeight="1.1"
+                            fontSize="15px"
+                            fontWeight="700"
+                            color="gray.500"
+                            letterSpacing="0.01em"
+                            lineHeight="1.2"
                             noOfLines={1}
                           >
                             {item[nameKey]}
                           </Text>
                           <Text
-                            fontSize="8px"
-                            fontWeight="700"
+                            fontSize="9px"
+                            fontWeight="600"
                             color="gray.400"
                             textTransform="uppercase"
-                            letterSpacing="widest"
-                            mt={0.5}
+                            letterSpacing="0.05em"
                           >
-                            {title.replace(/ Directory| Page/i, "").trim()} #
-                            {indexOfFirstItem + index + 1}
+                            Permanent Record
                           </Text>
-                        </HStack>
+                        </VStack>
+
+                        <Box
+                          px={2}
+                          py={0.5}
+                          bg="gray.50"
+                          borderRadius="full"
+                          borderWidth="1px"
+                          borderColor="gray.100"
+                        >
+                          <Text
+                            fontSize="9px"
+                            fontWeight="800"
+                            color="gray.500"
+                            letterSpacing="0.05em"
+                          >
+                            #{indexOfFirstItem + index + 1}
+                          </Text>
+                        </Box>
                       </Flex>
 
-                      {/* Detail Rows */}
-                      <HStack align="start" spacing={2} w="full" px={0.5}>
+                      {/* Structured Data Grid */}
+                      <SimpleGrid columns={2} spacing={4} gap={"10px"} mb={2}>
                         {columns
                           .filter((col) => col.key !== nameKey)
                           .map((col, idx) => (
-                            <HStack key={`card-field-compact-${idx}`} w="full">
-                              <Box w="100%">
-                                <Text
-                                  fontSize="7px"
-                                  fontWeight="800"
-                                  color="gray.400"
-                                  textTransform="uppercase"
-                                  letterSpacing="wider"
-                                  mb={-0.5}
-                                >
-                                  {col.header}
-                                </Text>
-                                <Text
-                                  fontSize="9px"
-                                  fontWeight="700"
-                                  color="gray.600"
-                                  noOfLines={1}
-                                  lineHeight="1.2"
-                                >
-                                  {item[col.key] || "—"}
-                                </Text>
-                              </Box>
-                            </HStack>
+                            <VStack
+                              key={`card-field-saas-${idx}`}
+                              align="start"
+                              spacing={0}
+                              gap={0}
+                            >
+                              <Text
+                                fontSize="8px"
+                                fontWeight="800"
+                                color="gray.400"
+                                textTransform="uppercase"
+                                letterSpacing="0.1em"
+                                mb={0.5}
+                              >
+                                {col.header}
+                              </Text>
+                              <Text
+                                fontSize="11px"
+                                fontWeight="600"
+                                color="gray.600"
+                                noOfLines={1}
+                                lineHeight="1.2"
+                              >
+                                {item[col.key] || "—"}
+                              </Text>
+                            </VStack>
                           ))}
-                      </HStack>
+                      </SimpleGrid>
                     </Box>
 
                     {/* Compact Action Bar */}
-                    <Box mt={2} bg="gray.50" px={4} py={1.5}>
+                    <Box bg="gray.50" px={4} py={1.5}>
                       <Flex justify="space-between" align="center">
                         <HStack spacing={1.5}>
                           {extraActions.map((action, idx) => {
