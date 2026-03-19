@@ -172,8 +172,10 @@ const MembersPage = () => {
     const freshFamilies = fRes.data || [];
     const allMembers = mRes.data || [];
 
-    // Filter for heads
-    const heads = allMembers.filter((m) => !m.relationship);
+    // Filter for heads using is_family_head and not expired/inactive
+    const heads = allMembers.filter(
+      (m) => m.is_family_head && m.is_active !== false && m.expire !== true,
+    );
 
     // Map names
     const mapped = heads.map((h) => {

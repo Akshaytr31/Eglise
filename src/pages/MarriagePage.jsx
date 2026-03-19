@@ -79,10 +79,12 @@ const MarriageFormModal = ({
     value: f.id,
     label: f.family_name,
   }));
-  const membersOptions = members.map((m) => ({
-    value: m.id,
-    label: `${m.name} (${m.family?.family_name || "N/A"})`,
-  }));
+  const membersOptions = members
+    .filter((m) => m.is_active !== false && m.expire !== true)
+    .map((m) => ({
+      value: m.id,
+      label: `${m.name} (${m.family?.family_name || "N/A"})`,
+    }));
   const relOptions = relationships.map((r) => ({
     value: r.id,
     label: r.name,
@@ -331,10 +333,12 @@ const MarriagePage = () => {
         value: f.id,
         label: f.family_name,
       }));
-      const membersOptions = members.map((m) => ({
-        value: m.id,
-        label: `${m.name} (${m.family?.family_name || "N/A"})`,
-      }));
+      const membersOptions = members
+        .filter((m) => m.is_active !== false && m.expire !== true)
+        .map((m) => ({
+          value: m.id,
+          label: `${m.name} (${m.family?.family_name || "N/A"})`,
+        }));
       const relOptions = relationships.map((r) => ({
         value: r.id,
         label: r.name,

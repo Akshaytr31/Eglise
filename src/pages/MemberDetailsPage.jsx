@@ -143,7 +143,10 @@ const MemberDetailsPage = () => {
       // familyId is always a plain integer now
       const filtered = res.data.filter(
         (m) =>
-          (m.family?.id ?? m.family) === familyId && m.id !== Number(headId),
+          (m.family?.id ?? m.family) === familyId &&
+          m.id !== Number(headId) &&
+          m.is_active !== false &&
+          m.expire !== true,
       );
 
       if (filtered.length > 0) {
