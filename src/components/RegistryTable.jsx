@@ -65,6 +65,7 @@ const RegistryTable = ({
   itemsPerPage = 12,
   extraActions = [], // Array of { label, icon, onClick, color, title }
   columns = [], // Array of { header, key, textAlign }
+  topContent = null, // Custom content above the table
 }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -221,6 +222,7 @@ const RegistryTable = ({
       <Navbar />
 
       <Container maxW="container.xl" flex="1" py={5}>
+        {topContent}
         <Box
           border="1px"
           borderColor="gray.200"
@@ -443,7 +445,6 @@ const RegistryTable = ({
                   >
                     {/* Modern SaaS Tile Card Content */}
                     <Box position="relative" p={4} pl={6} pb={0}>
-
                       {/* Header Section */}
                       <Flex align="start" justify="space-between" mb={4}>
                         <VStack align="start" spacing={0}>

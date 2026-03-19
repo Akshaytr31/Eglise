@@ -418,7 +418,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                       "select",
                       relationships.map((r) => ({
                         value: r.id,
-                        label: r.relation_name,
+                        label: r.name,
                       })),
                     )}
                   </>

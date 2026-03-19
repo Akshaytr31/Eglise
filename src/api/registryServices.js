@@ -113,6 +113,8 @@ export const deleteDesignation = (id) =>
 
 // Priest APIs
 export const listPriests = () => apiClient.get("/api/registry/priests/");
+export const listPriestsDropdown = () =>
+  apiClient.get("/api/registry/priests/dropdown/");
 export const createPriest = (data) =>
   apiClient.post("/api/registry/priests/", data);
 export const getPriest = (id) => apiClient.get(`/api/registry/priests/${id}/`);
