@@ -33,9 +33,11 @@ import {
 } from "@chakra-ui/react";
 
 const MARRIAGE_COLUMNS = [
+  { header: "Reg No", key: "register_number" },
   { header: "Type", key: "marriage_type" },
   { header: "Groom", key: "groom_display_name" },
   { header: "Bride", key: "bride_display_name" },
+  { header: "Family", key: "family_name" },
   { header: "Date", key: "date" },
 ];
 
@@ -77,7 +79,7 @@ const MarriageFormModal = ({
 
   const familiesOptions = families.map((f) => ({
     value: f.id,
-    label: f.family_name,
+    label: `${f.family_name} (${f.reg_no || f.id})`,
   }));
   const membersOptions = members
     .filter((m) => m.is_active !== false && m.expire !== true)
@@ -274,16 +276,30 @@ const MarriagePage = () => {
   ];
 
   const listMarriagesWithNames = async () => {
-    const res = await listMarriages();
-    if (res.data) {
-      const mappedData = res.data.map((m) => ({
-        ...m,
-        groom_display_name: m.groom_member?.name || m.groom_name || "N/A",
-        bride_display_name: m.bride_member?.name || m.bride_name || "N/A",
-      }));
-      return { ...res, data: mappedData };
+    try {
+      const [mRes, fRes] = await Promise.all([listMarriages(), listFamilies()]);
+      const marriages = mRes.data || [];
+      const families = fRes.data || [];
+
+      if (marriages) {
+        const mappedData = marriages.map((m) => {
+          const famObj = families.find(
+            (f) => f.id === (m.family?.id || m.family),
+          );
+          return {
+            ...m,
+            groom_display_name: m.groom_member?.name || m.groom_name || "N/A",
+            bride_display_name: m.bride_member?.name || m.bride_name || "N/A",
+            family_name: m.family?.family_name || famObj?.family_name || "N/A",
+          };
+        });
+        return { ...mRes, data: mappedData };
+      }
+      return mRes;
+    } catch (error) {
+      console.error("Error fetching and enriching marriages:", error);
+      return listMarriages();
     }
-    return res;
   };
 
   // Improved MarriageFormModal that handles state itself
@@ -331,7 +347,7 @@ const MarriagePage = () => {
     const getDynamicFields = (currentFormData) => {
       const familiesOptions = families.map((f) => ({
         value: f.id,
-        label: f.family_name,
+        label: `${f.family_name} (${f.reg_no || f.id})`,
       }));
       const membersOptions = members
         .filter((m) => m.is_active !== false && m.expire !== true)

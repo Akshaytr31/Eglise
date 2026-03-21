@@ -403,7 +403,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                       "select",
                       families.map((f) => ({
                         value: f.id,
-                        label: f.family_name,
+                        label: `${f.family_name} (${f.reg_no || f.id})`,
                       })),
                     )}
                     {renderField(

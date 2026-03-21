@@ -250,16 +250,27 @@ const MembersPage = () => {
     return hRes;
   };
 
+  const headColumns = [
+    { header: "Family Photo", key: "family_image" },
+    { header: "Reg No", key: "reg_no" },
+    { header: "Family Name", key: "family_name" },
+    { header: "Ward", key: "ward_name" },
+    { header: "Grade", key: "grade_name" },
+    { header: "Total Members", key: "total_members" },
+  ];
+
   const listHeadsWithNames = async () => {
     // Fetch fresh options to ensure names are correct after an update
-    const [wRes, fRes, mRes] = await Promise.all([
+    const [wRes, fRes, gRes, mRes] = await Promise.all([
       listWards(),
       listFamilies(),
+      listGrades(),
       listMembers(),
     ]);
 
     const freshWards = wRes.data || [];
     const freshFamilies = fRes.data || [];
+    const freshGrades = gRes.data || [];
     const allMembers = mRes.data || [];
 
     // Filter for heads using is_family_head and not expired/inactive
@@ -267,16 +278,26 @@ const MembersPage = () => {
       (m) => m.is_family_head && m.is_active !== false && m.expire !== true,
     );
 
-    // Map names
+    // Map names and extra details
     const mapped = heads.map((h) => {
       const familyObj = freshFamilies.find(
         (f) => f.id === (h.family?.id || h.family),
       );
       const wardObj = freshWards.find((w) => w.id === (h.ward?.id || h.ward));
+      const gradeObj = freshGrades.find(
+        (g) => g.id === (h.grade?.id || h.grade),
+      );
+      const familyCount = allMembers.filter(
+        (m) => (m.family?.id || m.family) === (h.family?.id || h.family),
+      ).length;
+
       return {
         ...h,
         family_name: h.family?.family_name || familyObj?.family_name || "N/A",
         ward_name: h.ward?.ward_name || wardObj?.ward_name || "N/A",
+        grade_name: h.grade?.name || gradeObj?.name || "N/A",
+        reg_no: familyObj?.reg_no || "N/A",
+        total_members: familyCount,
       };
     });
 
@@ -289,6 +310,7 @@ const MembersPage = () => {
       addLabel="Create Head"
       nameKey="name"
       columnLabel="Head of Family"
+      columns={headColumns}
       emptyMessage="No members found."
       listFn={listHeadsWithNames}
       createFn={createHead}

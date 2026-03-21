@@ -19,48 +19,73 @@ import {
   listPriestsDropdown, // Added this
 } from "../api/registryServices";
 
-const PRIEST_FIELDS = [
-  {
-    name: "name",
-    label: "Name",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "house_name",
-    label: "House Name",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "address",
-    label: "Address",
-    type: "textarea",
-    required: true,
-  },
-];
-
-const PRIEST_COLUMNS = [
-  { header: "Name", key: "name", textAlign: "left" },
-  { header: "House Name", key: "house_name", textAlign: "left" },
-  { header: "Address", key: "address", textAlign: "left" },
-];
-
 const PriestPage = () => {
   const [dropdownData, setDropdownData] = useState([]);
+  const [designations, setDesignations] = useState([]);
   const primaryMaroon = "var(--primary-maroon)";
 
   useEffect(() => {
-    const fetchDropdown = async () => {
+    const fetchOptions = async () => {
       try {
-        const response = await listPriestsDropdown();
-        setDropdownData(response.data || []);
+        const [dRes, desRes] = await Promise.all([
+          listPriestsDropdown(),
+          listDesignations(),
+        ]);
+        setDropdownData(dRes.data || []);
+        setDesignations(desRes.data || []);
       } catch (err) {
-        console.error("Error fetching priest dropdown:", err);
+        console.error("Error fetching priest options:", err);
       }
     };
-    fetchDropdown();
+    fetchOptions();
   }, []);
+
+  const priestFields = [
+    { name: "name", label: "Name", required: true },
+    { name: "family_name", label: "Family Name" },
+    { name: "phone_number", label: "Phone Number" },
+    {
+      name: "designation",
+      label: "Designation",
+      type: "select",
+      options: designations.map((d) => ({ value: d.id, label: d.name })),
+      coerce: Number,
+    },
+    { name: "house_name", label: "House Name", required: true },
+    { name: "address", label: "Address", type: "textarea", required: true },
+  ];
+
+  const priestColumns = [
+    { header: "Family Name", key: "family_name" },
+    { header: "Phone", key: "phone_number" },
+    { header: "Designation", key: "designation_name" },
+    { header: "House Name", key: "house_name" },
+  ];
+
+  const listPriestsEnriched = async () => {
+    try {
+      const [pRes, dRes] = await Promise.all([
+        listPriests(),
+        listDesignations(),
+      ]);
+      const priests = pRes.data || [];
+      const designationsLocal = dRes.data || [];
+
+      const mapped = priests.map((p) => {
+        const desObj = designationsLocal.find(
+          (d) => d.id === (p.designation?.id || p.designation),
+        );
+        return {
+          ...p,
+          designation_name: p.designation?.name || desObj?.name || "—",
+        };
+      });
+      return { ...pRes, data: mapped };
+    } catch (error) {
+      console.error("Error enriching priests:", error);
+      return listPriests();
+    }
+  };
 
   const QuickView = (
     <Box
@@ -74,7 +99,6 @@ const PriestPage = () => {
       position="relative"
       overflow="hidden"
     >
-
       <VStack align="stretch" spacing={5} position="relative" zIndex={1}>
         <HStack justify="space-between" gap={"10px"}>
           <VStack align="start" spacing={0}>
@@ -108,7 +132,11 @@ const PriestPage = () => {
           </Badge>
         </HStack>
 
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4} gap={2}>
+        <SimpleGrid
+          columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
+          spacing={4}
+          gap={2}
+        >
           {dropdownData.length > 0 ? (
             dropdownData.map((priest, index) => {
               const name = typeof priest === "string" ? priest : priest.name;
@@ -191,13 +219,13 @@ const PriestPage = () => {
       title="Priest Master"
       addLabel="Add Priest"
       nameKey="name"
-      columns={PRIEST_COLUMNS}
+      columns={priestColumns}
       emptyMessage="No priests found."
-      listFn={listPriests}
+      listFn={listPriestsEnriched}
       createFn={createPriest}
       updateFn={updatePriest}
       deleteFn={deletePriest}
-      fields={PRIEST_FIELDS}
+      fields={priestFields}
       topContent={QuickView}
     />
   );

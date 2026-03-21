@@ -171,6 +171,18 @@ const MemberDetailsPage = () => {
 
   if (!isDataLoaded) return null;
 
+  const calculateAge = (dob) => {
+    if (!dob) return "—";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const listFamilyMembersStrict = async () => {
     const res = await listFamilyMembers(familyId);
     if (res.data && Array.isArray(res.data)) {
@@ -183,10 +195,6 @@ const MemberDetailsPage = () => {
           m.expire !== true,
       );
 
-      if (filtered.length > 0) {
-        console.log("[MemberDetailsPage] sample member:", filtered[0]);
-        console.log("[MemberDetailsPage] relationships list:", relationships);
-      }
       const mapped = filtered.map((m) => {
         const relId =
           typeof m.relationship === "object"
@@ -196,6 +204,7 @@ const MemberDetailsPage = () => {
         return {
           ...m,
           relationship_name: m.relationship?.name || relObj?.name || "—",
+          age: calculateAge(m.dob),
         };
       });
 
@@ -205,9 +214,10 @@ const MemberDetailsPage = () => {
   };
 
   const memberColumns = [
-    { header: "Name", key: "name" },
     { header: "Relationship", key: "relationship_name" },
+    { header: "Age", key: "age" },
   ];
+
   const extraActions = [
     {
       label: "Promote",

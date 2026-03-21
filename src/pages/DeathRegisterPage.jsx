@@ -1,30 +1,42 @@
 import React, { useState, useEffect } from "react";
 import { HStack, Button, Text } from "@chakra-ui/react";
 import RegistryTable from "../components/RegistryTable";
-import { listDeaths, updateDeath, deleteDeath } from "../api/registryServices";
+import {
+  listDeaths,
+  updateDeath,
+  deleteDeath,
+  listFamilies,
+} from "../api/registryServices";
 import { listTombTypes } from "../api/churchServices";
 
 const DEATH_COLUMNS = [
   { header: "Reg No", key: "register_number" },
+  { header: "Name", key: "member_name" },
+  { header: "Family", key: "family_name" },
   { header: "Date of Death", key: "died_on" },
-  { header: "Funeral", key: "funeral_on" },
-  { header: "Status", key: "status" },
+  // { header: "Funeral", key: "funeral_on" },
+  // { header: "Status", key: "status" },
 ];
 
 const DeathRegisterPage = () => {
   const [tombTypes, setTombTypes] = useState([]);
+  const [families, setFamilies] = useState([]);
   const [filterStatus, setFilterStatus] = useState(null); // null for ALL, 'pending' for Pending
 
   useEffect(() => {
-    const fetchTombTypes = async () => {
+    const fetchOptions = async () => {
       try {
-        const response = await listTombTypes();
-        setTombTypes(response.data || []);
+        const [tRes, fRes] = await Promise.all([
+          listTombTypes(),
+          listFamilies(),
+        ]);
+        setTombTypes(tRes.data || []);
+        setFamilies(fRes.data || []);
       } catch (error) {
-        console.error("Error fetching tomb types:", error);
+        console.error("Error fetching options for DeathRegisterPage:", error);
       }
     };
-    fetchTombTypes();
+    fetchOptions();
   }, []);
 
   const deathFields = [
@@ -48,7 +60,27 @@ const DeathRegisterPage = () => {
     { name: "remarks", label: "Remarks", type: "textarea", fullWidth: true },
   ];
 
-  const listDeathsFiltered = () => listDeaths(filterStatus);
+  const listDeathsFiltered = async () => {
+    try {
+      const res = await listDeaths(filterStatus);
+      if (res.data) {
+        const mapped = res.data.map((d) => {
+          const famObj = families.find(
+            (f) => f.id === (d.family?.id || d.family),
+          );
+          return {
+            ...d,
+            family_name: d.family?.family_name || famObj?.family_name || "N/A",
+          };
+        });
+        return { ...res, data: mapped };
+      }
+      return res;
+    } catch (error) {
+      console.error("Error fetching and enriching deaths:", error);
+      return listDeaths(filterStatus);
+    }
+  };
 
   const topContent = (
     <HStack mb={4} spacing={4}>

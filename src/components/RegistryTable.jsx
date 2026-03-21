@@ -23,6 +23,7 @@ import {
   LuChevronsLeft,
   LuChevronsRight,
   LuSearch,
+  LuImage,
 } from "react-icons/lu";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -444,8 +445,61 @@ const RegistryTable = ({
                     }}
                   >
                     {/* Modern SaaS Tile Card Content */}
+                    {/* Large Card Image if available at the very top */}
+                    {(() => {
+                      const imageCol = columns.find(
+                        (c) =>
+                          c.key.toLowerCase().includes("image") ||
+                          c.key.toLowerCase().includes("photo"),
+                      );
+                      if (!imageCol) return null;
+
+                      const val = item[imageCol.key];
+                      const getFullImageUrl = (url) => {
+                        if (!url) return null;
+                        if (url.startsWith("http") || url.startsWith("data:"))
+                          return url;
+                        const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+                        return `${baseUrl.replace(/\/$/, "")}${url.startsWith("/") ? "" : "/"}${url}`;
+                      };
+
+                      return (
+                        <Box
+                          position="relative"
+                          width="100%"
+                          height="180px"
+                          bg="gray.50"
+                          borderBottom="1px solid"
+                          borderBottomColor="gray.100"
+                          overflow="hidden"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          {val ? (
+                            <Box
+                              as="img"
+                              src={getFullImageUrl(val)}
+                              alt={imageCol.header}
+                              w="100%"
+                              h="100%"
+                              objectFit="cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <Icon
+                              as={LuImage}
+                              fontSize="40px"
+                              color="gray.200"
+                            />
+                          )}
+                        </Box>
+                      );
+                    })()}
+
                     <Box position="relative" p={4} pl={6} pb={0}>
                       {/* Header Section */}
+
                       <Flex align="start" justify="space-between" mb={4}>
                         <VStack align="start" spacing={0}>
                           <Text
@@ -491,7 +545,13 @@ const RegistryTable = ({
                       {/* Structured Data Grid */}
                       <SimpleGrid columns={2} spacing={4} gap={"10px"} mb={2}>
                         {columns
-                          .filter((col) => col.key !== nameKey)
+                          .filter(
+                            (col) =>
+                              col.key !== nameKey &&
+                              !col.key.toLowerCase().includes("image") &&
+                              !col.key.toLowerCase().includes("photo"),
+                          )
+
                           .map((col, idx) => (
                             <VStack
                               key={`card-field-saas-${idx}`}
