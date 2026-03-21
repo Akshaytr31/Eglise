@@ -41,7 +41,7 @@ const MembersPage = () => {
     fetchOptions();
   }, []);
 
-  const getHeadFields = (formData) => [
+  const getHeadFields = (formData, itemData) => [
     {
       name: "family",
       label: "Family",
@@ -120,7 +120,7 @@ const MembersPage = () => {
       label: "Mark as Deceased",
       type: "checkbox",
       fullWidth: true,
-      showIf: (fd) => !fd.is_deceased || familyMembers.length > 0,
+      showIf: (fd) => itemData && (!fd.is_deceased || familyMembers.length > 0),
       onChange: async (checked, fd, setFd, itemData) => {
         if (checked && itemData?.id) {
           try {
@@ -160,7 +160,7 @@ const MembersPage = () => {
       type: "select",
       required: true,
       fullWidth: true,
-      showIf: (fd) => fd.is_deceased,
+      showIf: (fd) => itemData && fd.is_deceased,
       options: familyMembers.map((m) => ({ value: m.id, label: m.name })),
       coerce: Number,
     },

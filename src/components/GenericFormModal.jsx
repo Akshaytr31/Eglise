@@ -52,7 +52,8 @@ const GenericFormModal = ({
 }) => {
   const primaryMaroon = "var(--primary-maroon)";
   const buildEmpty = () => {
-    const initialFields = typeof fields === "function" ? fields({}) : fields;
+    const initialFields =
+      typeof fields === "function" ? fields({}, itemData) : fields;
     return Object.fromEntries(initialFields.map((f) => [f.name, ""]));
   };
 
@@ -70,21 +71,33 @@ const GenericFormModal = ({
   useEffect(() => {
     if (itemData) {
       const initialFields =
-        typeof fields === "function" ? fields(itemData) : fields;
-      setFormData(
-        Object.fromEntries(
-          initialFields.map((f) => {
-            let val = itemData[f.name];
-            // If the value is an object (common for foreign keys), try to get the ID
-            if (val && typeof val === "object" && val.id !== undefined) {
-              val = val.id;
+        typeof fields === "function" ? fields(itemData, itemData) : fields;
+
+      const newPreviews = {};
+      const newFormData = Object.fromEntries(
+        initialFields.map((f) => {
+          let val = itemData[f.name];
+
+          // Populate previews for file type fields
+          if (f.type === "file" && val && typeof val === "string") {
+            let url = val;
+            if (!url.startsWith("http") && !url.startsWith("data:")) {
+              const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+              url = `${baseUrl.replace(/\/$/, "")}${url.startsWith("/") ? "" : "/"}${url}`;
             }
-            return [f.name, val ?? ""];
-          }),
-        ),
+            newPreviews[f.name] = url;
+          }
+
+          // If the value is an object (common for foreign keys), try to get the ID
+          if (val && typeof val === "object" && val.id !== undefined) {
+            val = val.id;
+          }
+          return [f.name, val ?? ""];
+        }),
       );
-      // If there's an existing image URL, we could show it, but for now we focus on new uploads
-      setPreviews({});
+
+      setFormData(newFormData);
+      setPreviews(newPreviews);
     } else {
       setFormData(buildEmpty());
       setPreviews({});
@@ -108,7 +121,9 @@ const GenericFormModal = ({
     });
   };
 
-  const activeFields = typeof fields === "function" ? fields(formData) : fields;
+  const activeFields = (
+    typeof fields === "function" ? fields(formData, itemData) : fields
+  ).filter((f) => !f.showIf || f.showIf(formData, itemData));
   const columnCount = activeFields.length > 6 ? 3 : 2;
   const isEditing = Boolean(itemData);
 
