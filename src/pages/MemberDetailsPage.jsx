@@ -9,7 +9,10 @@ import {
   listRelationships,
   listGrades,
   listFamilies,
+  markMemberAsDeceased,
+  promoteToHead,
 } from "../api/registryServices";
+import { LuTrendingUp } from "react-icons/lu";
 
 const MemberDetailsPage = () => {
   const { headId } = useParams();
@@ -123,6 +126,37 @@ const MemberDetailsPage = () => {
     { name: "joining_date", label: "Joining Date", type: "date" },
     { name: "transferred_from", label: "Transferred From" },
     { name: "address", label: "Address", type: "textarea", fullWidth: true },
+    {
+      name: "is_deceased",
+      label: "Mark as Deceased",
+      type: "checkbox",
+      fullWidth: true,
+      showIf: (formData) => !formData.is_deceased,
+      onChange: async (checked, formData, setFormData, itemData) => {
+        if (checked && itemData?.id) {
+          if (
+            window.confirm(
+              "Are you sure you want to mark this member as deceased?",
+            )
+          ) {
+            try {
+              const res = await markMemberAsDeceased(itemData.id);
+              window.alert(res.data.message);
+              // Closing the modal or refreshing is usually handled by the user or onSave,
+              // but here we did an out-of-band action.
+            } catch (error) {
+              console.error("Error marking member as deceased:", error);
+              window.alert("Failed to mark member as deceased.");
+              // Revert checkbox
+              setFormData((prev) => ({ ...prev, is_deceased: false }));
+            }
+          } else {
+            // Revert checkbox
+            setFormData((prev) => ({ ...prev, is_deceased: false }));
+          }
+        }
+      },
+    },
   ];
 
   const handleCreateMember = (formData) => {
@@ -174,6 +208,32 @@ const MemberDetailsPage = () => {
     { header: "Name", key: "name" },
     { header: "Relationship", key: "relationship_name" },
   ];
+  const extraActions = [
+    {
+      label: "Promote",
+      icon: LuTrendingUp,
+      title: "Promote to Head",
+      color: "blue.500",
+      onClick: async (item) => {
+        if (
+          window.confirm(
+            `Are you sure you want to promote ${item.name} to Head?`,
+          )
+        ) {
+          try {
+            const res = await promoteToHead(item.id);
+            window.alert(res.data.message || "Member promoted to Head.");
+            // Refresh would be nice, but RegistryTable doesn't expose it easily
+            // except via re-fetch in listFn.
+            window.location.reload(); // Simple way to refresh the whole state
+          } catch (error) {
+            console.error("Error promoting to head:", error);
+            window.alert("Failed to promote member to Head.");
+          }
+        }
+      },
+    },
+  ];
 
   return (
     <RegistryTable
@@ -188,6 +248,7 @@ const MemberDetailsPage = () => {
       deleteFn={deleteMember}
       fields={memberFields}
       columns={memberColumns}
+      extraActions={extraActions}
     />
   );
 };

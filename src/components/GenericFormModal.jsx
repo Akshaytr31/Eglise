@@ -92,8 +92,20 @@ const GenericFormModal = ({
   }, [itemData, isOpen]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    const newVal = type === "checkbox" ? checked : value;
+
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: newVal };
+
+      // Call field-specific onChange if it exists
+      const fieldConfig = activeFields.find((f) => f.name === name);
+      if (fieldConfig?.onChange) {
+        fieldConfig.onChange(newVal, updated, setFormData, itemData);
+      }
+
+      return updated;
+    });
   };
 
   const activeFields = typeof fields === "function" ? fields(formData) : fields;
@@ -252,9 +264,11 @@ const GenericFormModal = ({
                       w="full"
                       position="relative"
                       gridColumn={f.fullWidth ? `span ${columnCount}` : "auto"}
+                      display={f.type === "checkbox" ? "flex" : "block"}
+                      alignItems={f.type === "checkbox" ? "center" : "initial"}
                     >
                       {/* Floating Label */}
-                      {f.type !== "file" && (
+                      {f.type !== "file" && f.type !== "checkbox" && (
                         <Text
                           as="label"
                           position="absolute"
@@ -506,6 +520,33 @@ const GenericFormModal = ({
                             );
                           })}
                         </Box>
+                      ) : f.type === "checkbox" ? (
+                        <Flex align="center" gap={3} py={2}>
+                          <input
+                            type="checkbox"
+                            name={f.name}
+                            checked={Boolean(formData[f.name])}
+                            onChange={handleChange}
+                            id={`check-${f.name}`}
+                            style={{
+                              width: "18px",
+                              height: "18px",
+                              cursor: "pointer",
+                              accentColor: primaryMaroon,
+                            }}
+                          />
+                          <Text
+                            as="label"
+                            htmlFor={`check-${f.name}`}
+                            fontSize="sm"
+                            fontWeight="600"
+                            color="gray.700"
+                            cursor="pointer"
+                            userSelect="none"
+                          >
+                            {f.label}
+                          </Text>
+                        </Flex>
                       ) : (
                         <Input
                           name={f.name}

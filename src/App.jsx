@@ -24,6 +24,7 @@ import DesignationPage from "./pages/DesignationPage";
 import PriestPage from "./pages/PriestPage";
 import PriestChangesPage from "./pages/PriestChangesPage";
 import RegisterSettingsPage from "./pages/RegisterSettingsPage";
+import DeathRegisterPage from "./pages/DeathRegisterPage";
 
 const ProtectedRoute = ({ children }) => {
   if (!authService.isAuthenticated()) {
@@ -179,6 +180,14 @@ function App() {
           element={
             <ProtectedRoute>
               <RegisterSettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/death-register"
+          element={
+            <ProtectedRoute>
+              <DeathRegisterPage />
             </ProtectedRoute>
           }
         />

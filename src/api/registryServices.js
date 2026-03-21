@@ -57,6 +57,24 @@ export const createHead = (data) =>
   apiClient.post("/api/registry/members/create-head/", data);
 export const updateHead = (id, data) =>
   apiClient.patch(`/api/registry/family-head/${id}/`, data);
+export const markMemberAsDeceased = (id) =>
+  apiClient.post(`/api/registry/members/mark-dead/${id}/`);
+export const promoteToHead = (id) =>
+  apiClient.post(`/api/registry/members/promote-head/${id}/`);
+
+// Death Register APIs
+export const listDeaths = (status) => {
+  const url = status
+    ? `/api/registry/death-register/?status=${status}`
+    : "/api/registry/death-register/";
+  return apiClient.get(url);
+};
+export const getDeath = (id) =>
+  apiClient.get(`/api/registry/death-register/${id}/`);
+export const updateDeath = (id, data) =>
+  apiClient.patch(`/api/registry/death-registers/${id}/`, data);
+export const deleteDeath = (id) =>
+  apiClient.delete(`/api/registry/death-register/${id}/`);
 
 // Baptism APIs
 export const listBaptisms = () => apiClient.get("/api/registry/baptisms/");

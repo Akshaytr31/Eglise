@@ -32,6 +32,7 @@ const ROUTE_MAP = {
   Designation: "/designation",
   "Priest Master": "/priest-master",
   "Priest Change": "/priest-change",
+  "Death Register": "/death-register",
 };
 
 // ─── Menu data ────────────────────────────────────────────────────────────────

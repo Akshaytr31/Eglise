@@ -11,6 +11,9 @@ import {
   listWards,
   listGrades,
   updateHead,
+  markMemberAsDeceased,
+  listFamilyMembers,
+  promoteToHead,
 } from "../api/registryServices";
 
 const MembersPage = () => {
@@ -18,6 +21,7 @@ const MembersPage = () => {
   const [wards, setWards] = useState([]);
   const [families, setFamilies] = useState([]);
   const [grades, setGrades] = useState([]);
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -37,7 +41,7 @@ const MembersPage = () => {
     fetchOptions();
   }, []);
 
-  const headFields = [
+  const getHeadFields = (formData) => [
     {
       name: "family",
       label: "Family",
@@ -111,6 +115,55 @@ const MembersPage = () => {
       type: "file",
       fullWidth: true,
     },
+    {
+      name: "is_deceased",
+      label: "Mark as Deceased",
+      type: "checkbox",
+      fullWidth: true,
+      showIf: (fd) => !fd.is_deceased || familyMembers.length > 0,
+      onChange: async (checked, fd, setFd, itemData) => {
+        if (checked && itemData?.id) {
+          try {
+            const familyId = itemData.family?.id || itemData.family;
+            const res = await listFamilyMembers(familyId);
+            const members = (res.data || []).filter(
+              (m) =>
+                (m.family?.id || m.family) === familyId &&
+                m.id !== itemData.id &&
+                m.is_active !== false &&
+                m.expire !== true,
+            );
+
+            if (members.length === 0) {
+              window.alert(
+                "No other family members available to promote as head. Please add members first.",
+              );
+              setFd((prev) => ({ ...prev, is_deceased: false }));
+              return;
+            }
+
+            setFamilyMembers(members);
+            setFd((prev) => ({ ...prev, is_deceased: true }));
+          } catch (error) {
+            console.error("Error fetching family members:", error);
+            window.alert("Failed to fetch family members.");
+            setFd((prev) => ({ ...prev, is_deceased: false }));
+          }
+        } else {
+          setFd((prev) => ({ ...prev, is_deceased: false, new_head_id: "" }));
+        }
+      },
+    },
+    {
+      name: "new_head_id",
+      label: "Select New Head of Family",
+      type: "select",
+      required: true,
+      fullWidth: true,
+      showIf: (fd) => fd.is_deceased,
+      options: familyMembers.map((m) => ({ value: m.id, label: m.name })),
+      coerce: Number,
+    },
   ];
 
   const extraActions = [
@@ -135,16 +188,55 @@ const MembersPage = () => {
 
   const handleUpdateHead = async (id, formData) => {
     // 1. Prepare data
-    let ward, familyId, memberData;
+    let isDeceased = false;
+    let newHeadId = null;
+
+    if (formData instanceof FormData) {
+      isDeceased = formData.get("is_deceased") === "true";
+      newHeadId = formData.get("new_head_id");
+    } else {
+      isDeceased = formData.is_deceased;
+      newHeadId = formData.new_head_id;
+    }
+
+    // 2. Special handling for marking head as deceased
+    if (isDeceased) {
+      if (!newHeadId) {
+        window.alert("Please select a new head of family.");
+        return;
+      }
+
+      if (
+        window.confirm(
+          "This will promote the selected member as the new head and mark the current head as deceased. Proceed?",
+        )
+      ) {
+        try {
+          // Promote new head
+          await promoteToHead(newHeadId);
+          // Mark old head as deceased
+          const res = await markMemberAsDeceased(id);
+          window.alert(res.data.message || "Head updated successfully.");
+          return res;
+        } catch (error) {
+          console.error("Error processing deceased head flow:", error);
+          window.alert("Failed to update deceased head status.");
+          throw error;
+        }
+      } else {
+        return; // User cancelled
+      }
+    }
+
+    // Normal update flow
+    let ward, familyId;
     if (formData instanceof FormData) {
       ward = formData.get("ward");
       familyId = formData.get("family");
-      memberData = formData;
     } else {
-      const { ward: w, family: f, ...rest } = formData;
+      const { ward: w, family: f } = formData;
       ward = w;
       familyId = f;
-      memberData = rest;
     }
 
     // 2. Call updateHead (handles Ward and other fields)
@@ -152,8 +244,6 @@ const MembersPage = () => {
 
     // 3. Call updateMember (specifically for Family field which updateHead ignores)
     if (familyId) {
-      // If it was FormData, we don't want to resend the whole file again if possible,
-      // but simple JSON update for family should work.
       await updateMember(id, { family: Number(familyId) });
     }
 
@@ -204,7 +294,7 @@ const MembersPage = () => {
       createFn={createHead}
       updateFn={handleUpdateHead}
       deleteFn={deleteMember}
-      fields={headFields}
+      fields={getHeadFields}
       extraActions={extraActions}
     />
   );
