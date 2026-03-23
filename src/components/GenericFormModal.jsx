@@ -25,6 +25,7 @@ import {
   LuUpload,
   LuImage,
   LuTrash2,
+  LuChevronDown,
 } from "react-icons/lu";
 
 /**
@@ -60,6 +61,27 @@ const GenericFormModal = ({
   const [formData, setFormData] = useState({});
   const [focusedField, setFocusedField] = useState(null);
   const [previews, setPreviews] = useState({});
+  const [openSelect, setOpenSelect] = useState(null);
+  const [selectSearch, setSelectSearch] = useState("");
+
+  const searchRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      // Don't close if clicking inside the search input
+      if (searchRef.current && searchRef.current.contains(e.target)) return;
+      setOpenSelect(null);
+      setSelectSearch("");
+    };
+    if (openSelect) {
+      window.addEventListener("click", handleOutsideClick);
+      // Auto-focus search input when opening
+      setTimeout(() => {
+        if (searchRef.current) searchRef.current.focus();
+      }, 50);
+    }
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [openSelect]);
 
   useEffect(() => {
     // Cleanup previews on unmount
@@ -541,39 +563,235 @@ const GenericFormModal = ({
                           }}
                         />
                       ) : f.type === "select" ? (
-                        <Box
-                          as="select"
-                          name={f.name}
-                          value={formData[f.name]}
-                          onChange={handleChange}
-                          onFocus={() => setFocusedField(f.name)}
-                          onBlur={() => setFocusedField(null)}
-                          required={f.required}
-                          disabled={isEditing && f.disabledOnEdit}
-                          style={{
-                            width: "100%",
-                            height: "38px",
-                            borderRadius: "8px",
-                            borderColor: "var(--chakra-colors-gray-200)",
-                            borderWidth: "1px",
-                            fontSize: "var(--chakra-fontSizes-sm)",
-                            paddingLeft: "12px",
-                            appearance: "none",
-                            background: "white",
-                          }}
-                        >
-                          <option value="">Select {f.label}</option>
-                          {f.options?.map((opt, i) => {
-                            const isObj =
-                              typeof opt === "object" && opt !== null;
-                            const val = isObj ? opt.value : opt;
-                            const lbl = isObj ? opt.label : opt;
-                            return (
-                              <option key={i} value={val}>
-                                {lbl}
-                              </option>
-                            );
-                          })}
+                        <Box position="relative">
+                          <Box
+                            onClick={(e) => {
+                              if (isEditing && f.disabledOnEdit) return;
+                              e.stopPropagation();
+                              setOpenSelect(
+                                openSelect === f.name ? null : f.name,
+                              );
+                            }}
+                            onFocus={() => {
+                              if (!(isEditing && f.disabledOnEdit))
+                                setFocusedField(f.name);
+                            }}
+                            onBlur={() => setFocusedField(null)}
+                            tabIndex={isEditing && f.disabledOnEdit ? -1 : 0}
+                            style={{
+                              width: "100%",
+                              height: "38px",
+                              borderRadius: "8px",
+                              borderColor: "var(--chakra-colors-gray-200)",
+                              borderWidth: "1px",
+                              fontSize: "var(--chakra-fontSizes-sm)",
+                              paddingLeft: "12px",
+                              paddingRight: "30px",
+                              display: "flex",
+                              alignItems: "center",
+                              background:
+                                isEditing && f.disabledOnEdit
+                                  ? "var(--chakra-colors-gray-100)"
+                                  : "white",
+                              cursor:
+                                isEditing && f.disabledOnEdit
+                                  ? "not-allowed"
+                                  : "pointer",
+                              position: "relative",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              opacity: isEditing && f.disabledOnEdit ? 0.6 : 1,
+                            }}
+                          >
+                            <Text noOfLines={1} fontSize="sm">
+                              {(() => {
+                                const selectedOpt = f.options?.find(
+                                  (opt) =>
+                                    (typeof opt === "object"
+                                      ? opt.value
+                                      : opt) == formData[f.name],
+                                );
+                                if (selectedOpt) {
+                                  return typeof selectedOpt === "object"
+                                    ? selectedOpt.label
+                                    : selectedOpt;
+                                }
+                                return `Select ${f.label}`;
+                              })()}
+                            </Text>
+                            <Box
+                              position="absolute"
+                              right="10px"
+                              top="50%"
+                              transform="translateY(-50%)"
+                              pointerEvents="none"
+                            >
+                              <Icon
+                                as={LuChevronDown}
+                                fontSize="14px"
+                                color="gray.400"
+                              />
+                            </Box>
+                          </Box>
+
+                          {openSelect === f.name && (
+                            <Box
+                              position="absolute"
+                              top="42px"
+                              left={0}
+                              right={0}
+                              bg="white"
+                              border="1px solid"
+                              borderColor="gray.200"
+                              borderRadius="8px"
+                              boxShadow="lg"
+                              zIndex={100}
+                              maxH="260px"
+                              display="flex"
+                              flexDirection="column"
+                              overflow="hidden"
+                            >
+                              <Box
+                                px={2}
+                                py={2}
+                                borderBottom="1px solid"
+                                borderColor="gray.100"
+                                bg="gray.50"
+                              >
+                                <Input
+                                  ref={searchRef}
+                                  placeholder={`Search ${f.label}...`}
+                                  size="xs"
+                                  value={selectSearch}
+                                  onChange={(e) =>
+                                    setSelectSearch(e.target.value)
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                  bg="white"
+                                  borderRadius="md"
+                                  fontSize="xs"
+                                  h="28px"
+                                  _focus={{
+                                    borderColor: primaryMaroon,
+                                    boxShadow: `0 0 0 1px ${primaryMaroon}`,
+                                  }}
+                                />
+                              </Box>
+
+                              <Box
+                                flex="1"
+                                overflowY="auto"
+                                py={1}
+                                css={{
+                                  "&::-webkit-scrollbar": { width: "4px" },
+                                  "&::-webkit-scrollbar-track": {
+                                    background: "transparent",
+                                  },
+                                  "&::-webkit-scrollbar-thumb": {
+                                    background: "rgba(0,0,0,0.1)",
+                                    borderRadius: "10px",
+                                  },
+                                }}
+                              >
+                                {/* Empty option */}
+                                {!f.required && !selectSearch && (
+                                  <Box
+                                    px={3}
+                                    py={2}
+                                    fontSize="sm"
+                                    cursor="pointer"
+                                    _hover={{
+                                      bg: "gray.50",
+                                      color: primaryMaroon,
+                                    }}
+                                    onClick={() => {
+                                      handleChange({
+                                        target: { name: f.name, value: "" },
+                                      });
+                                      setOpenSelect(null);
+                                      setSelectSearch("");
+                                    }}
+                                  >
+                                    Select {f.label}
+                                  </Box>
+                                )}
+
+                                {f.options
+                                  ?.filter((opt) => {
+                                    if (!selectSearch) return true;
+                                    const lbl =
+                                      typeof opt === "object" ? opt.label : opt;
+                                    return String(lbl)
+                                      .toLowerCase()
+                                      .includes(selectSearch.toLowerCase());
+                                  })
+                                  .map((opt, i) => {
+                                    const isObj =
+                                      typeof opt === "object" && opt !== null;
+                                    const val = isObj ? opt.value : opt;
+                                    const lbl = isObj ? opt.label : opt;
+                                    const isSelected =
+                                      String(formData[f.name]) === String(val);
+
+                                    return (
+                                      <Box
+                                        key={i}
+                                        px={3}
+                                        py={2}
+                                        fontSize="sm"
+                                        cursor="pointer"
+                                        bg={
+                                          isSelected
+                                            ? "rgba(123, 13, 30, 0.05)"
+                                            : "transparent"
+                                        }
+                                        color={
+                                          isSelected
+                                            ? primaryMaroon
+                                            : "gray.700"
+                                        }
+                                        fontWeight={isSelected ? "600" : "400"}
+                                        _hover={{
+                                          bg: "gray.50",
+                                          color: primaryMaroon,
+                                        }}
+                                        onClick={() => {
+                                          handleChange({
+                                            target: {
+                                              name: f.name,
+                                              value: val,
+                                            },
+                                          });
+                                          setOpenSelect(null);
+                                          setSelectSearch("");
+                                        }}
+                                      >
+                                        {lbl}
+                                      </Box>
+                                    );
+                                  })}
+
+                                {f.options?.filter((opt) => {
+                                  const lbl =
+                                    typeof opt === "object" ? opt.label : opt;
+                                  return String(lbl)
+                                    .toLowerCase()
+                                    .includes(selectSearch.toLowerCase());
+                                }).length === 0 && (
+                                  <Box
+                                    px={3}
+                                    py={4}
+                                    textAlign="center"
+                                    color="gray.400"
+                                    fontSize="xs"
+                                  >
+                                    No results found
+                                  </Box>
+                                )}
+                              </Box>
+                            </Box>
+                          )}
                         </Box>
                       ) : f.type === "checkbox" ? (
                         <Flex align="center" gap={3} py={2}>

@@ -22,18 +22,21 @@ const MembersPage = () => {
   const [families, setFamilies] = useState([]);
   const [grades, setGrades] = useState([]);
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [allMembers, setAllMembers] = useState([]);
 
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const [wRes, fRes, gRes] = await Promise.all([
+        const [wRes, fRes, gRes, mRes] = await Promise.all([
           listWards(),
           listFamilies(),
           listGrades(),
+          listMembers(),
         ]);
         setWards(wRes.data || []);
         setFamilies(fRes.data || []);
         setGrades(gRes.data || []);
+        setAllMembers(mRes.data || []);
       } catch (error) {
         console.error("Error fetching options:", error);
       }
@@ -84,7 +87,22 @@ const MembersPage = () => {
         { value: "DIVORCED", label: "Divorced" },
       ],
     },
-    { name: "spouse_name", label: "Spouse Name" },
+    {
+      name: "spouse_name",
+      label: "Spouse",
+      type: "select",
+      options: allMembers
+        .filter(
+          (m) =>
+            (m.family?.id || m.family) === Number(formData?.family) &&
+            m.id !== itemData?.id,
+        )
+        .map((m) => ({
+          value: m.name,
+          label: `${m.name}`,
+        })),
+      required: false,
+    },
     { name: "dob", label: "Date of Birth", type: "date" },
     { name: "mobile_no", label: "Mobile No", required: true },
     { name: "phone_no", label: "Phone No" },

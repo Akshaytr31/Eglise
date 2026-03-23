@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import RegistryTable from "../components/RegistryTable";
 import {
+  listMembers,
   listFamilyMembers,
   createMember,
   updateMember,
@@ -25,13 +26,12 @@ const MemberDetailsPage = () => {
   const [relationships, setRelationships] = useState([]);
   const [grades, setGrades] = useState([]);
   const [families, setFamilies] = useState([]);
+  const [allMembers, setAllMembers] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
     const fetchOptionsAndHead = async () => {
       try {
-        const promises = [listRelationships(), listGrades(), listFamilies()];
-
         let fetchedHead = head;
         if (!fetchedHead) {
           const hRes = await getMember(headId);
@@ -44,10 +44,16 @@ const MemberDetailsPage = () => {
           setFamilyId(f?.id ?? f ?? null);
         }
 
-        const [rRes, gRes, fRes] = await Promise.all(promises);
+        const [rRes, gRes, fRes, mRes] = await Promise.all([
+          listRelationships(),
+          listGrades(),
+          listFamilies(),
+          listMembers(),
+        ]);
         setRelationships(rRes.data || []);
         setGrades(gRes.data || []);
         setFamilies(fRes.data || []);
+        setAllMembers(mRes.data || []);
         setIsDataLoaded(true);
       } catch (error) {
         console.error("Error fetching options or head:", error);
@@ -56,7 +62,7 @@ const MemberDetailsPage = () => {
     fetchOptionsAndHead();
   }, [headId]);
 
-  const memberFields = [
+  const getMemberFields = (formData, itemData) => [
     {
       name: "family",
       label: "Family",
@@ -101,7 +107,21 @@ const MemberDetailsPage = () => {
         { value: "DIVORCED", label: "Divorced" },
       ],
     },
-    { name: "spouse_name", label: "Spouse Name" },
+    {
+      name: "spouse_name",
+      label: "Spouse",
+      type: "select",
+      options: allMembers
+        .filter(
+          (m) =>
+            (m.family?.id || m.family) === familyId && m.id !== itemData?.id,
+        )
+        .map((m) => ({
+          value: m.name,
+          label: `${m.name}`,
+        })),
+      required: false,
+    },
     { name: "dob", label: "Date of Birth", type: "date" },
     { name: "mobile_no", label: "Mobile No", required: true },
     { name: "phone_no", label: "Phone No" },
@@ -256,7 +276,7 @@ const MemberDetailsPage = () => {
       createFn={handleCreateMember}
       updateFn={updateMember}
       deleteFn={deleteMember}
-      fields={memberFields}
+      fields={getMemberFields}
       columns={memberColumns}
       extraActions={extraActions}
     />
