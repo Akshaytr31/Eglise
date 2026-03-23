@@ -10,12 +10,10 @@ import {
 import { listTombTypes } from "../api/churchServices";
 
 const DEATH_COLUMNS = [
-  { header: "Reg No", key: "register_number" },
+  { header: "Reg No", key: "reg_no" },
   { header: "Name", key: "member_name" },
   { header: "Family", key: "family_name" },
   { header: "Date of Death", key: "died_on" },
-  // { header: "Funeral", key: "funeral_on" },
-  // { header: "Status", key: "status" },
 ];
 
 const DeathRegisterPage = () => {
@@ -65,12 +63,19 @@ const DeathRegisterPage = () => {
       const res = await listDeaths(filterStatus);
       if (res.data) {
         const mapped = res.data.map((d) => {
-          const famObj = families.find(
-            (f) => f.id === (d.family?.id || d.family),
-          );
+          // Find family by object ID or direct ID
+          const famId = d.family?.id || d.family;
+          const famObj = families.find((f) => f.id === famId);
+
           return {
             ...d,
-            family_name: d.family?.family_name || famObj?.family_name || "N/A",
+            family_name:
+              d.family_name ||
+              d.family?.family_name ||
+              famObj?.family_name ||
+              "N/A",
+            house_name:
+              d.house_name || d.family?.house_name || famObj?.house_name || "—",
           };
         });
         return { ...res, data: mapped };
@@ -109,7 +114,7 @@ const DeathRegisterPage = () => {
 
   return (
     <RegistryTable
-      key={filterStatus} // Force re-fetch when filter changes
+      key={`${filterStatus}-${families.length}`} // Force re-fetch when filter OR families load
       title="Death Register"
       addLabel="Add Record"
       nameKey="member_name"

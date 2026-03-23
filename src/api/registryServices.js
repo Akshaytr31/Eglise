@@ -160,3 +160,13 @@ export const createRegisterSettings = (data) =>
   apiClient.post("/api/registry/register-settings/create/", data);
 export const updateRegisterSettings = (type, data) =>
   apiClient.patch(`/api/registry/register-settings/${type}/`, data);
+
+// Events APIs
+export const listEvents = () => apiClient.get("/api/registry/events/");
+export const createEvent = (data) =>
+  apiClient.post("/api/registry/events/", data);
+export const getEvent = (id) => apiClient.get(`/api/registry/events/${id}/`);
+export const updateEvent = (id, data) =>
+  apiClient.patch(`/api/registry/events/${id}/`, data);
+export const deleteEvent = (id) =>
+  apiClient.delete(`/api/registry/events/${id}/`);
