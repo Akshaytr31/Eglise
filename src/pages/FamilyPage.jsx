@@ -36,6 +36,7 @@ const FamilyPage = () => {
       updateFn={updateFamily}
       deleteFn={deleteFamily}
       fields={familyFields}
+      isMaster={true}
     />
   );
 };

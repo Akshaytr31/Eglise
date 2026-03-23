@@ -121,10 +121,48 @@ const GenericFormModal = ({
     });
   };
 
-  const activeFields = (
+  const activeFieldsSource = (
     typeof fields === "function" ? fields(formData, itemData) : fields
   ).filter((f) => !f.showIf || f.showIf(formData, itemData));
-  const columnCount = activeFields.length > 6 ? 3 : 2;
+
+  const maxCols = activeFieldsSource.length > 6 ? 3 : 2;
+
+  const processedFields = (() => {
+    const result = [];
+    let currentRowCols = 0;
+
+    for (let i = 0; i < activeFieldsSource.length; i++) {
+      const field = activeFieldsSource[i];
+      const isTextArea = field.type === "textarea";
+      const isExplicitFull = field.fullWidth;
+      const nextField = activeFieldsSource[i + 1];
+      const isNextFull =
+        nextField && (nextField.fullWidth || nextField.type === "textarea");
+
+      let effectivelyFull = isTextArea || isExplicitFull || maxCols === 1;
+
+      // Logic for "lonely" fields: if this field is at the start of a row
+      // but there's no next field or the next field starts its own row (is full-width),
+      // then make this one full-width to fill the gap.
+      if (!effectivelyFull && currentRowCols === 0) {
+        if (!nextField || isNextFull) {
+          effectivelyFull = true;
+        }
+      }
+
+      result.push({ ...field, effectivelyFull });
+
+      if (effectivelyFull) {
+        currentRowCols = 0;
+      } else {
+        currentRowCols = (currentRowCols + 1) % maxCols;
+      }
+    }
+    return result;
+  })();
+
+  const activeFields = processedFields;
+  const columnCount = maxCols;
   const isEditing = Boolean(itemData);
 
   const handleSubmit = (e) => {
@@ -278,7 +316,9 @@ const GenericFormModal = ({
                       key={f.name}
                       w="full"
                       position="relative"
-                      gridColumn={f.fullWidth ? `span ${columnCount}` : "auto"}
+                      gridColumn={
+                        f.effectivelyFull ? `span ${columnCount}` : "auto"
+                      }
                       display={f.type === "checkbox" ? "flex" : "block"}
                       alignItems={f.type === "checkbox" ? "center" : "initial"}
                     >
@@ -315,7 +355,7 @@ const GenericFormModal = ({
                           align="center"
                           w="full"
                           gridColumn={
-                            f.fullWidth ? `span ${columnCount}` : "auto"
+                            f.effectivelyFull ? `span ${columnCount}` : "auto"
                           }
                         >
                           <Box
