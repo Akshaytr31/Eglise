@@ -37,6 +37,7 @@ const WardPage = () => (
     updateFn={updateWard}
     deleteFn={deleteWard}
     fields={WARD_FIELDS}
+    isMaster={true}
   />
 );
 

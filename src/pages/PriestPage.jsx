@@ -16,7 +16,8 @@ import {
   createPriest,
   updatePriest,
   deletePriest,
-  listPriestsDropdown, // Added this
+  listPriestsDropdown,
+  listDesignations,
 } from "../api/registryServices";
 
 const PriestPage = () => {
@@ -56,10 +57,8 @@ const PriestPage = () => {
   ];
 
   const priestColumns = [
-    { header: "Family Name", key: "family_name" },
+    { header: "Family Name", key: "house_name" },
     { header: "Phone", key: "phone_number" },
-    { header: "Designation", key: "designation_name" },
-    { header: "House Name", key: "house_name" },
   ];
 
   const listPriestsEnriched = async () => {
@@ -227,6 +226,7 @@ const PriestPage = () => {
       deleteFn={deletePriest}
       fields={priestFields}
       topContent={QuickView}
+      isMaster={true}
     />
   );
 };

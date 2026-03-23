@@ -23,6 +23,7 @@ const RelationshipPage = () => (
     updateFn={updateRelationship}
     deleteFn={deleteRelationship}
     fields={RELATIONSHIP_FIELDS}
+    isMaster={true}
   />
 );
 

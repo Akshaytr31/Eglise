@@ -107,6 +107,7 @@ const TombFeesPage = () => {
       updateFn={updateTombFees}
       deleteFn={deleteTombFees}
       fields={fields}
+      isMaster={true}
     />
   );
 };

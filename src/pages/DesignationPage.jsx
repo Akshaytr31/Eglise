@@ -32,6 +32,7 @@ const DesignationPage = () => (
     updateFn={updateDesignation}
     deleteFn={deleteDesignation}
     fields={DESIGNATION_FIELDS}
+    isMaster={true}
   />
 );
 

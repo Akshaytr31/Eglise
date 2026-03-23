@@ -24,11 +24,13 @@ import {
   LuChevronsRight,
   LuSearch,
   LuImage,
+  LuEye,
 } from "react-icons/lu";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import GenericFormModal from "./GenericFormModal";
+import ViewDetailsModal from "./ViewDetailsModal";
 
 /**
  * RegistryTable — a reusable CRUD table page component.
@@ -67,6 +69,7 @@ const RegistryTable = ({
   extraActions = [], // Array of { label, icon, onClick, color, title }
   columns = [], // Array of { header, key, textAlign }
   topContent = null, // Custom content above the table
+  isMaster = false, // New prop to hide "View" button on master pages
 }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -78,6 +81,8 @@ const RegistryTable = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [viewItem, setViewItem] = useState(null);
 
   const primaryMaroon = "var(--primary-maroon)";
   // Alternating column backgrounds
@@ -169,6 +174,11 @@ const RegistryTable = ({
   const handleEdit = (item) => {
     setSelectedItem(item);
     onOpen();
+  };
+
+  const handleView = (item) => {
+    setViewItem(item);
+    setIsViewOpen(true);
   };
 
   const handleAddNew = () => {
@@ -623,6 +633,35 @@ const RegistryTable = ({
                         </HStack>
 
                         <HStack spacing={2}>
+                          {!isMaster && (
+                            <Box
+                              as="button"
+                              onClick={() => handleView(item)}
+                              display="inline-flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              w="26px"
+                              h="26px"
+                              borderRadius="full"
+                              color="green.500"
+                              bg="white"
+                              boxShadow="xs"
+                              border="1px solid"
+                              borderColor="green.50"
+                              transition="all 0.2s"
+                              _hover={{
+                                transform: "translateY(-1px)",
+                                color: "white",
+                                bg: "green.500",
+                                boxShadow: "0 3px 8px rgba(72, 187, 120, 0.2)",
+                                border: "none",
+                              }}
+                              title="View Details"
+                            >
+                              <Icon as={LuEye} fontSize="12px" />
+                            </Box>
+                          )}
+
                           <Box
                             as="button"
                             onClick={() => handleEdit(item)}
@@ -852,6 +891,16 @@ const RegistryTable = ({
           isLoading={isLoading}
         />
       ) : null}
+
+      <ViewDetailsModal
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        itemData={viewItem}
+        title={title}
+        fields={
+          typeof fields === "function" ? fields(viewItem, viewItem) : fields
+        }
+      />
 
       <ConfirmDeleteModal
         isOpen={isDeleteOpen}

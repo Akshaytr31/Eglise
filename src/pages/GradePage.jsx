@@ -23,6 +23,7 @@ const GradePage = () => (
     updateFn={updateGrade}
     deleteFn={deleteGrade}
     fields={GRADE_FIELDS}
+    isMaster={true}
   />
 );
 

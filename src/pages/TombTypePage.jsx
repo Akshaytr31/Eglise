@@ -25,6 +25,7 @@ const TombTypePage = () => (
     updateFn={updateTombType}
     deleteFn={deleteTombType}
     fields={TOMB_TYPE_FIELDS}
+    isMaster={true}
   />
 );
 

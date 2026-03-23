@@ -120,6 +120,7 @@ const PriestChangesPage = () => {
       updateFn={updatePriestChange}
       deleteFn={deletePriestChange}
       fields={fields}
+      isMaster={true}
     />
   );
 };
