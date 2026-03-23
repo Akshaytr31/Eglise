@@ -9,14 +9,83 @@ import {
   DialogRoot,
   DialogBackdrop,
   DialogContent,
-  DialogHeader,
   DialogBody,
   DialogFooter,
   DialogCloseTrigger,
   DialogPositioner,
   Button,
+  HStack,
+  Separator,
 } from "@chakra-ui/react";
-import { LuX, LuEye } from "react-icons/lu";
+import {
+  LuX,
+  LuUser,
+  LuMail,
+  LuPhone,
+  LuMapPin,
+  LuChurch,
+  LuCalendar,
+  LuInfo,
+  LuGraduationCap,
+  LuBriefcase,
+  LuHeart,
+} from "react-icons/lu";
+
+const SectionHeader = ({ icon, title, primaryMaroon }) => (
+  <HStack spacing={2} mb={4} mt={6} align="center">
+    <Box
+      p={1.5}
+      bg="rgba(123, 13, 30, 0.08)"
+      borderRadius="lg"
+      color={primaryMaroon}
+    >
+      <Icon as={icon} fontSize="16px" />
+    </Box>
+    <Text
+      fontSize="xs"
+      fontWeight="800"
+      color={primaryMaroon}
+      textTransform="uppercase"
+      letterSpacing="0.1em"
+    >
+      {title}
+    </Text>
+    <Separator flex="1" borderColor="gray.100" />
+  </HStack>
+);
+
+const DetailField = ({ label, value, icon }) => (
+  <VStack
+    align="start"
+    spacing={1}
+    p={3}
+    borderRadius="xl"
+    bg="gray.50"
+    border="1px solid"
+    borderColor="gray.100"
+    transition="all 0.2s"
+    _hover={{
+      bg: "white",
+      borderColor: "rgba(123, 13, 30, 0.2)",
+      boxShadow: "sm",
+    }}
+  >
+    <HStack spacing={1.5} color="gray.400">
+      {icon && <Icon as={icon} fontSize="10px" />}
+      <Text
+        fontSize="10px"
+        fontWeight="800"
+        textTransform="uppercase"
+        letterSpacing="0.05em"
+      >
+        {label}
+      </Text>
+    </HStack>
+    <Text fontSize="sm" fontWeight="600" color="gray.700" noOfLines={2}>
+      {value}
+    </Text>
+  </VStack>
+);
 
 const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
   const primaryMaroon = "var(--primary-maroon)";
@@ -30,35 +99,113 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
     return `${baseUrl.replace(/\/$/, "")}${url.startsWith("/") ? "" : "/"}${url}`;
   };
 
-  const renderValue = (value, field = {}) => {
+  const renderValue = (value) => {
     if (value === null || value === undefined || value === "") return "—";
-
-    // Handle objects (like family or priest objects)
     if (typeof value === "object") {
-      // Common name keys in this project
       return (
         value.name ||
         value.family_name ||
+        value.ward_name ||
         value.designation_name ||
         JSON.stringify(value)
       );
     }
-
     return String(value);
   };
 
-  // Determine which fields to show. Use 'fields' prop if provided (and it's an array), otherwise show all keys in itemData
+  // Categories mapping
+  const personalKeys = [
+    "gender",
+    "dob",
+    "blood_group",
+    "marital_status",
+    "spouse_name",
+    "father_name",
+    "mother_name",
+  ];
+  const churchKeys = [
+    "baptismal_name",
+    "date_of_baptism",
+    "parish_of_baptism",
+    "ward",
+    "family",
+    "grade",
+    "joining_date",
+    "sunday_school_qualification",
+    "transferred_from",
+  ];
+  const contactKeys = ["email", "mobile_no", "phone_no", "address"];
+  const miscKeys = ["educational_qualification", "profession"];
+
+  const getIconForKey = (key) => {
+    if (key.includes("email")) return LuMail;
+    if (key.includes("mobile") || key.includes("phone")) return LuPhone;
+    if (key.includes("date") || key.includes("dob") || key.includes("joining"))
+      return LuCalendar;
+    if (
+      key.includes("parish") ||
+      key.includes("church") ||
+      key.includes("ward") ||
+      key.includes("family")
+    )
+      return LuChurch;
+    if (key.includes("address")) return LuMapPin;
+    if (key.includes("qualification")) return LuGraduationCap;
+    if (key.includes("profession")) return LuBriefcase;
+    if (
+      key.includes("blood") ||
+      key.includes("marital") ||
+      key.includes("spouse")
+    )
+      return LuHeart;
+    return LuInfo;
+  };
+
   const displayFields = Array.isArray(fields)
-    ? fields.map((f) => ({ label: f.label, key: f.name, type: f.type }))
+    ? fields.map((f) => ({ label: f.label, key: f.name }))
     : Object.keys(itemData)
-        .filter((key) => !["id", "created_at", "updated_at"].includes(key))
+        .filter(
+          (key) =>
+            !["id", "created_at", "updated_at", "family_image"].includes(key),
+        )
         .map((key) => ({
           label: key
             .split("_")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
             .join(" "),
           key: key,
         }));
+
+  const imageKey =
+    displayFields.find(
+      (f) =>
+        f.key.toLowerCase().includes("image") ||
+        f.key.toLowerCase().includes("photo"),
+    )?.key || "family_image";
+  const profileImage = itemData[imageKey];
+  const mainName = itemData.name || itemData.family_name || title;
+
+  // Filter fields into groups and check if they have content
+  const personalFields = displayFields.filter(
+    (f) =>
+      personalKeys.includes(f.key) ||
+      (miscKeys.includes(f.key) && !churchKeys.includes(f.key)),
+  );
+  const churchFields = displayFields.filter((f) => churchKeys.includes(f.key));
+  const contactFields = displayFields.filter((f) =>
+    contactKeys.includes(f.key),
+  );
+
+  const handledKeys = [
+    ...personalKeys,
+    ...churchKeys,
+    ...contactKeys,
+    ...miscKeys,
+    imageKey,
+  ];
+  const unhandledFields = displayFields.filter(
+    (f) => !handledKeys.includes(f.key),
+  );
 
   return (
     <DialogRoot
@@ -67,155 +214,229 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
       placement="center"
       size="xl"
     >
-      <DialogBackdrop bg="blackAlpha.600" backdropFilter="blur(4px)" />
+      <DialogBackdrop bg="blackAlpha.700" backdropFilter="blur(8px)" />
       <DialogPositioner alignItems="center">
         <DialogContent
-          borderRadius="14px"
+          borderRadius="24px"
           overflow="hidden"
-          boxShadow="2xl"
+          boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
           maxH="90vh"
           display="flex"
           flexDirection="column"
+          border="none"
         >
-          <DialogHeader
-            bg={primaryMaroon}
+          <DialogCloseTrigger
+            position="absolute"
+            right={4}
+            top={4}
             color="white"
-            fontSize="md"
-            py={4}
-            px={8}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            position="relative"
-            borderBottom="1px solid rgba(255,255,255,0.1)"
+            bg="whiteAlpha.300"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.400" }}
+            p={2}
+            zIndex={10}
           >
-            <Flex align="center" gap={2}>
-              <Icon as={LuEye} fontSize="18px" />
-              <Text
-                fontWeight="600"
-                letterSpacing="0.5px"
-                fontSize="md"
-                textTransform="uppercase"
-              >
-                View Details: {title}
-              </Text>
-            </Flex>
-            <DialogCloseTrigger
-              position="absolute"
-              right={3}
-              top="50%"
-              transform="translateY(-50%)"
-              color="white"
-              bg="whiteAlpha.200"
-              borderRadius="full"
-              _hover={{ bg: "whiteAlpha.400" }}
-              p={1}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <Icon as={LuX} fontSize="18px" />
-            </DialogCloseTrigger>
-          </DialogHeader>
+            <Icon as={LuX} fontSize="20px" />
+          </DialogCloseTrigger>
 
           <DialogBody
-            py={8}
-            px={8}
+            p={0}
             bg="white"
             flex="1"
             overflowY="auto"
             css={{
-              "&::-webkit-scrollbar": { width: "4px" },
-              "&::-webkit-scrollbar-track": { background: "transparent" },
+              "&::-webkit-scrollbar": { width: "6px" },
+              "&::-webkit-scrollbar-track": { background: "gray.50" },
               "&::-webkit-scrollbar-thumb": {
-                background: "rgba(0,0,0,0.1)",
+                background: "rgba(123, 13, 30, 0.2)",
                 borderRadius: "10px",
               },
             }}
           >
-            {/* Image Section if applicable */}
-            {(() => {
-              const imageField = displayFields.find(
-                (f) =>
-                  f.key.toLowerCase().includes("image") ||
-                  f.key.toLowerCase().includes("photo"),
-              );
-              if (!imageField || !itemData[imageField.key]) return null;
+            {/* Hero Banner Area */}
+            <Box
+              h={profileImage ? "140px" : "100px"}
+              bgGradient={`linear(to-br, ${primaryMaroon}, #9b1b30)`}
+              position="relative"
+              w="full"
+            />
 
-              return (
-                <Box mb={8} textAlign="center">
+            {/* Profile Summary Header */}
+            <Flex
+              direction="column"
+              align="center"
+              mt={profileImage ? "-60px" : "-30px"}
+              px={8}
+              pb={6}
+              borderBottom="1px solid"
+              borderColor="gray.50"
+              position="relative"
+            >
+              {profileImage && (
+                <Box
+                  p={1}
+                  bg="white"
+                  borderRadius="3xl"
+                  boxShadow="xl"
+                  position="relative"
+                  mb={4}
+                >
                   <Box
                     as="img"
-                    src={getFullImageUrl(itemData[imageField.key])}
-                    alt={imageField.label}
-                    maxH="300px"
-                    mx="auto"
-                    borderRadius="lg"
-                    boxShadow="sm"
-                    border="1px solid"
-                    borderColor="gray.100"
+                    src={getFullImageUrl(profileImage)}
+                    w="120px"
+                    h="120px"
+                    borderRadius="2xl"
+                    objectFit="cover"
                   />
-                  <Text mt={2} fontSize="xs" color="gray.500" fontWeight="bold">
-                    {imageField.label}
-                  </Text>
                 </Box>
-              );
-            })()}
+              )}
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-              {displayFields
-                .filter(
-                  (f) =>
-                    !f.key.toLowerCase().includes("image") &&
-                    !f.key.toLowerCase().includes("photo"),
-                )
-                .map((field, idx) => (
-                  <VStack
-                    key={idx}
-                    align="start"
-                    spacing={1}
-                    p={3}
-                    borderRadius="md"
-                    bg="gray.50"
-                    border="1px solid"
-                    borderColor="gray.100"
-                  >
+              <VStack mt={profileImage ? 0 : 4} spacing={0} textAlign="center">
+                <Text
+                  fontSize="2xl"
+                  fontWeight="800"
+                  color="gray.800"
+                  letterSpacing="tight"
+                >
+                  {mainName}
+                </Text>
+                <HStack color="gray.500" spacing={2} justify="center">
+                  {itemData.baptismal_name && (
+                    <Text fontSize="sm" fontWeight="600">
+                      {itemData.baptismal_name}
+                    </Text>
+                  )}
+                  {itemData.baptismal_name && itemData.house_name && (
+                    <Text opacity={0.3}>•</Text>
+                  )}
+                  {itemData.house_name && (
                     <Text
-                      fontSize="10px"
-                      fontWeight="800"
-                      color="gray.400"
+                      fontSize="xs"
+                      fontWeight="700"
                       textTransform="uppercase"
                       letterSpacing="0.05em"
                     >
-                      {field.label}
+                      {itemData.house_name}
                     </Text>
-                    <Text fontSize="sm" fontWeight="600" color="gray.700">
-                      {renderValue(itemData[field.key], field)}
-                    </Text>
-                  </VStack>
-                ))}
-            </SimpleGrid>
+                  )}
+                </HStack>
+              </VStack>
+            </Flex>
+
+            {/* Content Sections */}
+            <Box px={10} pb={12}>
+              {/* Personal Info Section */}
+              {personalFields.length > 0 && (
+                <>
+                  <SectionHeader
+                    icon={LuUser}
+                    title="Personal Information"
+                    primaryMaroon={primaryMaroon}
+                  />
+                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    {personalFields.map((f, idx) => (
+                      <DetailField
+                        key={idx}
+                        label={f.label}
+                        value={renderValue(itemData[f.key])}
+                        icon={getIconForKey(f.key)}
+                      />
+                    ))}
+                  </SimpleGrid>
+                </>
+              )}
+
+              {/* Church Info Section */}
+              {churchFields.length > 0 && (
+                <>
+                  <SectionHeader
+                    icon={LuChurch}
+                    title="Church & Parish Data"
+                    primaryMaroon={primaryMaroon}
+                  />
+                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    {churchFields.map((f, idx) => (
+                      <DetailField
+                        key={idx}
+                        label={f.label}
+                        value={renderValue(itemData[f.key])}
+                        icon={getIconForKey(f.key)}
+                      />
+                    ))}
+                  </SimpleGrid>
+                </>
+              )}
+
+              {/* Contact Info Section */}
+              {contactFields.length > 0 && (
+                <>
+                  <SectionHeader
+                    icon={LuMail}
+                    title="Contact Details"
+                    primaryMaroon={primaryMaroon}
+                  />
+                  <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                    {contactFields.map((f, idx) => (
+                      <DetailField
+                        key={idx}
+                        label={f.label}
+                        value={renderValue(itemData[f.key])}
+                        icon={getIconForKey(f.key)}
+                      />
+                    ))}
+                  </SimpleGrid>
+                </>
+              )}
+
+              {/* Remaining Fields (Catch-all) */}
+              {unhandledFields.length > 0 && (
+                <>
+                  <SectionHeader
+                    icon={LuInfo}
+                    title="Other Details"
+                    primaryMaroon={primaryMaroon}
+                  />
+                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    {unhandledFields.map((f, idx) => (
+                      <DetailField
+                        key={idx}
+                        label={f.label}
+                        value={renderValue(itemData[f.key])}
+                        icon={getIconForKey(f.key)}
+                      />
+                    ))}
+                  </SimpleGrid>
+                </>
+              )}
+            </Box>
           </DialogBody>
 
           <DialogFooter
-            px={8}
-            py={4}
+            p={6}
             bg="gray.50"
             borderTop="1px solid"
             borderColor="gray.100"
+            justifyContent="center"
           >
             <Button
               onClick={onClose}
-              bg="gray.500"
+              bg={primaryMaroon}
               color="white"
-              borderRadius="lg"
-              h="36px"
-              px={6}
-              fontSize="sm"
+              borderRadius="xl"
+              h="45px"
+              px={12}
+              fontSize="md"
               fontWeight="bold"
-              _hover={{ bg: "gray.600" }}
+              _hover={{
+                bg: "#6b0f1a",
+                transform: "translateY(-1px)",
+                boxShadow: "lg",
+              }}
+              _active={{ transform: "translateY(0)" }}
+              transition="all 0.2s"
             >
-              Close
+              Done Viewing
             </Button>
           </DialogFooter>
         </DialogContent>
