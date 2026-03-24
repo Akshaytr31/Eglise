@@ -65,7 +65,7 @@ const RegistryTable = ({
   deleteFn,
   FormModal,
   fields,
-  itemsPerPage = 12,
+  itemsPerPage = 8,
   extraActions = [], // Array of { label, icon, onClick, color, title }
   columns = [], // Array of { header, key, textAlign }
   topContent = null, // Custom content above the table
@@ -440,31 +440,29 @@ const RegistryTable = ({
                   <Box
                     key={item.id}
                     position="relative"
-                    borderRadius="lg"
+                    borderRadius="2xl"
                     overflow="hidden"
                     bg="white"
                     borderWidth="1px"
-                    borderColor="purple.100"
-                    boxShadow="0 2px 12px -5px rgba(0,0,0,0.05), 0 1px 4px -5px rgba(0,0,0,0.02)"
-                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                    borderColor="gray.100"
+                    boxShadow="0 4px 20px -10px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.02)"
+                    transition="all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
                     _hover={{
-                      transform: "translateY(-4px)",
+                      transform: "translateY(-6px)",
                       boxShadow:
-                        "0 15px 30px -10px rgba(123, 13, 30, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.03)",
-                      borderColor: "rgba(13, 11, 11, 0.1)",
+                        "0 22px 35px -15px rgba(123, 13, 30, 0.12), 0 8px 15px -3px rgba(0, 0, 0, 0.05)",
+                      borderColor: "rgba(123, 13, 30, 0.15)",
                     }}
                   >
-                    {/* Modern SaaS Tile Card Content */}
-                    {/* Large Card Image if available at the very top */}
+                    {/* Modern Premium Card Header */}
                     {(() => {
                       const imageCol = columns.find(
                         (c) =>
                           c.key.toLowerCase().includes("image") ||
                           c.key.toLowerCase().includes("photo"),
                       );
-                      if (!imageCol) return null;
 
-                      const val = item[imageCol.key];
+                      const val = imageCol ? item[imageCol.key] : null;
                       const getFullImageUrl = (url) => {
                         if (!url) return null;
                         if (url.startsWith("http") || url.startsWith("data:"))
@@ -473,116 +471,163 @@ const RegistryTable = ({
                         return `${baseUrl.replace(/\/$/, "")}${url.startsWith("/") ? "" : "/"}${url}`;
                       };
 
-                      return (
-                        <Box
-                          position="relative"
-                          width="100%"
-                          height="180px"
-                          bg="gray.50"
-                          borderBottom="1px solid"
-                          borderBottomColor="gray.100"
-                          overflow="hidden"
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          {val ? (
+                      const imageUrl = getFullImageUrl(val);
+
+                      if (imageUrl) {
+                        return (
+                          <Box
+                            position="relative"
+                            height="200px"
+                            overflow="hidden"
+                            bg="gray.100"
+                          >
                             <Box
                               as="img"
-                              src={getFullImageUrl(val)}
-                              alt={imageCol.header}
+                              src={imageUrl}
+                              alt={item[nameKey]}
                               w="100%"
                               h="100%"
                               objectFit="cover"
-                              loading="lazy"
+                              transition="transform 0.6s ease"
+                              _groupHover={{ transform: "scale(1.05)" }}
                             />
-                          ) : (
-                            <Icon
-                              as={LuImage}
-                              fontSize="40px"
-                              color="gray.200"
-                            />
-                          )}
-                        </Box>
-                      );
+
+                            {/* Glassmorphism Title Overlay */}
+                            <Box
+                              position="absolute"
+                              bottom="0"
+                              left="0"
+                              right="0"
+                              p={4}
+                              background="linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)"
+                              backdropFilter="blur(2px)"
+                            >
+                              <VStack align="start" spacing={0}>
+                                <Text
+                                  color="white"
+                                  fontSize="18px"
+                                  fontWeight="800"
+                                  lineHeight="1.2"
+                                  textShadow="0 2px 4px rgba(0,0,0,0.3)"
+                                >
+                                  {item[nameKey]}
+                                </Text>
+                                <HStack spacing={2} mt={1}>
+                                  {item.is_family_head && (
+                                    <Box
+                                      px={2}
+                                      py={0.5}
+                                      bg="rgba(123, 13, 30, 0.9)"
+                                      borderRadius="md"
+                                      border="1px solid rgba(255,255,255,0.2)"
+                                    >
+                                      <Text
+                                        fontSize="9px"
+                                        fontWeight="800"
+                                        color="white"
+                                        textTransform="uppercase"
+                                        letterSpacing="0.05em"
+                                      >
+                                        Head of Family
+                                      </Text>
+                                    </Box>
+                                  )}
+                                </HStack>
+                              </VStack>
+                            </Box>
+                          </Box>
+                        );
+                      }
+
+                      // No image - return null here and we'll handle title in the body
+                      return null;
                     })()}
 
-                    <Box position="relative" p={4} pl={6} pb={0}>
-                      {/* Header Section */}
+                    {/* Card Body - Structured Information */}
+                    <Box p={5} pb={4}>
+                      {/* Title for items without image */}
+                      {(() => {
+                        const imageCol = columns.find(
+                          (c) =>
+                            c.key.toLowerCase().includes("image") ||
+                            c.key.toLowerCase().includes("photo"),
+                        );
+                        if (!imageCol || !item[imageCol.key]) {
+                          return (
+                            <HStack align="start" spacing={0} mb={2} justifyContent="space-between">
+                              <Text
+                                fontSize="16px"
+                                fontWeight="600"
+                                color="gray.500"
+                                lineHeight="1.2"
+                              >
+                                {item[nameKey]}
+                              </Text>
+                              <HStack spacing={1} mt={1}>
+                                {item.is_family_head && (
+                                  <Box
+                                    px={2}
+                                    py={0.5}
+                                    bg="rgba(123, 13, 30, 0.08)"
+                                    borderRadius="md"
+                                    border="1px solid"
+                                    borderColor="rgba(123, 13, 30, 0.2)"
+                                  >
+                                    <Text
+                                      fontSize="9px"
+                                      fontWeight="800"
+                                      color="var(--primary-maroon)"
+                                      textTransform="uppercase"
+                                      letterSpacing="0.05em"
+                                    >
+                                      Head of Family
+                                    </Text>
+                                  </Box>
+                                )}
+                                <Text
+                                  fontSize="10px"
+                                  color="gray.400"
+                                  fontWeight="600"
+                                >
+                                  {item.reg_no ||
+                                    `#${indexOfFirstItem + index + 1}`}
+                                </Text>
+                              </HStack>
+                            </HStack>
+                          );
+                        }
+                        return null;
+                      })()}
 
-                      <Flex align="start" justify="space-between" mb={4}>
-                        <VStack align="start" spacing={0}>
-                          <Text
-                            fontSize="15px"
-                            fontWeight="700"
-                            color="gray.500"
-                            letterSpacing="0.01em"
-                            lineHeight="1.2"
-                            noOfLines={1}
-                          >
-                            {item[nameKey]}
-                          </Text>
-                          <Text
-                            fontSize="9px"
-                            fontWeight="600"
-                            color="gray.400"
-                            textTransform="uppercase"
-                            letterSpacing="0.05em"
-                          >
-                            Permanent Record
-                          </Text>
-                        </VStack>
-
-                        <Box
-                          px={2}
-                          py={0.5}
-                          bg="gray.50"
-                          borderRadius="full"
-                          borderWidth="1px"
-                          borderColor="gray.100"
-                        >
-                          <Text
-                            fontSize="9px"
-                            fontWeight="800"
-                            color="gray.500"
-                            letterSpacing="0.05em"
-                          >
-                            #{indexOfFirstItem + index + 1}
-                          </Text>
-                        </Box>
-                      </Flex>
-
-                      {/* Structured Data Grid */}
-                      <SimpleGrid columns={2} spacing={4} gap={"10px"} mb={2}>
+                      <SimpleGrid columns={2} spacing={2} gap={"12px"}>
                         {columns
                           .filter(
                             (col) =>
                               col.key !== nameKey &&
+                              col.key !== "reg_no" && // Already in header
                               !col.key.toLowerCase().includes("image") &&
                               !col.key.toLowerCase().includes("photo"),
                           )
-
+                          .slice(0, 4) // Show top 4 fields for cleaner look
                           .map((col, idx) => (
                             <VStack
-                              key={`card-field-saas-${idx}`}
+                              key={`card-field-premium-${idx}`}
                               align="start"
-                              spacing={0}
-                              gap={0}
+                              gap={'4px'}
                             >
                               <Text
-                                fontSize="8px"
+                                fontSize="9px"
                                 fontWeight="800"
                                 color="gray.400"
                                 textTransform="uppercase"
-                                letterSpacing="0.1em"
-                                mb={0.5}
+                                letterSpacing="0.08em"
                               >
                                 {col.header}
                               </Text>
                               <Text
-                                fontSize="11px"
-                                fontWeight="600"
-                                color="gray.600"
+                                fontSize="12px"
+                                fontWeight="700"
+                                color="gray.700"
                                 noOfLines={1}
                                 lineHeight="1.2"
                               >
@@ -593,40 +638,43 @@ const RegistryTable = ({
                       </SimpleGrid>
                     </Box>
 
-                    {/* Compact Action Bar */}
-                    <Box bg="gray.50" px={4} py={1.5}>
+                    {/* Premium Action Bar //////////////////////////////////////////////*/}
+                    <Box
+                      px={5}
+                      py={3}
+                      borderTop="1px solid"
+                      borderColor="gray.50"
+                      bg="gray.50/50"
+                    >
                       <Flex justify="space-between" align="center">
-                        <HStack spacing={1.5}>
+                        <HStack spacing={2}>
                           {extraActions.map((action, idx) => {
                             if (action.showIf && !action.showIf(item))
                               return null;
                             return (
                               <Box
-                                key={`extra-action-compact-${idx}`}
+                                key={`extra-premium-${idx}`}
                                 as="button"
                                 onClick={() => action.onClick(item)}
                                 display="inline-flex"
                                 alignItems="center"
                                 justifyContent="center"
-                                w="24px"
-                                h="24px"
-                                borderRadius="full"
+                                w="30px"
+                                h="30px"
+                                borderRadius="lg"
                                 color={action.color || "gray.600"}
                                 bg="white"
-                                boxShadow="xs"
-                                border="1px solid"
-                                borderColor="gray.100"
+                                boxShadow="sm"
                                 transition="all 0.2s"
                                 _hover={{
-                                  transform: "translateY(-1px)",
+                                  transform: "translateY(-2px)",
                                   color: "white",
                                   bg: action.color || primaryMaroon,
-                                  boxShadow: "sm",
-                                  border: "none",
+                                  boxShadow: "0 4px 10px -2px rgba(0,0,0,0.1)",
                                 }}
                                 title={action.title}
                               >
-                                <Icon as={action.icon} fontSize="12px" />
+                                <Icon as={action.icon} fontSize="14px" />
                               </Box>
                             );
                           })}
@@ -640,80 +688,70 @@ const RegistryTable = ({
                               display="inline-flex"
                               alignItems="center"
                               justifyContent="center"
-                              w="26px"
-                              h="26px"
-                              borderRadius="full"
+                              w="30px"
+                              h="30px"
+                              borderRadius="lg"
                               color="green.500"
                               bg="white"
-                              boxShadow="xs"
-                              border="1px solid"
-                              borderColor="green.50"
+                              boxShadow="sm"
                               transition="all 0.2s"
                               _hover={{
-                                transform: "translateY(-1px)",
+                                transform: "translateY(-2px)",
                                 color: "white",
                                 bg: "green.500",
-                                boxShadow: "0 3px 8px rgba(72, 187, 120, 0.2)",
-                                border: "none",
+                                boxShadow:
+                                  "0 4px 12px rgba(72, 187, 120, 0.25)",
                               }}
                               title="View Details"
                             >
-                              <Icon as={LuEye} fontSize="12px" />
+                              <Icon as={LuEye} fontSize="14px" />
                             </Box>
                           )}
-
                           <Box
                             as="button"
                             onClick={() => handleEdit(item)}
                             display="inline-flex"
                             alignItems="center"
                             justifyContent="center"
-                            w="26px"
-                            h="26px"
-                            borderRadius="full"
+                            w="30px"
+                            h="30px"
+                            borderRadius="lg"
                             color="blue.500"
                             bg="white"
-                            boxShadow="xs"
-                            border="1px solid"
-                            borderColor="blue.50"
+                            boxShadow="sm"
                             transition="all 0.2s"
                             _hover={{
-                              transform: "translateY(-1px)",
+                              transform: "translateY(-2px)",
                               color: "white",
                               bg: "blue.500",
-                              boxShadow: "0 3px 8px rgba(49, 130, 206, 0.2)",
-                              border: "none",
+                              boxShadow: "0 4px 12px rgba(49, 130, 206, 0.25)",
                             }}
                             title="Edit"
                           >
-                            <Icon as={LuPencil} fontSize="12px" />
+                            <Icon as={LuPencil} fontSize="14px" />
                           </Box>
-
                           <Box
                             as="button"
                             onClick={() => handleDelete(item.id)}
                             display="inline-flex"
                             alignItems="center"
                             justifyContent="center"
-                            w="26px"
-                            h="26px"
-                            borderRadius="full"
+                            w="30px"
+                            h="30px"
+                            borderRadius="lg"
                             color="red.500"
                             bg="white"
-                            boxShadow="xs"
-                            border="1px solid"
-                            borderColor="red.50"
+                            boxShadow="sm"
                             transition="all 0.2s"
                             _hover={{
-                              transform: "translateY(-1px)",
+                              transform: "translateY(-2px)",
                               color: "white",
                               bg: "red.500",
-                              boxShadow: "0 3px 8px rgba(229, 62, 62, 0.2)",
-                              border: "none",
+                              boxShadow: "0 4px 12px rgba(229, 62, 62, 0.25)",
                             }}
                             title="Delete"
                           >
-                            <Icon as={LuTrash2} fontSize="12px" />
+                            <Icon as={LuTrash2} fontSize="14px" />
                           </Box>
                         </HStack>
                       </Flex>
