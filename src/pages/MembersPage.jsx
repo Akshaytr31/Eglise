@@ -13,6 +13,7 @@ import {
   updateHead,
   markMemberAsDeceased,
   listFamilyMembers,
+  listMembersByHead,
   promoteToHead,
 } from "../api/registryServices";
 
@@ -142,11 +143,9 @@ const MembersPage = () => {
       onChange: async (checked, fd, setFd, itemData) => {
         if (checked && itemData?.id) {
           try {
-            const familyId = itemData.family?.id || itemData.family;
-            const res = await listFamilyMembers(familyId);
+            const res = await listMembersByHead(itemData.id);
             const members = (res.data || []).filter(
               (m) =>
-                (m.family?.id || m.family) === familyId &&
                 m.id !== itemData.id &&
                 m.is_active !== false &&
                 m.expire !== true,

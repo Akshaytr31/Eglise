@@ -4,6 +4,7 @@ import RegistryTable from "../components/RegistryTable";
 import {
   listMembers,
   listFamilyMembers,
+  listMembersByHead,
   createMember,
   updateMember,
   deleteMember,
@@ -204,15 +205,12 @@ const MemberDetailsPage = () => {
   };
 
   const listFamilyMembersStrict = async () => {
-    const res = await listFamilyMembers(familyId);
+    const res = await listMembersByHead(headId);
     if (res.data && Array.isArray(res.data)) {
       // familyId is always a plain integer now
       const filtered = res.data.filter(
         (m) =>
-          (m.family?.id ?? m.family) === familyId &&
-          m.id !== Number(headId) &&
-          m.is_active !== false &&
-          m.expire !== true,
+          m.id !== Number(headId) && m.is_active !== false && m.expire !== true,
       );
 
       const mapped = filtered.map((m) => {

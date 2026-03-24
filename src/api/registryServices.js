@@ -61,6 +61,8 @@ export const markMemberAsDeceased = (id) =>
   apiClient.post(`/api/registry/members/mark-dead/${id}/`);
 export const promoteToHead = (id) =>
   apiClient.post(`/api/registry/members/promote-head/${id}/`);
+export const listMembersByHead = (headId) =>
+  apiClient.get(`/api/registry/members/by-head/${headId}/`);
 
 // Death Register APIs
 export const listDeaths = (status) => {

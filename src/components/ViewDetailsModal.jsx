@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { listMembersByHead, listRelationships } from "../api/registryServices";
 import {
   Box,
   VStack,
@@ -89,6 +90,42 @@ const DetailField = ({ label, value, icon }) => (
 
 const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
   const primaryMaroon = "var(--primary-maroon)";
+  const [familyMembers, setFamilyMembers] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [relationships, setRelationships] = useState([]);
+
+  useEffect(() => {
+    const fetchRelationships = async () => {
+      try {
+        const res = await listRelationships();
+        setRelationships(res.data || []);
+      } catch (err) {
+        console.error("Error fetching relationships in modal:", err);
+      }
+    };
+    if (isOpen) {
+      fetchRelationships();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const fetchFamilyMembers = async () => {
+      if (isOpen && itemData?.is_family_head && itemData?.id) {
+        setLoadingMembers(true);
+        try {
+          const res = await listMembersByHead(itemData.id);
+          setFamilyMembers(res.data || []);
+        } catch (err) {
+          console.error("Error fetching family members in modal:", err);
+        } finally {
+          setLoadingMembers(false);
+        }
+      } else {
+        setFamilyMembers([]);
+      }
+    };
+    fetchFamilyMembers();
+  }, [isOpen, itemData]);
 
   if (!itemData) return null;
 
@@ -116,6 +153,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
   // Categories mapping
   const personalKeys = [
     "gender",
+    "relationship",
     "dob",
     "blood_group",
     "marital_status",
@@ -161,13 +199,22 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
     return LuInfo;
   };
 
+  const excludedFields = [
+    "id",
+    "created_at",
+    "updated_at",
+    "family_image",
+    "is_deceased",
+    "new_head_id",
+    "mark_as_deceased",
+  ];
+
   const displayFields = Array.isArray(fields)
-    ? fields.map((f) => ({ label: f.label, key: f.name }))
+    ? fields
+        .filter((f) => !excludedFields.includes(f.name))
+        .map((f) => ({ label: f.label, key: f.name }))
     : Object.keys(itemData)
-        .filter(
-          (key) =>
-            !["id", "created_at", "updated_at", "family_image"].includes(key),
-        )
+        .filter((key) => !excludedFields.includes(key))
         .map((key) => ({
           label: key
             .split("_")
@@ -326,6 +373,81 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
 
             {/* Content Sections */}
             <Box px={10} pb={12}>
+              {/* Family Members Section (For Heads) */}
+              {itemData.is_family_head && (
+                <>
+                  <SectionHeader
+                    icon={LuUser}
+                    title="Family Members"
+                    primaryMaroon={primaryMaroon}
+                  />
+                  {loadingMembers ? (
+                    <Text fontSize="xs" color="gray.500">
+                      Loading family members...
+                    </Text>
+                  ) : familyMembers.length > 0 ? (
+                    <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                      {familyMembers.map((member) => (
+                        <Box
+                          key={member.id}
+                          p={3}
+                          borderRadius="xl"
+                          bg="rgba(123, 13, 30, 0.03)"
+                          border="1px solid"
+                          borderColor="rgba(123, 13, 30, 0.1)"
+                        >
+                          <HStack justify="space-between">
+                            <VStack align="start" gap={"1px"}>
+                              <Text
+                                fontSize="sm"
+                                fontWeight="700"
+                                color="gray.800"
+                              >
+                                {member.name}
+                              </Text>
+                              <Text fontSize="xs" color="gray.500">
+                                {(() => {
+                                  const rel = member.relationship;
+                                  if (typeof rel === "object" && rel?.name)
+                                    return rel.name;
+                                  const relId = Number(rel);
+                                  const relObj = relationships.find(
+                                    (r) => Number(r.id) === relId,
+                                  );
+                                  return relObj?.name || "Member";
+                                })()}
+                              </Text>
+                            </VStack>
+                            {member.dob && (
+                              <Box
+                                px={2}
+                                py={1}
+                                bg="white"
+                                borderRadius="md"
+                                boxShadow="xs"
+                              >
+                                <Text
+                                  fontSize="10px"
+                                  fontWeight="800"
+                                  color={primaryMaroon}
+                                >
+                                  {new Date().getFullYear() -
+                                    new Date(member.dob).getFullYear()}{" "}
+                                  YRS
+                                </Text>
+                              </Box>
+                            )}
+                          </HStack>
+                        </Box>
+                      ))}
+                    </SimpleGrid>
+                  ) : (
+                    <Text fontSize="xs" color="gray.500">
+                      No family members found.
+                    </Text>
+                  )}
+                </>
+              )}
               {/* Personal Info Section */}
               {personalFields.length > 0 && (
                 <>
@@ -335,14 +457,20 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                     primaryMaroon={primaryMaroon}
                   />
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    {personalFields.map((f, idx) => (
-                      <DetailField
-                        key={idx}
-                        label={f.label}
-                        value={renderValue(itemData[f.key])}
-                        icon={getIconForKey(f.key)}
-                      />
-                    ))}
+                    {personalFields.map((f, idx) => {
+                      const val =
+                        itemData[`${f.key}_name`] !== undefined
+                          ? itemData[`${f.key}_name`]
+                          : itemData[f.key];
+                      return (
+                        <DetailField
+                          key={idx}
+                          label={f.label}
+                          value={renderValue(val)}
+                          icon={getIconForKey(f.key)}
+                        />
+                      );
+                    })}
                   </SimpleGrid>
                 </>
               )}
@@ -356,14 +484,20 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                     primaryMaroon={primaryMaroon}
                   />
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    {churchFields.map((f, idx) => (
-                      <DetailField
-                        key={idx}
-                        label={f.label}
-                        value={renderValue(itemData[f.key])}
-                        icon={getIconForKey(f.key)}
-                      />
-                    ))}
+                    {churchFields.map((f, idx) => {
+                      const val =
+                        itemData[`${f.key}_name`] !== undefined
+                          ? itemData[`${f.key}_name`]
+                          : itemData[f.key];
+                      return (
+                        <DetailField
+                          key={idx}
+                          label={f.label}
+                          value={renderValue(val)}
+                          icon={getIconForKey(f.key)}
+                        />
+                      );
+                    })}
                   </SimpleGrid>
                 </>
               )}
@@ -377,20 +511,26 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                     primaryMaroon={primaryMaroon}
                   />
                   <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                    {contactFields.map((f, idx) => (
-                      <DetailField
-                        key={idx}
-                        label={f.label}
-                        value={renderValue(itemData[f.key])}
-                        icon={getIconForKey(f.key)}
-                      />
-                    ))}
+                    {contactFields.map((f, idx) => {
+                      const val =
+                        itemData[`${f.key}_name`] !== undefined
+                          ? itemData[`${f.key}_name`]
+                          : itemData[f.key];
+                      return (
+                        <DetailField
+                          key={idx}
+                          label={f.label}
+                          value={renderValue(val)}
+                          icon={getIconForKey(f.key)}
+                        />
+                      );
+                    })}
                   </SimpleGrid>
                 </>
               )}
 
               {/* Remaining Fields (Catch-all) */}
-              {unhandledFields.length > 0 && (
+              {/* {unhandledFields.length > 0 && (
                 <>
                   <SectionHeader
                     icon={LuInfo}
@@ -398,17 +538,23 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                     primaryMaroon={primaryMaroon}
                   />
                   <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    {unhandledFields.map((f, idx) => (
-                      <DetailField
-                        key={idx}
-                        label={f.label}
-                        value={renderValue(itemData[f.key])}
-                        icon={getIconForKey(f.key)}
-                      />
-                    ))}
+                    {unhandledFields.map((f, idx) => {
+                      const val =
+                        itemData[`${f.key}_name`] !== undefined
+                          ? itemData[`${f.key}_name`]
+                          : itemData[f.key];
+                      return (
+                        <DetailField
+                          key={idx}
+                          label={f.label}
+                          value={renderValue(val)}
+                          icon={getIconForKey(f.key)}
+                        />
+                      );
+                    })}
                   </SimpleGrid>
                 </>
-              )}
+              )} */}
             </Box>
           </DialogBody>
 
