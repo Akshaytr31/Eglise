@@ -554,7 +554,12 @@ const RegistryTable = ({
                         );
                         if (!imageCol || !item[imageCol.key]) {
                           return (
-                            <HStack align="start" spacing={0} mb={2} justifyContent="space-between">
+                            <HStack
+                              align="start"
+                              spacing={0}
+                              mb={2}
+                              justifyContent="space-between"
+                            >
                               <Text
                                 fontSize="16px"
                                 fontWeight="600"
@@ -608,12 +613,12 @@ const RegistryTable = ({
                               !col.key.toLowerCase().includes("image") &&
                               !col.key.toLowerCase().includes("photo"),
                           )
-                          .slice(0, 4) // Show top 4 fields for cleaner look
+                          .slice(0, 6) // Show top 6 fields for cleaner look
                           .map((col, idx) => (
                             <VStack
                               key={`card-field-premium-${idx}`}
                               align="start"
-                              gap={'4px'}
+                              gap={"4px"}
                             >
                               <Text
                                 fontSize="9px"

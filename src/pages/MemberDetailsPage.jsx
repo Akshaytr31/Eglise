@@ -234,6 +234,9 @@ const MemberDetailsPage = () => {
   const memberColumns = [
     { header: "Relationship", key: "relationship_name" },
     { header: "Age", key: "age" },
+    { header: "DOB", key: "dob" },
+    { header: "Qualification", key: "educational_qualification" },
+    { header: "Profession", key: "profession" },
   ];
 
   const extraActions = [
