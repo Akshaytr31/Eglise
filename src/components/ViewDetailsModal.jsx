@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { listMembersByHead, listRelationships } from "../api/registryServices";
 import {
   Box,
@@ -30,7 +30,9 @@ import {
   LuGraduationCap,
   LuBriefcase,
   LuHeart,
+  LuPrinter,
 } from "react-icons/lu";
+import { useReactToPrint } from "react-to-print";
 
 const SectionHeader = ({ icon, title, primaryMaroon }) => (
   <HStack spacing={2} mb={4} mt={6} align="center">
@@ -93,6 +95,13 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [relationships, setRelationships] = useState([]);
+  const printRef = useRef(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle:
+      itemData?.name || itemData?.family_name || title || "Details",
+  });
 
   useEffect(() => {
     const fetchRelationships = async () => {
@@ -250,9 +259,9 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
     ...miscKeys,
     imageKey,
   ];
-  const unhandledFields = displayFields.filter(
-    (f) => !handledKeys.includes(f.key),
-  );
+  // const unhandledFields = displayFields.filter(
+  //   (f) => !handledKeys.includes(f.key),
+  // );
 
   return (
     <DialogRoot
@@ -300,237 +309,242 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
               },
             }}
           >
-            {/* Hero Banner Area */}
-            <Box
-              h={profileImage ? "140px" : "100px"}
-              bgGradient={`linear(to-br, ${primaryMaroon}, #9b1b30)`}
-              position="relative"
-              w="full"
-            />
+            <Box ref={printRef} bg="white" w="full">
+              {/* Hero Banner Area */}
+              <Box
+                h={profileImage ? "140px" : "100px"}
+                bgGradient={`linear(to-br, ${primaryMaroon}, #9b1b30)`}
+                position="relative"
+                w="full"
+              />
 
-            {/* Profile Summary Header */}
-            <Flex
-              direction="column"
-              align="center"
-              mt={profileImage ? "-60px" : "-30px"}
-              px={8}
-              pb={6}
-              borderBottom="1px solid"
-              borderColor="gray.50"
-              position="relative"
-            >
-              {profileImage && (
-                <Box
-                  p={1}
-                  bg="white"
-                  borderRadius="3xl"
-                  boxShadow="xl"
-                  position="relative"
-                  mb={4}
-                >
+              {/* Profile Summary Header */}
+              <Flex
+                direction="column"
+                align="center"
+                mt={profileImage ? "-60px" : "-30px"}
+                px={8}
+                pb={6}
+                borderBottom="1px solid"
+                borderColor="gray.50"
+                position="relative"
+              >
+                {profileImage && (
                   <Box
-                    as="img"
-                    src={getFullImageUrl(profileImage)}
-                    w="120px"
-                    h="120px"
-                    borderRadius="2xl"
-                    objectFit="cover"
-                  />
-                </Box>
-              )}
+                    p={1}
+                    bg="white"
+                    borderRadius="3xl"
+                    boxShadow="xl"
+                    position="relative"
+                    mb={4}
+                  >
+                    <Box
+                      as="img"
+                      src={getFullImageUrl(profileImage)}
+                      w="120px"
+                      h="120px"
+                      borderRadius="2xl"
+                      objectFit="cover"
+                    />
+                  </Box>
+                )}
 
-              <VStack mt={profileImage ? 0 : 4} spacing={0} textAlign="center">
-                <Text
-                  fontSize="2xl"
-                  fontWeight="800"
-                  color="gray.800"
-                  letterSpacing="tight"
+                <VStack
+                  mt={profileImage ? 0 : 4}
+                  spacing={0}
+                  textAlign="center"
                 >
-                  {mainName}
-                </Text>
-                <HStack color="gray.500" spacing={2} justify="center">
-                  {itemData.baptismal_name && (
-                    <Text fontSize="sm" fontWeight="600">
-                      {itemData.baptismal_name}
-                    </Text>
-                  )}
-                  {itemData.baptismal_name && itemData.house_name && (
-                    <Text opacity={0.3}>•</Text>
-                  )}
-                  {itemData.house_name && (
-                    <Text
-                      fontSize="xs"
-                      fontWeight="700"
-                      textTransform="uppercase"
-                      letterSpacing="0.05em"
-                    >
-                      {itemData.house_name}
-                    </Text>
-                  )}
-                </HStack>
-              </VStack>
-            </Flex>
+                  <Text
+                    fontSize="2xl"
+                    fontWeight="800"
+                    color="gray.800"
+                    letterSpacing="tight"
+                  >
+                    {mainName}
+                  </Text>
+                  <HStack color="gray.500" spacing={2} justify="center">
+                    {itemData.baptismal_name && (
+                      <Text fontSize="sm" fontWeight="600">
+                        {itemData.baptismal_name}
+                      </Text>
+                    )}
+                    {itemData.baptismal_name && itemData.house_name && (
+                      <Text opacity={0.3}>•</Text>
+                    )}
+                    {itemData.house_name && (
+                      <Text
+                        fontSize="xs"
+                        fontWeight="700"
+                        textTransform="uppercase"
+                        letterSpacing="0.05em"
+                      >
+                        {itemData.house_name}
+                      </Text>
+                    )}
+                  </HStack>
+                </VStack>
+              </Flex>
 
-            {/* Content Sections */}
-            <Box px={10} pb={12}>
-              {/* Family Members Section (For Heads) */}
-              {itemData.is_family_head && (
-                <>
-                  <SectionHeader
-                    icon={LuUser}
-                    title="Family Members"
-                    primaryMaroon={primaryMaroon}
-                  />
-                  {loadingMembers ? (
-                    <Text fontSize="xs" color="gray.500">
-                      Loading family members...
-                    </Text>
-                  ) : familyMembers.length > 0 ? (
-                    <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                      {familyMembers.map((member) => (
-                        <Box
-                          key={member.id}
-                          p={3}
-                          borderRadius="xl"
-                          bg="rgba(123, 13, 30, 0.03)"
-                          border="1px solid"
-                          borderColor="rgba(123, 13, 30, 0.1)"
-                        >
-                          <HStack justify="space-between">
-                            <VStack align="start" gap={"1px"}>
-                              <Text
-                                fontSize="sm"
-                                fontWeight="700"
-                                color="gray.800"
-                              >
-                                {member.name}
-                              </Text>
-                              <Text fontSize="xs" color="gray.500">
-                                {(() => {
-                                  const rel = member.relationship;
-                                  if (typeof rel === "object" && rel?.name)
-                                    return rel.name;
-                                  const relId = Number(rel);
-                                  const relObj = relationships.find(
-                                    (r) => Number(r.id) === relId,
-                                  );
-                                  return relObj?.name || "Member";
-                                })()}
-                              </Text>
-                            </VStack>
-                            {member.dob && (
-                              <Box
-                                px={2}
-                                py={1}
-                                bg="white"
-                                borderRadius="md"
-                                boxShadow="xs"
-                              >
+              {/* Content Sections */}
+              <Box px={10} pb={12}>
+                {/* Family Members Section (For Heads) */}
+                {itemData.is_family_head && (
+                  <>
+                    <SectionHeader
+                      icon={LuUser}
+                      title="Family Members"
+                      primaryMaroon={primaryMaroon}
+                    />
+                    {loadingMembers ? (
+                      <Text fontSize="xs" color="gray.500">
+                        Loading family members...
+                      </Text>
+                    ) : familyMembers.length > 0 ? (
+                      <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                        {familyMembers.map((member) => (
+                          <Box
+                            key={member.id}
+                            p={3}
+                            borderRadius="xl"
+                            bg="rgba(123, 13, 30, 0.03)"
+                            border="1px solid"
+                            borderColor="rgba(123, 13, 30, 0.1)"
+                          >
+                            <HStack justify="space-between">
+                              <VStack align="start" gap={"1px"}>
                                 <Text
-                                  fontSize="10px"
-                                  fontWeight="800"
-                                  color={primaryMaroon}
+                                  fontSize="sm"
+                                  fontWeight="700"
+                                  color="gray.800"
                                 >
-                                  {new Date().getFullYear() -
-                                    new Date(member.dob).getFullYear()}{" "}
-                                  YRS
+                                  {member.name}
                                 </Text>
-                              </Box>
-                            )}
-                          </HStack>
-                        </Box>
-                      ))}
+                                <Text fontSize="xs" color="gray.500">
+                                  {(() => {
+                                    const rel = member.relationship;
+                                    if (typeof rel === "object" && rel?.name)
+                                      return rel.name;
+                                    const relId = Number(rel);
+                                    const relObj = relationships.find(
+                                      (r) => Number(r.id) === relId,
+                                    );
+                                    return relObj?.name || "Member";
+                                  })()}
+                                </Text>
+                              </VStack>
+                              {member.dob && (
+                                <Box
+                                  px={2}
+                                  py={1}
+                                  bg="white"
+                                  borderRadius="md"
+                                  boxShadow="xs"
+                                >
+                                  <Text
+                                    fontSize="10px"
+                                    fontWeight="800"
+                                    color={primaryMaroon}
+                                  >
+                                    {new Date().getFullYear() -
+                                      new Date(member.dob).getFullYear()}{" "}
+                                    YRS
+                                  </Text>
+                                </Box>
+                              )}
+                            </HStack>
+                          </Box>
+                        ))}
+                      </SimpleGrid>
+                    ) : (
+                      <Text fontSize="xs" color="gray.500">
+                        No family members found.
+                      </Text>
+                    )}
+                  </>
+                )}
+                {/* Personal Info Section */}
+                {personalFields.length > 0 && (
+                  <>
+                    <SectionHeader
+                      icon={LuUser}
+                      title="Personal Information"
+                      primaryMaroon={primaryMaroon}
+                    />
+                    <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                      {personalFields.map((f, idx) => {
+                        const val =
+                          itemData[`${f.key}_name`] !== undefined
+                            ? itemData[`${f.key}_name`]
+                            : itemData[f.key];
+                        return (
+                          <DetailField
+                            key={idx}
+                            label={f.label}
+                            value={renderValue(val)}
+                            icon={getIconForKey(f.key)}
+                          />
+                        );
+                      })}
                     </SimpleGrid>
-                  ) : (
-                    <Text fontSize="xs" color="gray.500">
-                      No family members found.
-                    </Text>
-                  )}
-                </>
-              )}
-              {/* Personal Info Section */}
-              {personalFields.length > 0 && (
-                <>
-                  <SectionHeader
-                    icon={LuUser}
-                    title="Personal Information"
-                    primaryMaroon={primaryMaroon}
-                  />
-                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    {personalFields.map((f, idx) => {
-                      const val =
-                        itemData[`${f.key}_name`] !== undefined
-                          ? itemData[`${f.key}_name`]
-                          : itemData[f.key];
-                      return (
-                        <DetailField
-                          key={idx}
-                          label={f.label}
-                          value={renderValue(val)}
-                          icon={getIconForKey(f.key)}
-                        />
-                      );
-                    })}
-                  </SimpleGrid>
-                </>
-              )}
+                  </>
+                )}
 
-              {/* Church Info Section */}
-              {churchFields.length > 0 && (
-                <>
-                  <SectionHeader
-                    icon={LuChurch}
-                    title="Church & Parish Data"
-                    primaryMaroon={primaryMaroon}
-                  />
-                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                    {churchFields.map((f, idx) => {
-                      const val =
-                        itemData[`${f.key}_name`] !== undefined
-                          ? itemData[`${f.key}_name`]
-                          : itemData[f.key];
-                      return (
-                        <DetailField
-                          key={idx}
-                          label={f.label}
-                          value={renderValue(val)}
-                          icon={getIconForKey(f.key)}
-                        />
-                      );
-                    })}
-                  </SimpleGrid>
-                </>
-              )}
+                {/* Church Info Section */}
+                {churchFields.length > 0 && (
+                  <>
+                    <SectionHeader
+                      icon={LuChurch}
+                      title="Church & Parish Data"
+                      primaryMaroon={primaryMaroon}
+                    />
+                    <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                      {churchFields.map((f, idx) => {
+                        const val =
+                          itemData[`${f.key}_name`] !== undefined
+                            ? itemData[`${f.key}_name`]
+                            : itemData[f.key];
+                        return (
+                          <DetailField
+                            key={idx}
+                            label={f.label}
+                            value={renderValue(val)}
+                            icon={getIconForKey(f.key)}
+                          />
+                        );
+                      })}
+                    </SimpleGrid>
+                  </>
+                )}
 
-              {/* Contact Info Section */}
-              {contactFields.length > 0 && (
-                <>
-                  <SectionHeader
-                    icon={LuMail}
-                    title="Contact Details"
-                    primaryMaroon={primaryMaroon}
-                  />
-                  <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                    {contactFields.map((f, idx) => {
-                      const val =
-                        itemData[`${f.key}_name`] !== undefined
-                          ? itemData[`${f.key}_name`]
-                          : itemData[f.key];
-                      return (
-                        <DetailField
-                          key={idx}
-                          label={f.label}
-                          value={renderValue(val)}
-                          icon={getIconForKey(f.key)}
-                        />
-                      );
-                    })}
-                  </SimpleGrid>
-                </>
-              )}
+                {/* Contact Info Section */}
+                {contactFields.length > 0 && (
+                  <>
+                    <SectionHeader
+                      icon={LuMail}
+                      title="Contact Details"
+                      primaryMaroon={primaryMaroon}
+                    />
+                    <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                      {contactFields.map((f, idx) => {
+                        const val =
+                          itemData[`${f.key}_name`] !== undefined
+                            ? itemData[`${f.key}_name`]
+                            : itemData[f.key];
+                        return (
+                          <DetailField
+                            key={idx}
+                            label={f.label}
+                            value={renderValue(val)}
+                            icon={getIconForKey(f.key)}
+                          />
+                        );
+                      })}
+                    </SimpleGrid>
+                  </>
+                )}
 
-              {/* Remaining Fields (Catch-all) */}
-              {/* {unhandledFields.length > 0 && (
+                {/* Remaining Fields (Catch-all) */}
+                {/* {unhandledFields.length > 0 && (
                 <>
                   <SectionHeader
                     icon={LuInfo}
@@ -555,6 +569,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                   </SimpleGrid>
                 </>
               )} */}
+              </Box>
             </Box>
           </DialogBody>
 
@@ -565,25 +580,47 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
             borderColor="gray.100"
             justifyContent="center"
           >
-            <Button
-              onClick={onClose}
-              bg={primaryMaroon}
-              color="white"
-              borderRadius="xl"
-              h="45px"
-              px={12}
-              fontSize="md"
-              fontWeight="bold"
-              _hover={{
-                bg: "#6b0f1a",
-                transform: "translateY(-1px)",
-                boxShadow: "lg",
-              }}
-              _active={{ transform: "translateY(0)" }}
-              transition="all 0.2s"
-            >
-              Done Viewing
-            </Button>
+            <HStack spacing={4}>
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                color={primaryMaroon}
+                borderColor={primaryMaroon}
+                borderRadius="xl"
+                h="45px"
+                px={8}
+                fontSize="md"
+                fontWeight="bold"
+                _hover={{
+                  bg: "rgba(123, 13, 30, 0.05)",
+                  transform: "translateY(-1px)",
+                }}
+                _active={{ transform: "translateY(0)" }}
+                transition="all 0.2s"
+              >
+                <Icon as={LuPrinter} mr={2} />
+                Print Details
+              </Button>
+              <Button
+                onClick={onClose}
+                bg={primaryMaroon}
+                color="white"
+                borderRadius="xl"
+                h="45px"
+                px={8}
+                fontSize="md"
+                fontWeight="bold"
+                _hover={{
+                  bg: "#6b0f1a",
+                  transform: "translateY(-1px)",
+                  boxShadow: "lg",
+                }}
+                _active={{ transform: "translateY(0)" }}
+                transition="all 0.2s"
+              >
+                Done Viewing
+              </Button>
+            </HStack>
           </DialogFooter>
         </DialogContent>
       </DialogPositioner>
