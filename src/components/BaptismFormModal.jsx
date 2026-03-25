@@ -30,6 +30,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
 
   const [formData, setFormData] = useState({});
   const [focusedField, setFocusedField] = useState(null);
+  const [errors, setErrors] = useState({});
 
   // Options states
   const [families, setFamilies] = useState([]);
@@ -111,10 +112,59 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error for this field
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validation
+    const requiredFields = [
+      "baptism_category",
+      "date_of_baptism",
+      "place_of_birth",
+      "name",
+      "gender",
+      "dob",
+      "father_name",
+      "mother_name",
+    ];
+    if (formData.baptism_category === "PARISH") {
+      requiredFields.push("family", "main_member", "relation_with_main_member");
+    }
+
+    const newErrors = {};
+    requiredFields.forEach((field) => {
+      const val = formData[field];
+      if (
+        val === undefined ||
+        val === null ||
+        val === "" ||
+        (Array.isArray(val) && val.length === 0)
+      ) {
+        newErrors[field] = true;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      // Focus the first invalid field
+      const firstErrorField = requiredFields.find((f) => newErrors[f]);
+      if (firstErrorField) {
+        const element = document.getElementsByName(firstErrorField)[0];
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+      return;
+    }
 
     // Process and coerce
     const submissionData = { ...formData };
@@ -180,6 +230,7 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
     type = "text",
     options = null,
     fullWidth = false,
+    required = false,
   ) => {
     const hasValue = String(formData[name] || "").length > 0;
     const isFocused = focusedField === name;
@@ -213,6 +264,11 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
           letterSpacing="0.3px"
         >
           {label}
+          {required && (
+            <Text as="span" color="red.500" ml={1}>
+              *
+            </Text>
+          )}
         </Text>
 
         {type === "select" ? (
@@ -223,16 +279,29 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
             onChange={handleChange}
             onFocus={() => setFocusedField(name)}
             onBlur={() => setFocusedField(null)}
+            required={required}
             style={{
               width: "100%",
               height: "38px",
               borderRadius: "8px",
-              borderColor: "var(--chakra-colors-gray-200)",
               borderWidth: "1px",
+              borderColor: errors[name]
+                ? "var(--chakra-colors-red-500)"
+                : "var(--chakra-colors-gray-200)",
               fontSize: "var(--chakra-fontSizes-sm)",
               paddingLeft: "12px",
-              appearance: "none",
+              paddingRight: "30px",
+              display: "flex",
+              alignItems: "center",
               background: "white",
+              cursor: "pointer",
+              position: "relative",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              boxShadow: errors[name]
+                ? "0 0 0 1px var(--chakra-colors-red-500)"
+                : "none",
             }}
           >
             <option value="">Select {label}</option>
@@ -266,10 +335,13 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
             type={type}
             value={formData[name] || ""}
             onChange={handleChange}
-            onFocus={() => setFocusedField(name)}
             onBlur={() => setFocusedField(null)}
+            required={required}
             borderRadius="8px"
-            borderColor="gray.200"
+            borderColor={errors[name] ? "red.500" : "gray.200"}
+            boxShadow={
+              errors[name] ? "0 0 0 1px var(--chakra-colors-red-500)" : "none"
+            }
             h="38px"
             fontSize="sm"
             _focus={{
@@ -359,27 +431,69 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
               }}
             >
               <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-                {renderField("baptism_category", "Baptism Category", "select", [
-                  { value: "PARISH", label: "Parish" },
-                  { value: "OTHER", label: "Other" },
-                ])}
-                {renderField("date_of_baptism", "Date of Baptism", "date")}
-                {renderField("place_of_birth", "Place of Birth")}
-                {renderField("name", "Name")}
+                {renderField(
+                  "baptism_category",
+                  "Baptism Category",
+                  "select",
+                  [
+                    { value: "PARISH", label: "Parish" },
+                    { value: "OTHER", label: "Other" },
+                  ],
+                  false,
+                  true,
+                )}
+                {renderField(
+                  "date_of_baptism",
+                  "Date of Baptism",
+                  "date",
+                  null,
+                  false,
+                  true,
+                )}
+                {renderField(
+                  "place_of_birth",
+                  "Place of Birth",
+                  "text",
+                  null,
+                  false,
+                  true,
+                )}
+                {renderField("name", "Name", "text", null, false, true)}
                 {renderField("baptismal_name", "Baptismal Name")}
-                {renderField("gender", "Gender", "select", [
-                  { value: "MALE", label: "Male" },
-                  { value: "FEMALE", label: "Female" },
-                  { value: "OTHER", label: "Other" },
-                ])}
-                {renderField("dob", "Date of Birth", "date")}
+                {renderField(
+                  "gender",
+                  "Gender",
+                  "select",
+                  [
+                    { value: "MALE", label: "Male" },
+                    { value: "FEMALE", label: "Female" },
+                    { value: "OTHER", label: "Other" },
+                  ],
+                  false,
+                  true,
+                )}
+                {renderField("dob", "Date of Birth", "date", null, false, true)}
                 {renderField("parish_of_baptism", "Parish of Baptism")}
                 {renderField("priest_name", "Priest Name")}
                 {renderField("panchayath", "Panchayath")}
                 {renderField("god_father", "God Father")}
                 {renderField("god_mother", "God Mother")}
-                {renderField("father_name", "Father Name")}
-                {renderField("mother_name", "Mother Name")}
+                {renderField(
+                  "father_name",
+                  "Father Name",
+                  "text",
+                  null,
+                  false,
+                  true,
+                )}
+                {renderField(
+                  "mother_name",
+                  "Mother Name",
+                  "text",
+                  null,
+                  false,
+                  true,
+                )}
 
                 {isParish && (
                   <>
@@ -405,12 +519,16 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                         value: f.id,
                         label: `${f.family_name} (${f.reg_no || f.id})`,
                       })),
+                      false,
+                      true,
                     )}
                     {renderField(
                       "main_member",
                       "Main Member",
                       "select",
                       members.map((m) => ({ value: m.id, label: m.name })),
+                      false,
+                      true,
                     )}
                     {renderField(
                       "relation_with_main_member",
@@ -420,6 +538,8 @@ const BaptismFormModal = ({ isOpen, onClose, onSave, itemData, isLoading }) => {
                         value: r.id,
                         label: r.name,
                       })),
+                      false,
+                      true,
                     )}
                   </>
                 )}

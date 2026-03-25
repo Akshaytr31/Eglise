@@ -86,7 +86,7 @@ const ChangePasswordPage = () => {
     <Box bg={white} minH="100vh" display="flex" flexDirection="column">
       <Navbar />
 
-      <Flex flex="1" align="center" justify="center"  >
+      <Flex flex="1" align="center" justify="center">
         <Box
           maxW="450px"
           w="full"
@@ -159,6 +159,9 @@ const ChangePasswordPage = () => {
                 <Field.Root w="full">
                   <Field.Label fontWeight="600" mb={1} fontSize="sm">
                     Current Password
+                    <Text as="span" color="red.500" ml={1}>
+                      *
+                    </Text>
                   </Field.Label>
                   <Input
                     type="password"
@@ -175,6 +178,9 @@ const ChangePasswordPage = () => {
                 <Field.Root w="full">
                   <Field.Label fontWeight="600" mb={1} fontSize="sm">
                     New Password
+                    <Text as="span" color="red.500" ml={1}>
+                      *
+                    </Text>
                   </Field.Label>
                   <Input
                     type="password"
@@ -191,6 +197,9 @@ const ChangePasswordPage = () => {
                 <Field.Root w="full">
                   <Field.Label fontWeight="600" mb={1} fontSize="sm">
                     Confirm New Password
+                    <Text as="span" color="red.500" ml={1}>
+                      *
+                    </Text>
                   </Field.Label>
                   <Input
                     type="password"

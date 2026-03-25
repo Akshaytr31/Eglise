@@ -60,6 +60,7 @@ const GenericFormModal = ({
 
   const [formData, setFormData] = useState({});
   const [focusedField, setFocusedField] = useState(null);
+  const [errors, setErrors] = useState({});
   const [previews, setPreviews] = useState({});
   const [openSelect, setOpenSelect] = useState(null);
   const [selectSearch, setSelectSearch] = useState("");
@@ -124,6 +125,7 @@ const GenericFormModal = ({
       setFormData(buildEmpty());
       setPreviews({});
     }
+    setErrors({}); // Clear errors when modal opens or itemData changes
   }, [itemData, isOpen]);
 
   const handleChange = (e) => {
@@ -140,6 +142,13 @@ const GenericFormModal = ({
       }
 
       return updated;
+    });
+
+    // Clear error for this field if it was previously set
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
     });
   };
 
@@ -189,6 +198,36 @@ const GenericFormModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validation
+    const newErrors = {};
+    activeFields.forEach((f) => {
+      if (f.required) {
+        const val = formData[f.name];
+        if (
+          val === undefined ||
+          val === null ||
+          val === "" ||
+          (Array.isArray(val) && val.length === 0)
+        ) {
+          newErrors[f.name] = true;
+        }
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      // Focus the first invalid field
+      const firstErrorField = activeFields.find((f) => newErrors[f.name]);
+      if (firstErrorField) {
+        const element = document.getElementsByName(firstErrorField.name)[0];
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+      return;
+    }
 
     const hasFile = activeFields.some(
       (f) =>
@@ -242,10 +281,18 @@ const GenericFormModal = ({
     }
   };
 
-  const fieldFocus = {
-    borderColor: primaryMaroon,
-    boxShadow: `0 0 0 1px ${primaryMaroon}`,
-  };
+  const getFieldStyles = (fieldName) => ({
+    borderColor: errors[fieldName]
+      ? "red.500"
+      : focusedField === fieldName
+        ? primaryMaroon
+        : "gray.200",
+    boxShadow: errors[fieldName]
+      ? "0 0 0 1px red.500"
+      : focusedField === fieldName
+        ? `0 0 0 1px ${primaryMaroon}`
+        : "none",
+  });
 
   return (
     <DialogRoot
@@ -368,6 +415,11 @@ const GenericFormModal = ({
                           letterSpacing="0.3px"
                         >
                           {f.label}
+                          {f.required && (
+                            <Text as="span" color="red.500" ml={1}>
+                              *
+                            </Text>
+                          )}
                         </Text>
                       )}
 
@@ -545,44 +597,53 @@ const GenericFormModal = ({
                       ) : f.type === "textarea" ? (
                         <Textarea
                           name={f.name}
-                          value={formData[f.name]}
+                          value={formData[f.name] || ""}
                           onChange={handleChange}
                           onFocus={() => setFocusedField(f.name)}
                           onBlur={() => setFocusedField(null)}
                           required={f.required}
                           disabled={isEditing && f.disabledOnEdit}
                           rows={f.rows || 3}
-                          borderRadius="8px"
-                          borderColor="gray.200"
+                          borderRadius="lg"
                           fontSize="sm"
                           pt={3}
-                          _focus={{
-                            borderColor: primaryMaroon,
-                            boxShadow: "none",
-                            borderWidth: "1px",
-                          }}
+                          {...getFieldStyles(f.name)}
                         />
                       ) : f.type === "select" ? (
                         <Box position="relative">
                           <Box
-                            onClick={(e) => {
-                              if (isEditing && f.disabledOnEdit) return;
-                              e.stopPropagation();
-                              setOpenSelect(
-                                openSelect === f.name ? null : f.name,
-                              );
+                            name={f.name}
+                            onClick={() => {
+                              if (!isEditing || !f.disabledOnEdit) {
+                                setOpenSelect(
+                                  openSelect === f.name ? null : f.name,
+                                );
+                              }
                             }}
                             onFocus={() => {
                               if (!(isEditing && f.disabledOnEdit))
                                 setFocusedField(f.name);
                             }}
                             onBlur={() => setFocusedField(null)}
-                            tabIndex={isEditing && f.disabledOnEdit ? -1 : 0}
+                            ref={(el) => {
+                              if (el) {
+                                // Add a focus method to the Box so it can be focused like an input
+                                el.focus = () => setOpenSelect(f.name);
+                              }
+                            }}
+                            tabIndex={!isEditing || !f.disabledOnEdit ? 0 : -1}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setOpenSelect(
+                                  openSelect === f.name ? null : f.name,
+                                );
+                              }
+                            }}
                             style={{
                               width: "100%",
                               height: "38px",
                               borderRadius: "8px",
-                              borderColor: "var(--chakra-colors-gray-200)",
                               borderWidth: "1px",
                               fontSize: "var(--chakra-fontSizes-sm)",
                               paddingLeft: "12px",
@@ -603,6 +664,7 @@ const GenericFormModal = ({
                               whiteSpace: "nowrap",
                               opacity: isEditing && f.disabledOnEdit ? 0.6 : 1,
                             }}
+                            {...getFieldStyles(f.name)}
                           >
                             <Text noOfLines={1} fontSize="sm">
                               {(() => {
@@ -805,7 +867,14 @@ const GenericFormModal = ({
                               width: "18px",
                               height: "18px",
                               cursor: "pointer",
-                              accentColor: primaryMaroon,
+                              accentColor: errors[f.name]
+                                ? "red"
+                                : primaryMaroon,
+                              outline: errors[f.name]
+                                ? "2px solid red"
+                                : "none",
+                              outlineOffset: "2px",
+                              borderRadius: "2px",
                             }}
                           />
                           <Text
@@ -818,6 +887,11 @@ const GenericFormModal = ({
                             userSelect="none"
                           >
                             {f.label}
+                            {f.required && (
+                              <Text as="span" color="red.500" ml={1}>
+                                *
+                              </Text>
+                            )}
                           </Text>
                         </Flex>
                       ) : (
@@ -839,18 +913,12 @@ const GenericFormModal = ({
                           }}
                           onFocus={() => setFocusedField(f.name)}
                           onBlur={() => setFocusedField(null)}
-                          required={f.required}
                           disabled={isEditing && f.disabledOnEdit}
+                          {...getFieldStyles(f.name)}
                           borderRadius="8px"
-                          borderColor="gray.200"
                           h="38px"
                           fontSize="sm"
                           pt={f.type === "file" ? "10px" : "auto"}
-                          _focus={{
-                            borderColor: primaryMaroon,
-                            boxShadow: "none",
-                            borderWidth: "1px",
-                          }}
                         />
                       )}
                     </Box>

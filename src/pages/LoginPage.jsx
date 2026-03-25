@@ -399,6 +399,9 @@ const LoginPage = () => {
                               mb={1.5}
                             >
                               Email Address
+                              <Text as="span" color="red.500" ml={1}>
+                                *
+                              </Text>
                             </Field.Label>
                             <Box position="relative" w="full">
                               <Box
@@ -511,6 +514,9 @@ const LoginPage = () => {
                           <Field.Root w="full">
                             <Field.Label fontWeight="bold" mb={1}>
                               Password
+                              <Text as="span" color="red.500" ml={1}>
+                                *
+                              </Text>
                             </Field.Label>
                             <Box position="relative" width="full">
                               <Input
@@ -721,7 +727,12 @@ const LoginPage = () => {
                           </Text>
 
                           <Field.Root w="full">
-                            <Field.Label fontWeight="bold">OTP</Field.Label>
+                            <Field.Label fontWeight="bold">
+                              OTP
+                              <Text as="span" color="red.500" ml={1}>
+                                *
+                              </Text>
+                            </Field.Label>
                             <Input
                               type="text"
                               value={otp}
@@ -737,6 +748,9 @@ const LoginPage = () => {
                           <Field.Root w="full">
                             <Field.Label fontWeight="bold">
                               New Password
+                              <Text as="span" color="red.500" ml={1}>
+                                *
+                              </Text>
                             </Field.Label>
                             <Box position="relative">
                               <Input
@@ -781,6 +795,9 @@ const LoginPage = () => {
                           <Field.Root w="full">
                             <Field.Label fontWeight="bold">
                               Confirm Password
+                              <Text as="span" color="red.500" ml={1}>
+                                *
+                              </Text>
                             </Field.Label>
                             <Box position="relative">
                               <Input
