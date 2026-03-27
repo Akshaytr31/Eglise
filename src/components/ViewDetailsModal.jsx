@@ -35,12 +35,19 @@ import {
 import { useReactToPrint } from "react-to-print";
 
 const SectionHeader = ({ icon, title, primaryMaroon }) => (
-  <HStack spacing={2} mb={4} mt={6} align="center">
+  <HStack
+    spacing={2}
+    mb={4}
+    mt={6}
+    align="center"
+    className="print-section-header"
+  >
     <Box
       p={1.5}
       bg="rgba(123, 13, 30, 0.08)"
       borderRadius="lg"
       color={primaryMaroon}
+      className="print-header-icon"
     >
       <Icon as={icon} fontSize="16px" />
     </Box>
@@ -53,7 +60,7 @@ const SectionHeader = ({ icon, title, primaryMaroon }) => (
     >
       {title}
     </Text>
-    <Separator flex="1" borderColor="gray.100" />
+    <Separator flex="1" borderColor="gray.100" className="print-separator" />
   </HStack>
 );
 
@@ -66,6 +73,7 @@ const DetailField = ({ label, value, icon }) => (
     bg="gray.50"
     border="1px solid"
     borderColor="gray.100"
+    className="print-detail-field"
     transition="all 0.2s"
     _hover={{
       bg: "white",
@@ -84,7 +92,13 @@ const DetailField = ({ label, value, icon }) => (
         {label}
       </Text>
     </HStack>
-    <Text fontSize="sm" fontWeight="600" color="gray.700" noOfLines={2}>
+    <Text
+      fontSize="sm"
+      fontWeight="600"
+      color="gray.700"
+      noOfLines={2}
+      className="print-detail-value"
+    >
       {value}
     </Text>
   </VStack>
@@ -101,6 +115,84 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
     contentRef: printRef,
     documentTitle:
       itemData?.name || itemData?.family_name || title || "Details",
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 10mm;
+      }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          background: white !important;
+        }
+        .print-container {
+          padding: 0 !important;
+          margin: 0 !important;
+          box-shadow: none !important;
+        }
+        .print-hero {
+          height: 60px !important;
+        }
+        .print-profile-summary {
+          margin-top: -30px !important;
+          padding-bottom: 15px !important;
+          border-bottom: 1px solid #eee !important;
+        }
+        .print-profile-img-box {
+          width: 80px !important;
+          height: 80px !important;
+          margin-bottom: 5px !important;
+          border-radius: 12px !important;
+        }
+        .print-profile-img {
+          width: 80px !important;
+          height: 80px !important;
+          border-radius: 10px !important;
+        }
+        .print-content-area {
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+        }
+        .print-section-header {
+          margin-top: 25px !important;
+          margin-bottom: 12px !important;
+          border-bottom: 2px solid #ae2050 !important;
+          padding-bottom: 5px !important;
+        }
+        .print-header-icon {
+          display: none !important;
+        }
+        .print-separator {
+          display: none !important;
+        }
+        .print-detail-field {
+          padding: 4px 10px !important;
+          border-radius: 6px !important;
+          background-color: transparent !important;
+          border: 1px solid #f0f0f0 !important;
+        }
+        .print-detail-value {
+          font-size: 11px !important;
+        }
+        .print-info-grid {
+          display: grid !important;
+          grid-template-columns: repeat(3, 1fr) !important;
+          gap: 12px !important;
+        }
+        .print-family-grid {
+          gap: 12px !important;
+          display: grid !important;
+          grid-template-columns: repeat(3, 1fr) !important;
+        }
+        .print-family-member {
+          padding: 6px 10px !important;
+          background-color: transparent !important;
+          border: 1px solid #f0f0f0 !important;
+        }
+      }
+    `,
   });
 
   useEffect(() => {
@@ -309,13 +401,14 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
               },
             }}
           >
-            <Box ref={printRef} bg="white" w="full">
+            <Box ref={printRef} bg="white" w="full" className="print-container">
               {/* Hero Banner Area */}
               <Box
                 h={profileImage ? "140px" : "100px"}
                 bgGradient={`linear(to-br, ${primaryMaroon}, #9b1b30)`}
                 position="relative"
                 w="full"
+                className="print-hero"
               />
 
               {/* Profile Summary Header */}
@@ -328,6 +421,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                 borderBottom="1px solid"
                 borderColor="gray.50"
                 position="relative"
+                className="print-profile-summary"
               >
                 {profileImage && (
                   <Box
@@ -337,6 +431,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                     boxShadow="xl"
                     position="relative"
                     mb={4}
+                    className="print-profile-img-box"
                   >
                     <Box
                       as="img"
@@ -345,6 +440,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                       h="120px"
                       borderRadius="2xl"
                       objectFit="cover"
+                      className="print-profile-img"
                     />
                   </Box>
                 )}
@@ -386,7 +482,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
               </Flex>
 
               {/* Content Sections */}
-              <Box px={10} pb={12}>
+              <Box px={10} pb={12} className="print-content-area">
                 {/* Family Members Section (For Heads) */}
                 {itemData.is_family_head && (
                   <>
@@ -400,7 +496,11 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                         Loading family members...
                       </Text>
                     ) : familyMembers.length > 0 ? (
-                      <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                      <SimpleGrid
+                        columns={{ base: 1, md: 2 }}
+                        gap={4}
+                        className="print-family-grid"
+                      >
                         {familyMembers.map((member) => (
                           <Box
                             key={member.id}
@@ -409,6 +509,7 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                             bg="rgba(123, 13, 30, 0.03)"
                             border="1px solid"
                             borderColor="rgba(123, 13, 30, 0.1)"
+                            className="print-family-member"
                           >
                             <HStack justify="space-between">
                               <VStack align="start" gap={"1px"}>
@@ -470,7 +571,11 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                       title="Personal Information"
                       primaryMaroon={primaryMaroon}
                     />
-                    <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    <SimpleGrid
+                      columns={{ base: 1, md: 3 }}
+                      gap={4}
+                      className="print-info-grid"
+                    >
                       {personalFields.map((f, idx) => {
                         const val =
                           itemData[`${f.key}_name`] !== undefined
@@ -497,7 +602,11 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                       title="Church & Parish Data"
                       primaryMaroon={primaryMaroon}
                     />
-                    <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    <SimpleGrid
+                      columns={{ base: 1, md: 3 }}
+                      gap={4}
+                      className="print-info-grid"
+                    >
                       {churchFields.map((f, idx) => {
                         const val =
                           itemData[`${f.key}_name`] !== undefined
@@ -524,7 +633,11 @@ const ViewDetailsModal = ({ isOpen, onClose, itemData, title, fields }) => {
                       title="Contact Details"
                       primaryMaroon={primaryMaroon}
                     />
-                    <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                    <SimpleGrid
+                      columns={{ base: 1, md: 2 }}
+                      gap={4}
+                      className="print-info-grid"
+                    >
                       {contactFields.map((f, idx) => {
                         const val =
                           itemData[`${f.key}_name`] !== undefined
